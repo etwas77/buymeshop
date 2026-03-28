@@ -1,0 +1,27 @@
+{"properties": [
+  {
+    "name": "api.prefix",
+    "type": "java.lang.String",
+    "description": "A description for 'api.prefix'"
+  },
+  {
+    "name": "auth.token.access-expiration-in-mils",
+    "type": "java.lang.String",
+    "description": "A description for 'auth.token.access-expiration-in-mils'"
+  },
+  {
+    "name": "auth.token.refresh-expiration-in-mils",
+    "type": "java.lang.String",
+    "description": "A description for 'auth.token.refresh-expiration-in-mils'"
+  },
+  {
+    "name": "auth.token.secret",
+    "type": "java.lang.String",
+    "description": "A description for 'auth.token.secret'"
+  },
+  {
+    "name": "app.use-secure-cookie",
+    "type": "java.lang.Boolean",
+    "description": "Enable secure cookies (HTTPS only, SameSite=None)"
+  }
+]}

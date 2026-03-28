@@ -1,0 +1,23 @@
+import { api } from "./api";
+
+export const getDistinctProductsByName = async () => {
+    try {
+        const response = await api.get("/products/distinct");
+        return response.data;
+    }   
+    catch (error) {        
+        console.log("Error fetching distinct products:", error);
+        throw error;
+    }   
+};
+
+export const getProductsByCategory = async (category: string) => {
+    try {
+        const response = await api.post("/products/category", {name: category});
+        return response.data;
+    }   
+    catch (error) {
+        console.log("Error fetching products by category ", error);
+        throw error;
+    }   
+};
