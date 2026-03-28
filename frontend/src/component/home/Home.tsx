@@ -104,7 +104,7 @@ const Home = () => {
                                 <p className={product.inventory > 0 ? "text-success" : "text-failure"}>
                                     {product.inventory > 0 ? "In stock " + product.inventory : "Out of stock"}
                                 </p>
-                                <Link to={"/products/" + product.name} className="shop-now-button">Shop Now</Link>
+                                <Link to={"/products/" + product.name} className="shop-now-button">add to cart</Link>
                                 <p className="product-name">{product.name}</p>
                                 <p className="product-description">{product.description}</p>
                             </Card.Body>
