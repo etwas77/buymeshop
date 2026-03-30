@@ -20,7 +20,7 @@ const Hero = () => {
             <HeroSlider currentSlide={currentSlide} />
             <div className="hero-content">
                 <h1>Welcome to <span className="text-primary">BuyMeShop-le</span></h1>
-                <SearchBar value={searchQuery} onChange={onChange} onClear={() => dispatch(setSearchQuery(''))} />
+                <SearchBar value={searchQuery} onChange={onChange} />
                 <div className="home-button-container">
                     <a href="#shop" className="home-shop-button link">Shop Now</a>
                     <button className="deals-button">today's deal</button>

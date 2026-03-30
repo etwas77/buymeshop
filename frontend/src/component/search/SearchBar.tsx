@@ -1,19 +1,18 @@
 import _ from "lodash";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllCategories } from "../../store/features/categorySlice";
-import type { AppDispatch } from "../../store/store";
 import { CategoryDto } from "../../dtos/CategoryDto";
-import { setSelectedCategory } from "../../store/features/searchSlice";
+import { getAllCategories } from "../../store/features/categorySlice";
+import { clearFilter, setSelectedCategory } from "../../store/features/searchSlice";
+import type { AppDispatch } from "../../store/store";
 
 export interface SearchBarProps {
     value: string;
     onChange: (value: string) => void;
-    onClear?: () => void;
 }
 
 const SearchBar = (p: SearchBarProps) => {
-    const { value, onChange, onClear } = p;
+    const { value, onChange } = p;
     const { categories } = useSelector((state: any) => state.category);
     const dispatch = useDispatch<AppDispatch>();
     const [category, setCategory] = React.useState<CategoryDto | undefined>(undefined);
@@ -29,11 +28,8 @@ const SearchBar = (p: SearchBarProps) => {
     }, [categories, dispatch]);
 
     const onClearFilter = React.useCallback(() => {
-        setCategory(undefined);
-        dispatch(setSelectedCategory("All Categories"));
-        if(onClear) 
-            onClear();
-    }, [onClear, dispatch]);
+        dispatch(clearFilter());
+    }, [dispatch]);
 
     return (
         <div className="search-bar input-group input-group-sm ">

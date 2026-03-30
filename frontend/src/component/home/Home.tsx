@@ -19,22 +19,10 @@ const Home = () => {
     const [products, setProducts] = React.useState<ProductDto[]>([]);
     const [showProducts, setShowProducts] = React.useState<ProductDto[]>([]);
     const [error, setError] = React.useState<string | null>(null);
-    const { searchQuery, selectedCategory } = useSelector((state: any) => state.search);    
+    const { searchQuery, selectedCategory } = useSelector((state: any) => state.search);
 
     if (error)
         console.log('error', error);
-
-    React.useEffect(() => {
-        if (searchQuery.length > 0) {
-            const filtered = products.filter(product =>
-                product.name.toLowerCase().includes(searchQuery.toLowerCase())
-            );
-            setFilteredProducts(filtered);
-        }
-        else {
-            setFilteredProducts(products);
-        }
-    }, [searchQuery, products]);
 
     const itemsPerPage = products.length > ITEMS_PER_PAGE ? ITEMS_PER_PAGE : products.length;
     const totalItems = products.length;
@@ -66,7 +54,7 @@ const Home = () => {
             }
         };
 
-        if(selectedCategory !== 'All Categories') {
+        if (selectedCategory !== 'All Categories') {
             fetchProductsByCategory(selectedCategory);
         }
         else {
@@ -81,10 +69,17 @@ const Home = () => {
 
     React.useEffect(() => {
         const productsToPaginate = filteredProducts.length > 0 ? filteredProducts : products;
+        
+        let filtered: ProductDto[] = productsToPaginate;
+        if (searchQuery.length > 0) {
+            filtered = productsToPaginate.filter(product =>
+                product.name.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
         const first = currentPage * itemsPerPage;
         const last = first + itemsPerPage;
-        setShowProducts(productsToPaginate.slice(first, last));
-    }, [products, filteredProducts, currentPage, itemsPerPage]);
+        setShowProducts(filtered.slice(first, last));
+    }, [products, filteredProducts, currentPage, itemsPerPage, searchQuery]);
 
 
     return (
