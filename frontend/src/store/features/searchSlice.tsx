@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface SearchState {
     searchQuery: string;   
@@ -12,13 +12,13 @@ const searchSlice = createSlice({
         selectedCategory: "All Categories",
     } as SearchState,
     reducers: {
-        setSearchQuery: (state, action: { payload: string }) => {
+        setSearchQuery: (state: SearchState, action: PayloadAction<string>) => {
             state.searchQuery = action.payload;
         },
-        setSelectedCategory: (state, action: { payload: string }) => {
+        setSelectedCategory: (state: SearchState, action: PayloadAction<string>) => {
             state.selectedCategory = action.payload;
         },
-        clearFilter: (state) => {            
+        clearFilter: (state: SearchState) => {            
             state.searchQuery = "";
             state.selectedCategory = "All Categories";
         }

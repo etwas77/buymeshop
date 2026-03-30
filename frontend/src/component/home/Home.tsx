@@ -1,7 +1,7 @@
 import _ from "lodash";
 import React from "react";
 import { Card } from "react-bootstrap";
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -10,15 +10,15 @@ import Paginator from "../common/Paginator";
 import ProductImage from "../common/utils/ProductImage";
 import Hero from "../hero/Hero";
 import { getDistinctProductsByName } from "../services/ProductService";
-
-export const ITEMS_PER_PAGE = 5;
+import { PaginationState, setTotalItems } from "../../store/features/paginationSlice";
 
 const Home = () => {
-    const [currentPage, setCurrentPage] = React.useState<number>(0);
     const [filteredProducts, setFilteredProducts] = React.useState<ProductDto[]>([]);
     const [products, setProducts] = React.useState<ProductDto[]>([]);
     const [error, setError] = React.useState<string | null>(null);
     const { searchQuery, selectedCategory } = useSelector((state: any) => state.search);
+    const { itemsPerPage, currentPage } = useSelector((state: { pagination: PaginationState }) => state.pagination);
+    const dispatch = useDispatch();
 
     if (error)
         console.log('error', error);
@@ -39,15 +39,13 @@ const Home = () => {
 
     }, [selectedCategory]);
 
-    const paginate = React.useMemo(() => (i: number) => {
-        console.log('i', i - 1);
-        setCurrentPage(i - 1);
-    }, []);
-
-    const itemsPerPage = filteredProducts.length > ITEMS_PER_PAGE ? ITEMS_PER_PAGE : filteredProducts.length;
     const first = currentPage * itemsPerPage;
     const last = first + itemsPerPage;
     const currentProducts = filteredProducts.slice(first, last);
+
+    React.useEffect(() => {
+        dispatch(setTotalItems(filteredProducts.length));
+    }, [filteredProducts, dispatch]);
 
     React.useEffect(() => {
         const filtered = products.filter(product => {
@@ -83,12 +81,7 @@ const Home = () => {
                         </Card>);
                 })}
             </div>
-            <Paginator
-                itemsPerPage={itemsPerPage}
-                totalItems={currentProducts.length}
-                currentPage={currentPage}
-                paginate={paginate}
-            />
+            <Paginator />
         </>
     );
 };

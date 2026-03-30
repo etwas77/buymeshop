@@ -1,15 +1,15 @@
 import React from "react";
 import { Pagination } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { PaginationState, setCurrentPage } from "../../store/features/paginationSlice";
 
-export interface PaginatorProps {
-    itemsPerPage?: number;
-    totalItems?: number;
-    currentPage?: number;
-    paginate?: (page: number) => void;
-};
+const Paginator = () => {
+    const { itemsPerPage, totalItems, currentPage } = useSelector((state: { pagination: PaginationState }) => state.pagination);
+    const dispatch = useDispatch();
 
-const Paginator = (p: PaginatorProps) => {
-    const { itemsPerPage, totalItems, currentPage, paginate } = p;
+    const paginate = React.useMemo(() => (pageNumber: number) => {        
+        dispatch(setCurrentPage(pageNumber - 1));
+    }, [dispatch]);
 
     const [items, setItems] = React.useState<React.ReactElement[]>([]);
 
@@ -17,14 +17,14 @@ const Paginator = (p: PaginatorProps) => {
 
     React.useEffect(() => {
         let tmpItems = [];
-        for(let i = 1; i <= totalPages; i++) {
+        for (let i = 1; i <= totalPages; i++) {
             tmpItems.push(
-                <Pagination.Item key={i} active={i === currentPage} onClick={() => paginate && paginate(i)}>
+                <Pagination.Item key={i} active={i === currentPage + 1} onClick={() => paginate(i)}>
                     {i}
                 </Pagination.Item>
             );
         }
-        setItems(tmpItems);    
+        setItems(tmpItems);
     }, [totalPages, paginate, currentPage]);
 
     return (
