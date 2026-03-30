@@ -18,7 +18,7 @@ const searchSlice = createSlice({
         setSelectedCategory: (state, action: { payload: string }) => {
             state.selectedCategory = action.payload;
         },
-        clearFilter: (state) => {
+        clearFilter: (state) => {            
             state.searchQuery = "";
             state.selectedCategory = "All Categories";
         }
