@@ -50,7 +50,7 @@ const productSlice = createSlice({
         selectedBrands: []
     } as ProductState,          
     reducers: {
-        toggleBrand: (state: ProductState, action: PayloadAction<String>) => {
+        filterByBrand: (state: ProductState, action: PayloadAction<String>) => {
             const itemPresent = state.selectedBrands.includes(action.payload);
             if (itemPresent) {
                 state.selectedBrands = state.selectedBrands.filter(brand => brand !== action.payload);
@@ -81,5 +81,5 @@ const productSlice = createSlice({
     }
 });
 
-export const { toggleBrand } = productSlice.actions;
+export const { filterByBrand } = productSlice.actions;
 export default productSlice.reducer;

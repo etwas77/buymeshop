@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch } from "../../store/store";
-import { getAllBrands, ProductState, toggleBrand } from "../../store/features/productSlice";
+import { getAllBrands, ProductState, filterByBrand } from "../../store/features/productSlice";
 import React from "react";
 import _ from "lodash";
 
@@ -20,9 +20,7 @@ const SideBar = () => {
                     <input
                         type="checkbox"
                         checked={selectedBrands.includes(brand)}
-                        onChange={() => {
-                            dispatch(toggleBrand(brand));
-                        }}
+                        onChange={() => dispatch(filterByBrand(brand))}
                     />
                     <span className="checkmark"></span>
                     {brand}
