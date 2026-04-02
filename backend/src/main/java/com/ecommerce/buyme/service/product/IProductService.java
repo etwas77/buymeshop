@@ -34,4 +34,6 @@ public interface IProductService {
     ProductDto convertToDto(Product product);
 
     List<Product> findDistinctProductsByNameList();
+
+    List<String> getAllDistinctBrands();
 }

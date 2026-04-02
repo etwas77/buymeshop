@@ -119,13 +119,19 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/distinct")
+    @GetMapping("/distinct/products")
     public ResponseEntity<ApiResponse> getDistinctProductsByName() {
         List<Product> products = productService.findDistinctProductsByNameList();
         List<ProductDto> productDtos = productService.convertProductsToDto(products);
 
         ApiResponse response = new ApiResponse("Distinct products retrieved successfully", productDtos);
-        return ResponseEntity.ok(response); 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/distinct/brands")
+    public ResponseEntity<ApiResponse> getDistinctBrands() {
+        ApiResponse response = new ApiResponse("Distinct brands retrieved successfully", productService.getAllDistinctBrands());
+        return ResponseEntity.ok(response);
     }
 
 }

@@ -188,4 +188,9 @@ public class ProductService implements IProductService {
         // the replacement
         return new ArrayList<>(distinctProductsMap.values());
     }
+
+    @Override
+    public List<String> getAllDistinctBrands() {
+        return productRepository.findAll().stream().map(Product :: getBrand).distinct().toList();
+    }
 }
