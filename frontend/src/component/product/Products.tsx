@@ -5,7 +5,7 @@ import ProductCard from "./ProductCard";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ProductDto } from "../../dtos/ProductDto";
-import { getAllProducts } from "../../store/features/productSlice";
+import { getAllProducts, ProductState } from "../../store/features/productSlice";
 import { SearchState } from "../../store/features/searchSlice";
 import { AppDispatch } from "../../store/store";
 import Paginator from "../common/Paginator";
@@ -14,7 +14,7 @@ import SideBar from "../common/SideBar";
 
 const Products = () => {
     const [filteredProducts, setFilteredProducts] = React.useState<ProductDto[]>([]);
-    const { products, selectedBrands } = useSelector((state: { products: { products: ProductDto[]; selectedBrands: string[] } }) => state.products);
+    const { products, selectedBrands } = useSelector((state: { products: ProductState }) => state.products);
     const { searchQuery, selectedCategory } = useSelector((state: { search: SearchState }) => state.search);
     const { itemsPerPage, currentPage } = useSelector((state: { pagination: PaginationState }) => state.pagination);
     const dispatch = useDispatch<AppDispatch>();
@@ -32,11 +32,9 @@ const Products = () => {
             const matchesCategory = selectedCategory === 'All Categories'
                 || product.category.name.toLowerCase().includes(selectedCategory.toLowerCase());
             const matchesSearchQuery = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-            return matchesCategory && matchesSearchQuery;
+            const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
+            return matchesCategory && matchesSearchQuery && matchesBrand;
         });
-        if (selectedBrands.length > 0) {
-            filtered = filtered.filter(product => selectedBrands.includes(product.brand));
-        }
         setFilteredProducts(filtered);
     }, [products, searchQuery, selectedCategory, selectedBrands]);
 
