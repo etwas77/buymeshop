@@ -121,7 +121,7 @@ const productSlice = createSlice({
                 state.errorMessage = action.error.message;
                 state.isLoading = false;
             })
-            .addCase(getAllProducts.pending, (state, action) => {
+            .addCase(getAllProducts.pending, (state) => {
                 state.isLoading = true;
             })
             ;

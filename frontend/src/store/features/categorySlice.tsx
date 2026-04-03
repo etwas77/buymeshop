@@ -1,7 +1,7 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { CategoryDto } from "../../dtos/CategoryDto";
-import { api } from "../../component/services/api";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
+import { api } from "../../component/services/api";
+import { CategoryDto } from "../../dtos/CategoryDto";
 
 
 export const getAllCategories = createAsyncThunk(
@@ -42,7 +42,7 @@ const categorySlice = createSlice({
             state.errorMessage = action.error.message;
             state.isLoading = false;
         })
-        .addCase(getAllCategories.pending, (state, action) => {
+        .addCase(getAllCategories.pending, (state) => {
             state.isLoading = true;
         })
         ;

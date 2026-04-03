@@ -24,7 +24,7 @@ const Products = () => {
     const location = useLocation();
     const queryParams = new URLSearchParams(location.search);
     const initialSearchQuery = queryParams.get("search") || name || "";
-
+    
     React.useEffect(() => {
         dispatch(getAllProducts());
     }, [dispatch]);
