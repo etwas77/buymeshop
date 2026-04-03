@@ -2,42 +2,29 @@ import _ from "lodash";
 import React from "react";
 import { Card } from "react-bootstrap";
 import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch } from '../../store/store';
 import { Link } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { ProductDto } from "../../dtos/ProductDto";
+import { PaginationState, setTotalItems } from "../../store/features/paginationSlice";
+import { getAllDistinctProducts, ProductState } from "../../store/features/productSlice";
 import Paginator from "../common/Paginator";
 import ProductImage from "../common/utils/ProductImage";
 import Hero from "../hero/Hero";
-import { getDistinctProductsByName } from "../services/ProductService";
-import { PaginationState, setTotalItems } from "../../store/features/paginationSlice";
 
 const Home = () => {
     const [filteredProducts, setFilteredProducts] = React.useState<ProductDto[]>([]);
-    const [products, setProducts] = React.useState<ProductDto[]>([]);
-    const [error, setError] = React.useState<string | null>(null);
+    //const [products, setProducts] = React.useState<ProductDto[]>([]);
+    //const [error, setError] = React.useState<string | null>(null);
     const { searchQuery, selectedCategory } = useSelector((state: any) => state.search);
     const { itemsPerPage, currentPage } = useSelector((state: { pagination: PaginationState }) => state.pagination);
-    const dispatch = useDispatch();
-
-    if (error)
-        console.log('error', error);
+    const { distinctProducts: products } = useSelector((state: { products: ProductState }) => state.products);
+    const dispatch = useDispatch<AppDispatch>();
 
     React.useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                const response = await getDistinctProductsByName();
-                setProducts(response.data);
-            }
-            catch (error: any) {
-                setError(error.message);
-                toast.error("Error fetching products: " + error.message);
-                setProducts([]);
-            }
-        };
-        fetchProducts();
-
-    }, [selectedCategory]);
+        dispatch(getAllDistinctProducts());
+    }, [dispatch]);
 
     const first = currentPage * itemsPerPage;
     const last = first + itemsPerPage;

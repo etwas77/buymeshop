@@ -12,11 +12,11 @@ const ProductCard = (p: ProductCardProps) => {
     const { products } = p;
 
     return (
-        <main className="row">
+        <main className="row m-2">
             {_.map(products, product => {
                 const imageId: string | undefined = product.images.length === 0 ? undefined : product.images[0].id;
                 return (
-                    <div className="col-12 col-sm-6 col-md-4" key={product.id}>
+                    <div className="col-12 col-sm-6 col-md-4 col-lg-2" key={product.id}>
                         <Card className="mb-2 mt-2">
                             <Link to={"/products/" + product.name} className="link" >
                                 {imageId && <ProductImage imageId={imageId} />}

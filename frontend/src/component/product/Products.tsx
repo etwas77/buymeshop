@@ -6,11 +6,12 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ProductDto } from "../../dtos/ProductDto";
 import { getAllProducts, ProductState } from "../../store/features/productSlice";
-import { SearchState } from "../../store/features/searchSlice";
+import { SearchState, setSearchQuery } from "../../store/features/searchSlice";
 import { AppDispatch } from "../../store/store";
 import Paginator from "../common/Paginator";
 import { PaginationState, setTotalItems } from "../../store/features/paginationSlice";
 import SideBar from "../common/SideBar";
+import { useLocation, useParams } from "react-router";
 
 const Products = () => {
     const [filteredProducts, setFilteredProducts] = React.useState<ProductDto[]>([]);
@@ -18,10 +19,18 @@ const Products = () => {
     const { searchQuery, selectedCategory } = useSelector((state: { search: SearchState }) => state.search);
     const { itemsPerPage, currentPage } = useSelector((state: { pagination: PaginationState }) => state.pagination);
     const dispatch = useDispatch<AppDispatch>();
-    
+    const { name } = useParams();
+    const location = useLocation();
+    const queryParams = new URLSearchParams(location.search);
+    const initialSearchQuery = queryParams.get("search") || name || "";
+
     React.useEffect(() => {
         dispatch(getAllProducts());
     }, [dispatch]);
+
+    React.useEffect(() => {
+        dispatch(setSearchQuery(initialSearchQuery));
+    }, [dispatch, initialSearchQuery]);
 
     React.useEffect(() => {
         dispatch(setTotalItems(filteredProducts.length));
@@ -40,7 +49,7 @@ const Products = () => {
 
     const first = currentPage * itemsPerPage;
     const last = first + itemsPerPage;
-    
+
     const currentProducts = filteredProducts.slice(first, last);
 
     return (
@@ -58,12 +67,9 @@ const Products = () => {
                 </aside>
                 <section style={{ flex: 1 }}>
                     <ProductCard products={currentProducts} />
-                    <div className="pagination justify-content-center">
-                        <Paginator />
-                    </div>
                 </section>
-
             </div>
+            <Paginator />
         </>
     );
 };

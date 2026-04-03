@@ -2,7 +2,6 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { api } from "../../component/services/api";
 import { ProductDto } from "../../dtos/ProductDto";
-import paginationSlice from "./paginationSlice";
 
 
 export const getAllProducts = createAsyncThunk(
@@ -33,8 +32,22 @@ export const getAllBrands = createAsyncThunk(
     }
 );
 
+export const getAllDistinctProducts = createAsyncThunk(
+    "product/getAllDistinctProducts",
+    async () => {
+        try {
+            const response = await api.get("/products/distinct/products");            
+            return response.data.data as ProductDto[];
+        }
+        catch (error: any) {
+            toast.error("Error fetching distinct products: " + error.message);
+            return [];
+        }
+    }
+);
 export interface ProductState {
     products: ProductDto[];
+    distinctProducts: ProductDto[];
     errorMessage?: String;
     isLoading: boolean;
     brands: String[];
@@ -45,10 +58,11 @@ const productSlice = createSlice({
     name: "product",
     initialState: {
         products: [],
+        distinctProducts: [],
         isLoading: false,
         brands: [],
         selectedBrands: []
-    } as ProductState,          
+    } as ProductState,
     reducers: {
         filterByBrand: (state: ProductState, action: PayloadAction<String>) => {
             const itemPresent = state.selectedBrands.includes(action.payload);
@@ -61,23 +75,27 @@ const productSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-        .addCase(getAllBrands.fulfilled, (state, action) => {
-            state.brands = action.payload;
-            state.isLoading = false;
-        })
-        .addCase(getAllProducts.fulfilled, (state, action) => {
-            state.products = action.payload;
-            state.isLoading = false;
-        })
-        .addCase(getAllProducts.rejected, (state, action) => {
-            toast.error("Failed to fetch products: " + action.error.message);
-            state.errorMessage = action.error.message;
-            state.isLoading = false;
-        })
-        .addCase(getAllProducts.pending, (state, action) => {
-            state.isLoading = true;
-        })
-        ;
+            .addCase(getAllDistinctProducts.fulfilled, (state, action) => {
+                state.distinctProducts = action.payload;
+                state.isLoading = false;
+            })
+            .addCase(getAllBrands.fulfilled, (state, action) => {
+                state.brands = action.payload;
+                state.isLoading = false;
+            })
+            .addCase(getAllProducts.fulfilled, (state, action) => {
+                state.products = action.payload;
+                state.isLoading = false;
+            })
+            .addCase(getAllProducts.rejected, (state, action) => {
+                toast.error("Failed to fetch products: " + action.error.message);
+                state.errorMessage = action.error.message;
+                state.isLoading = false;
+            })
+            .addCase(getAllProducts.pending, (state, action) => {
+                state.isLoading = true;
+            })
+            ;
     }
 });
 
