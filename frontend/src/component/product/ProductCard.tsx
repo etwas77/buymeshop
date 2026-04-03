@@ -18,7 +18,7 @@ const ProductCard = (p: ProductCardProps) => {
                 return (
                     <div className="col-12 col-sm-6 col-md-4 col-lg-2" key={product.id}>
                         <Card className="mb-2 mt-2">
-                            <Link to={"/products/" + product.name} className="link" >
+                            <Link to={"/products/" + product.id + "/details"} className="link" >
                                 {imageId && <ProductImage imageId={imageId} />}
                             </Link>
                             <Card.Body>

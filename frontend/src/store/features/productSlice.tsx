@@ -36,7 +36,7 @@ export const getAllDistinctProducts = createAsyncThunk(
     "product/getAllDistinctProducts",
     async () => {
         try {
-            const response = await api.get("/products/distinct/products");            
+            const response = await api.get("/products/distinct/products");
             return response.data.data as ProductDto[];
         }
         catch (error: any) {
@@ -45,9 +45,25 @@ export const getAllDistinctProducts = createAsyncThunk(
         }
     }
 );
+
+export const getProductById = createAsyncThunk(
+    "product/getProductById",
+    async (id: string) => {
+        try {
+            const response = await api.get("/products/product/" + id);
+            return response.data.data as ProductDto;
+        }
+        catch (error: any) {
+            toast.error("Error fetching product: " + error.message);
+            return undefined;
+        }
+    }
+);
+
 export interface ProductState {
     products: ProductDto[];
     distinctProducts: ProductDto[];
+    product?: ProductDto;
     errorMessage?: String;
     isLoading: boolean;
     brands: String[];
@@ -59,6 +75,7 @@ const productSlice = createSlice({
     initialState: {
         products: [],
         distinctProducts: [],
+        product: undefined,
         isLoading: false,
         brands: [],
         selectedBrands: []
@@ -77,6 +94,10 @@ const productSlice = createSlice({
         builder
             .addCase(getAllDistinctProducts.fulfilled, (state, action) => {
                 state.distinctProducts = action.payload;
+                state.isLoading = false;
+            })
+            .addCase(getProductById.fulfilled, (state, action) => {
+                state.product = action.payload;
                 state.isLoading = false;
             })
             .addCase(getAllBrands.fulfilled, (state, action) => {

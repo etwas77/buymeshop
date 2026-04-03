@@ -60,7 +60,7 @@ const Home = () => {
                     const imageId: string | undefined = product.images.length === 0 ? undefined : product.images[0].id;
                     return (
                         <Card key={product.id} className="home-product-card">
-                            <Link to={"/products/" + product.name} className="link" >
+                            <Link to={"/products/" + product.id + "/details"} className="link" >
                                 {imageId && <ProductImage imageId={imageId} />}
                             </Link>
                             <Card.Body>

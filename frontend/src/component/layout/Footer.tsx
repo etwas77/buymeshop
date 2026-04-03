@@ -8,13 +8,12 @@ const Footer = () => {
                 <div className="footer-section">
                     <h3>Contact Us</h3>
                     <p>Email: bla@boo.com</p>
-                    <p>Phone: 1234567890</p>
+                    <p>Phone: +XYZ 1234567890</p>
                 </div>
                 <div className="footer-section">
-                    <h3>Category</h3>
+                    <h3>Info</h3>
                     <ul>
-                        <li>All Products</li>
-                        <li>All Products</li>
+                        <li>Information</li>
                     </ul>
                 </div>
 

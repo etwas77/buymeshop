@@ -2,6 +2,7 @@ import { createBrowserRouter, createRoutesFromElements, Route, RouterProvider } 
 import Home from "./component/home/Home";
 import RootLayout from "./component/layout/RootLayout";
 import Products from "./component/product/Products";
+import ProductDetails from "./component/product/ProductDetails";
 
 function App() {
     const router = createBrowserRouter(
@@ -9,6 +10,7 @@ function App() {
             <Route path="/" element={<RootLayout />} >
                 <Route index element={<Home />} />
                 <Route path="/products/:name?" element={<Products />} />
+                <Route path="/products/:id/details" element={<ProductDetails />} />
             </Route>
         )
     );
