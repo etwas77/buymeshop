@@ -12,6 +12,7 @@ import { getAllDistinctProducts, ProductState } from "../../store/features/produ
 import Paginator from "../common/Paginator";
 import ProductImage from "../common/utils/ProductImage";
 import Hero from "../hero/Hero";
+import LoadSpinner from "../common/LoadSpinner";
 
 const Home = () => {
     const [filteredProducts, setFilteredProducts] = React.useState<ProductDto[]>([]);
@@ -19,7 +20,7 @@ const Home = () => {
     //const [error, setError] = React.useState<string | null>(null);
     const { searchQuery, selectedCategory } = useSelector((state: any) => state.search);
     const { itemsPerPage, currentPage } = useSelector((state: { pagination: PaginationState }) => state.pagination);
-    const { distinctProducts: products } = useSelector((state: { products: ProductState }) => state.products);
+    const { distinctProducts: products, isLoading } = useSelector((state: { products: ProductState }) => state.products);
     const dispatch = useDispatch<AppDispatch>();
 
     React.useEffect(() => {
@@ -43,6 +44,12 @@ const Home = () => {
         });
         setFilteredProducts(filtered);
     }, [products, searchQuery, selectedCategory]);
+
+    if (isLoading) {
+        return <div>
+            <LoadSpinner variant="secondary" />
+        </div>;
+    }
 
     return (
         <>

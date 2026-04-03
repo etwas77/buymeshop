@@ -12,10 +12,11 @@ import Paginator from "../common/Paginator";
 import { PaginationState, setTotalItems } from "../../store/features/paginationSlice";
 import SideBar from "../common/SideBar";
 import { useLocation, useParams } from "react-router";
+import LoadSpinner from "../common/LoadSpinner";
 
 const Products = () => {
     const [filteredProducts, setFilteredProducts] = React.useState<ProductDto[]>([]);
-    const { products, selectedBrands } = useSelector((state: { products: ProductState }) => state.products);
+    const { products, selectedBrands, isLoading } = useSelector((state: { products: ProductState }) => state.products);
     const { searchQuery, selectedCategory } = useSelector((state: { search: SearchState }) => state.search);
     const { itemsPerPage, currentPage } = useSelector((state: { pagination: PaginationState }) => state.pagination);
     const dispatch = useDispatch<AppDispatch>();
@@ -51,6 +52,12 @@ const Products = () => {
     const last = first + itemsPerPage;
 
     const currentProducts = filteredProducts.slice(first, last);
+
+    if (isLoading) {
+        return <div>
+            <LoadSpinner variant="secondary" />
+        </div>;
+    }
 
     return (
         <>
