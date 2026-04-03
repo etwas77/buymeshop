@@ -68,6 +68,7 @@ export interface ProductState {
     isLoading: boolean;
     brands: String[];
     selectedBrands: String[];
+    quantity: number;
 }
 
 const productSlice = createSlice({
@@ -78,7 +79,8 @@ const productSlice = createSlice({
         product: undefined,
         isLoading: false,
         brands: [],
-        selectedBrands: []
+        selectedBrands: [],
+        quantity: 0,
     } as ProductState,
     reducers: {
         filterByBrand: (state: ProductState, action: PayloadAction<String>) => {
@@ -89,6 +91,12 @@ const productSlice = createSlice({
             }
             state.selectedBrands = [...state.selectedBrands, action.payload];
         },
+        incrementQuantity: (state: ProductState) => {
+            state.quantity++;
+        },
+        decrementQuantity: (state: ProductState) => {
+            state.quantity = state.quantity > 0 ? state.quantity - 1 : 0;
+        }
     },
     extraReducers: (builder) => {
         builder
@@ -120,5 +128,5 @@ const productSlice = createSlice({
     }
 });
 
-export const { filterByBrand } = productSlice.actions;
+export const { filterByBrand, incrementQuantity, decrementQuantity } = productSlice.actions;
 export default productSlice.reducer;

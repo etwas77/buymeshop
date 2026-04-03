@@ -1,18 +1,17 @@
 import React from "react";
 import { BsDash, BsPlus } from "react-icons/bs";
+import { useDispatch, useSelector } from "react-redux";
+import { decrementQuantity, incrementQuantity, ProductState } from "../../../store/features/productSlice";
+import { AppDispatch } from "../../../store/store";
 
-export interface QuantityUpdaterProps {
-    quantity: number;
-    onIncrease: () => void;
-    onDecrease: () => void;
-}
-
-const QuantityUpdater = (p: QuantityUpdaterProps) => {
-    const { quantity, onIncrease, onDecrease } = p;
+const QuantityUpdater = () => {
+    const { quantity} = useSelector((state: { products: ProductState }) => state.products);
+    const dispatch = useDispatch<AppDispatch>();
+    
     return (
         <section style={{width: "150px"}}>
-            <div className="input-group">
-                <button onClick={onDecrease} className="btn btn-outline-secondary">
+            <div className="input-group">   
+                <button onClick={() => dispatch(decrementQuantity())} className="btn btn-outline-secondary">
                     {React.createElement(BsDash as React.ComponentType)}               
                 </button>
                 <input
@@ -22,7 +21,7 @@ const QuantityUpdater = (p: QuantityUpdaterProps) => {
                     value={quantity}
                     className="form-control text-center"
                 />
-                <button onClick={onIncrease} className="btn btn-outline-secondary">        
+                <button onClick={() => dispatch(incrementQuantity())} className="btn btn-outline-secondary">        
                     {React.createElement(BsPlus as React.ComponentType)}
                 </button>
             </div>

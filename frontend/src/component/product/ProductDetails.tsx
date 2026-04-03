@@ -7,28 +7,19 @@ import { AppDispatch } from "../../store/store";
 import ImageZoomify from "../common/ImageZoomify";
 import LoadSpinner from "../common/LoadSpinner";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
-
+import { FaShoppingBasket, FaShoppingCart } from "react-icons/fa";
 
 const ProductDetails = () => {
     const { id } = useParams();
 
     const { product } = useSelector((state: { products: ProductState }) => state.products);
     const dispatch = useDispatch<AppDispatch>();
-    const [quantity, setQuantity] = React.useState<number>(0);
 
     React.useEffect(() => {
         if (id) {
             dispatch(getProductById(id));
         }
     }, [id, dispatch]);
-
-    const onIncrease = () => {
-        setQuantity(prev => prev + 1);
-    };
-
-    const onDecrease = () => {
-       setQuantity(prev => prev > 0 ? prev - 1 : 0);
-    };
 
     if (product === undefined) {
         return <LoadSpinner variant="info" />;
@@ -58,12 +49,19 @@ const ProductDetails = () => {
                         {product.inventory > 0 ? "In stock " + product.inventory : "Out of stock"}
                     </p>
                     <div className="product-category">Quantity:
-                        <QuantityUpdater quantity={quantity} onIncrease={onIncrease} onDecrease={onDecrease} />
+                        <QuantityUpdater />
                     </div>
                 </div>
                 <div className="d-flex gap-2 mt-3">
-                    <button className="add-to-cart-button">add to cart</button>
-                    <button className="buy-now-button">buy now</button>
+                    <button className="add-to-cart-button">
+                        {React.createElement(FaShoppingCart as React.ComponentType)} 
+                        {" add to cart"}
+                    </button>
+                    <button className="buy-now-button">
+                        {React.createElement(FaShoppingBasket as React.ComponentType)} 
+                        {" buy now"}
+                        
+                    </button>
                 </div>
             </div>
 

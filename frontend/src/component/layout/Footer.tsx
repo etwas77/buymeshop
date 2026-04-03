@@ -12,9 +12,16 @@ const Footer = () => {
                 </div>
                 <div className="footer-section">
                     <h3>Info</h3>
-                    <ul>
-                        <li>Information</li>
-                    </ul>
+                    <div>
+                        In cillum laborum Lorem consequat laborum sunt cillum non esse. Minim incididunt incididunt aliqua labore 
+                        ea nisi tempor excepteur velit mollit dolore. Nulla deserunt ullamco cupidatat anim enim amet.
+                    </div>
+                </div>
+                <div className="footer-section">
+                    <h3>Cupidatat Anim</h3>
+                    <div>
+                        ea nisi tempor excepteur velit mollit dolore. Nulla deserunt ullamco cupidatat anim enim amet.
+                    </div>
                 </div>
 
             </div>
