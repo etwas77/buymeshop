@@ -1,18 +1,23 @@
 import _ from "lodash";
 import React from "react";
+import { FaShoppingBasket, FaShoppingCart } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
+import { addToCart, cartState } from "../../store/features/cartSlice";
 import { getProductById, ProductState } from "../../store/features/productSlice";
 import { AppDispatch } from "../../store/store";
 import ImageZoomify from "../common/ImageZoomify";
 import LoadSpinner from "../common/LoadSpinner";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
-import { FaShoppingBasket, FaShoppingCart } from "react-icons/fa";
 
 const ProductDetails = () => {
     const { id } = useParams();
 
-    const { product } = useSelector((state: { products: ProductState }) => state.products);
+    const { product, quantity } = useSelector((state: { products: ProductState }) => state.products);
+    const { successMessage, errorMessage } = useSelector((state: { cart: cartState }) => state.cart);
+
     const dispatch = useDispatch<AppDispatch>();
 
     React.useEffect(() => {
@@ -21,11 +26,29 @@ const ProductDetails = () => {
         }
     }, [id, dispatch]);
 
+    const handleAddTocart = () => {
+        try {
+            dispatch(addToCart({ productId: product!.id, quantity }));
+        } catch (error) {
+            toast.error((error as Error).message || "An error occurred while adding to cart");
+        }
+    }
+
+    React.useEffect(() => {
+        if (successMessage) {
+            toast.success(successMessage);
+        }
+        if (errorMessage) {
+            toast.error(errorMessage);
+        }   
+    }, [successMessage, errorMessage]);
+
     if (product === undefined) {
         return <LoadSpinner variant="info" />;
     }
     return (
         <div className="container">
+            <ToastContainer />
             <div className="row product-details">
                 <div className="col-md-2">
                     {_.map(product.images, image => {
@@ -52,15 +75,15 @@ const ProductDetails = () => {
                         <QuantityUpdater />
                     </div>
                 </div>
-                <div className="d-flex gap-2 mt-3">
-                    <button className="add-to-cart-button">
-                        {React.createElement(FaShoppingCart as React.ComponentType)} 
+                <div className="d-flex gap-2 mt-3" >
+                    <button className="add-to-cart-button" onClick={handleAddTocart}>
+                        <FaShoppingCart />
                         {" add to cart"}
                     </button>
                     <button className="buy-now-button">
-                        {React.createElement(FaShoppingBasket as React.ComponentType)} 
+                        <FaShoppingBasket />
                         {" buy now"}
-                        
+
                     </button>
                 </div>
             </div>
