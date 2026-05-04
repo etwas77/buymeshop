@@ -17,10 +17,11 @@ public class WebConfig {
                 //         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS");
 
                 registry.addMapping("/api/**")
-                        .allowedOrigins("http://localhost:3000")
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
+                    .allowedOrigins("http://localhost:3000")
+                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+                    .allowedHeaders("*")
+                    .exposedHeaders("*")
+                    .allowCredentials(true);
             }
         };
     }
