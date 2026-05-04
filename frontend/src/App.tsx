@@ -3,6 +3,7 @@ import Home from "./component/home/Home";
 import RootLayout from "./component/layout/RootLayout";
 import Products from "./component/product/Products";
 import ProductDetails from "./component/product/ProductDetails";
+import Login from "./component/home/Login";
 
 function App() {
     const router = createBrowserRouter(
@@ -11,6 +12,7 @@ function App() {
                 <Route index element={<Home />} />
                 <Route path="/products/:name?" element={<Products />} />
                 <Route path="/products/:id/details" element={<ProductDetails />} />
+                <Route path="/login" element={<Login />} />
             </Route>
         )
     );

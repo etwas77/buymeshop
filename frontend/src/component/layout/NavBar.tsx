@@ -1,7 +1,11 @@
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { LoginState, setAccessToken } from "../../store/features/loginSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 const NavBar = () => {
+    const { accessToken } = useSelector((state: { login: LoginState }) => state.login);
+    const dispatch = useDispatch();
 
     return (
         <Navbar expand='lg' sticky='top' className='nav-bg'>
@@ -36,14 +40,18 @@ const NavBar = () => {
 
                                 <NavDropdown.Divider />
 
-                                <NavDropdown.Item to={"#"} as={Link}>
-                                    Logout
-                                </NavDropdown.Item>
+                                {accessToken !== undefined &&
+                                    <NavDropdown.Item onClick={() => dispatch(setAccessToken(undefined))}>
+                                        Log-out
+                                    </NavDropdown.Item>
+                                }
+                                {accessToken === undefined &&
+                                    <NavDropdown.Item to={"/login"} as={Link}>
+                                        Log-in
+                                    </NavDropdown.Item>
+                                }
                             </>
 
-                            <NavDropdown.Item to={"#"} as={Link}>
-                                Login
-                            </NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>
