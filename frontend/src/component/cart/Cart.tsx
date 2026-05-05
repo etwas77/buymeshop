@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom"; import { AppDispatch } from "../../store/store";
-import { cartState, getUserCarts } from "../../store/features/cartSlice";
+import { cartState, getUserCarts, updateCartItemQuantity } from "../../store/features/cartSlice";
 import React from "react";
 import _ from "lodash";
 import { CartItemDto } from "../../dtos/CartItemDto";
@@ -11,7 +11,7 @@ import ProductImage from "../common/utils/ProductImage";
 const Cart = () => {
     const { userId } = useParams();
     const dispatch = useDispatch<AppDispatch>();
-    const { items } = useSelector((state: { cart: cartState }) => state.cart);
+    const { items, cartId } = useSelector((state: { cart: cartState }) => state.cart);
 
     React.useEffect(() => {
         if (userId) {
@@ -19,12 +19,11 @@ const Cart = () => {
         }
     }, [userId, dispatch]);
 
-    // React.useEffect(() => {
-    //     if (items.length !== 0) {
-    //         console.log('cart items', items);
-
-    //     }
-    // }, [items]);
+    const changeQuantity = (delta: number) => (item: CartItemDto) => {
+        return () => {
+            dispatch(updateCartItemQuantity({ cartId: cartId, productId: item.productId, quantity: item.quantity + delta }));
+        }
+    };
 
     return (
         <div className="container mt-5 mb-5 p-5">
@@ -41,19 +40,17 @@ const Cart = () => {
 
                 {_.map(items, (item: CartItemDto, idx) => {
                     const imageId: string | undefined = item.images.length === 0 ? undefined : item.images[0].id;
-                    console.log('imageId', imageId);
-                    
                     return (
                         <Card key={idx} className="mb-4">
                             <Card.Body className="d-flex justify-content-between align-items-center shadow">
                                 <div className="d-flex align-items-center">
                                     <Link to={"#"}>
-                                        <div className="cart-image-container-all100" >       
+                                        <div className="cart-image-container-all100" >
                                             {imageId &&
                                                 <ProductImage imageId={imageId} />
                                             }
                                         </div>
-                                    </Link> 
+                                    </Link>
                                 </div>
 
                                 <div className="text-center">{item.productName}</div>
@@ -62,10 +59,13 @@ const Cart = () => {
                                 <div className="text-center">{item.quantity}</div>
                                 <div className="text-center">{(item.unitPrice * item.quantity).toFixed(2)}</div>
                                 <div className="text-center">
-                                    <button className="btn btn-sm btn-outline-secondary me-2">
+                                    <button
+                                        disabled={item.quantity <= 1}
+                                        className="btn btn-sm btn-outline-secondary me-2"
+                                        onClick={changeQuantity(-1)(item)}>
                                         <BsDash />
                                     </button>
-                                    <button className="btn btn-sm btn-outline-secondary me-2">
+                                    <button className="btn btn-sm btn-outline-secondary me-2" onClick={changeQuantity(1)(item)}>
                                         <BsPlus />
                                     </button>
                                     <button className="btn btn-sm btn-outline-danger">

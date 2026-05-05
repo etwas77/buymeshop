@@ -1,14 +1,22 @@
+import React from "react";
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { LoginState, setAccessToken } from "../../store/features/loginSlice";
+import { AppDispatch } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
+import { LoginState, setAccessToken } from "../../store/features/loginSlice";
 
 const NavBar = () => {
     const { accessToken } = useSelector((state: { login: LoginState }) => state.login);
-    const dispatch = useDispatch();
+    const dispatch = useDispatch<AppDispatch>();
+
     const userId = accessToken ? JSON.parse(atob(accessToken.split('.')[1])).id : null;
 
-    console.log('userId', userId);
+    React.useEffect(() => {
+        if (accessToken === undefined) {
+            const accessToken = localStorage.getItem("accessToken");
+            dispatch(setAccessToken(accessToken ?? undefined));
+        }
+    }, [accessToken, dispatch]);
 
     return (
         <Navbar expand='lg' sticky='top' className='nav-bg'>
@@ -33,6 +41,13 @@ const NavBar = () => {
                             My Cart
                         </Nav.Link>
                     </Nav>
+                    {accessToken === undefined &&
+                        <Nav className='me-auto'>
+                            <Nav.Link to={"/login"} as={Link}>
+                                Log-in
+                            </Nav.Link>
+                        </Nav>
+                    }
                     <Nav className='ms-auto'>
                         <NavDropdown title='Account'>
                             <>
@@ -49,13 +64,12 @@ const NavBar = () => {
                                 <NavDropdown.Divider />
 
                                 {accessToken !== undefined &&
-                                    <NavDropdown.Item onClick={() => dispatch(setAccessToken(undefined))}>
+                                    <NavDropdown.Item onClick={() => {
+                                        localStorage.removeItem("accessToken");
+                                        dispatch(setAccessToken(undefined));
+                                        setAccessToken(undefined);
+                                    }}>
                                         Log-out
-                                    </NavDropdown.Item>
-                                }
-                                {accessToken === undefined &&
-                                    <NavDropdown.Item to={"/login"} as={Link}>
-                                        Log-in
                                     </NavDropdown.Item>
                                 }
                             </>

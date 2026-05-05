@@ -1,14 +1,12 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { api } from "../../component/services/api";
 import { CartDto } from "../../dtos/CartDto";
 import { CartItemDto } from "../../dtos/CartItemDto";
-import { LoginState } from "./loginSlice";
 
 export const addToCart = createAsyncThunk(
     "cart/addToCart",
-    async (payload: { productId: string; quantity: number }, { rejectWithValue, getState }) => {
-        const state = getState() as { login: LoginState };
-        const accessToken = state.login.accessToken ?? '';        
+    async (payload: { productId: string; quantity: number }, { rejectWithValue }) => {
+        const accessToken = localStorage.getItem("accessToken") ?? '';        
         try {
             const formData = new FormData();
             formData.append("productId", payload.productId);
@@ -20,7 +18,6 @@ export const addToCart = createAsyncThunk(
                 },
                 withCredentials: true
             });
-            console.log('response', response);
             return response.data;
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
@@ -33,9 +30,8 @@ export const addToCart = createAsyncThunk(
 
 export const getUserCarts = createAsyncThunk(
     "cart/getUserCarts",
-    async (payload: { userId: string; }, { rejectWithValue, getState }) => {
-        const state = getState() as { login: LoginState };
-        const accessToken = state.login.accessToken ?? '';
+    async (payload: { userId: string; }, { rejectWithValue }) => {
+        const accessToken = localStorage.getItem("accessToken") ?? '';
         try {
             const response = await api.get("/carts/user/" + payload.userId, {
                 headers: {
@@ -43,8 +39,6 @@ export const getUserCarts = createAsyncThunk(
                 },
                 withCredentials: true
             });
-            console.log('response', response);
-
             return response.data;
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
@@ -55,7 +49,34 @@ export const getUserCarts = createAsyncThunk(
     }
 );
 
+
+
+export const updateCartItemQuantity = createAsyncThunk(
+    "cart/updateCartItemQuantity",
+    async (payload: { cartId: number; productId: number; quantity: number }, { rejectWithValue }) => {        
+        const accessToken = localStorage.getItem("accessToken") ?? '';
+        try {
+            const formData = new FormData();
+            formData.append("quantity", payload.quantity.toString());
+
+            const response = await api.put(`/cartItems/update/${payload.cartId}/${payload.productId}`, formData, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                },
+                withCredentials: true
+            });
+            return {message: response.data.message as string, payload};
+        } catch (error: any) {            
+            if (error.response && error.response.data && error.response.data.message) {
+                return rejectWithValue(error.response.data.message);
+            }
+            return rejectWithValue(error.message || 'Unknown error');
+        }
+    }
+);
+
 export interface cartState {
+    cartId: number;
     items: CartItemDto[];
     totalAmount: number;
     errorMessage?: string;
@@ -65,6 +86,7 @@ export interface cartState {
 const cartSlice = createSlice({
     name: "cart",
     initialState: {
+        cartId: -1,
         items: [],
         totalAmount: 0
     } as cartState,
@@ -72,7 +94,8 @@ const cartSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(addToCart.fulfilled, (state, action) => {
-                const data: CartDto = action.payload.data;
+                const data: CartDto = action.payload.data;           
+                state.cartId = data.id;
                 state.items.push(...data.items);
                 state.totalAmount += data.totalAmount;
                 state.successMessage = action.payload.message;
@@ -87,6 +110,7 @@ const cartSlice = createSlice({
             })
             .addCase(getUserCarts.fulfilled, (state, action) => {
                 const data: CartDto = action.payload.data;
+                state.cartId = data.id;
                 state.items = data.items;
                 state.totalAmount = data.totalAmount;
                 state.successMessage = action.payload.message;
@@ -97,6 +121,20 @@ const cartSlice = createSlice({
                 state.successMessage = undefined; // Clear any previous success message on error
                 
                 console.log('action.error.message', action.error, 'action.payload', action.payload);
+            })
+            .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
+                const payload = action.payload.payload;
+                
+                const index = state.items.findIndex(item => item.productId === payload.productId);             
+                if (index !== -1) {
+                    state.items[index] = {...state.items[index], quantity: payload.quantity};                  
+                }
+                state.successMessage = action.payload.message;
+                state.errorMessage = undefined; // Clear any previous error message on success
+            })
+            .addCase(updateCartItemQuantity.rejected, (state, action) => {
+                state.errorMessage = "Failed to update cart item quantity: " + (action.payload || action.error.message);
+                state.successMessage = undefined; // Clear any previous success message on error
             });
     }
 });

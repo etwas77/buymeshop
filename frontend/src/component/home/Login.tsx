@@ -1,10 +1,9 @@
-import { useDispatch, useSelector } from "react-redux";
-import { userLogin, LoginState } from "../../store/features/loginSlice";
-import { AppDispatch } from "../../store/store";
 import React from "react";
 import { useNavigate } from "react-router-dom";
-
-
+import { api } from "../services/api";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store/store";
+import { setAccessToken } from "../../store/features/loginSlice";
 
 const Login = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -12,13 +11,14 @@ const Login = () => {
     const [password, setPassword] = React.useState<string>("456");
     const navigate = useNavigate();
 
-    const { accessToken } = useSelector((state: { login: LoginState }) => state.login);
-
-    React.useEffect(() => {
-        if (accessToken !== undefined) {
-            navigate("/products");
+    const userLogin = async (email: string, password: string) => {
+        const response = await api.post("/auth/login", { email, password });
+        if (response.data && response.data.accessToken) {
+            localStorage.setItem("accessToken", response.data.accessToken);
+            dispatch(setAccessToken(response.data.accessToken));
+            navigate("/");
         }
-    }, [accessToken, navigate]);
+    };
 
     return (
         <div className="justify-content-center p-5">
@@ -37,7 +37,7 @@ const Login = () => {
                 className="form-control mb-3"
                 style={{ maxWidth: "300px" }}
             />
-            <button className="btn btn-primary" onClick={() => dispatch(userLogin({ email, password }))}>Login</button>
+            <button className="btn btn-primary" onClick={() => userLogin(email, password)}>Login</button>
         </div>
     );
 };
