@@ -6,6 +6,9 @@ import { useDispatch, useSelector } from "react-redux";
 const NavBar = () => {
     const { accessToken } = useSelector((state: { login: LoginState }) => state.login);
     const dispatch = useDispatch();
+    const userId = accessToken ? JSON.parse(atob(accessToken.split('.')[1])).id : null;
+
+    console.log('userId', userId);
 
     return (
         <Navbar expand='lg' sticky='top' className='nav-bg'>
@@ -23,6 +26,11 @@ const NavBar = () => {
                     <Nav className='me-auto'>
                         <Nav.Link to={"#"} as={Link}>
                             Manage Products
+                        </Nav.Link>
+                    </Nav>
+                    <Nav className='me-auto'>
+                        <Nav.Link to={`/cart/${userId}`} as={Link}>
+                            My Cart
                         </Nav.Link>
                     </Nav>
                     <Nav className='ms-auto'>
@@ -51,7 +59,6 @@ const NavBar = () => {
                                     </NavDropdown.Item>
                                 }
                             </>
-
                         </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>

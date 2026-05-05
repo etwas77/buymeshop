@@ -129,6 +129,12 @@
     height: 50px;
 }
 
+.cart-image-container-all100 {
+    height: 100px;
+    width: 100px;
+    overflow: hidden;
+}
+
 .cart-title {
     color: #c0bcbce5;
     font-size: 24px;

@@ -7,7 +7,7 @@ interface ProductImageProps {
 
 const ProductImage = (p: ProductImageProps) => {
     const { imageId } = p;
-    const [productImage, setProductImage] = React.useState<string | null>(null);
+    const [productImage, setProductImage] = React.useState<string | null>(null);    
 
     React.useEffect(() => {
         const fetchProductImage = async (imageId: string) => {

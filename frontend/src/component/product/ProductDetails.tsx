@@ -4,21 +4,18 @@ import { FaShoppingBasket, FaShoppingCart } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
 import { addToCart, cartState } from "../../store/features/cartSlice";
 import { getProductById, ProductState } from "../../store/features/productSlice";
 import { AppDispatch } from "../../store/store";
 import ImageZoomify from "../common/ImageZoomify";
 import LoadSpinner from "../common/LoadSpinner";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
-import { LoginState } from "../../store/features/loginSlice";
 
 const ProductDetails = () => {
     const { id } = useParams();
 
     const { product, quantity } = useSelector((state: { products: ProductState }) => state.products);
     const { successMessage, errorMessage } = useSelector((state: { cart: cartState }) => state.cart);
-    const { accessToken } = useSelector((state: { login: LoginState }) => state.login);
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -30,7 +27,7 @@ const ProductDetails = () => {
 
     const handleAddTocart = () => {
         try {
-            dispatch(addToCart({ productId: product!.id, quantity, accessToken: accessToken ?? '' }));
+            dispatch(addToCart({ productId: product!.id, quantity }));
         } catch (error) {
             toast.error((error as Error).message || "An error occurred while adding to cart");
         }
@@ -42,7 +39,7 @@ const ProductDetails = () => {
         }
         if (errorMessage) {
             toast.error(errorMessage);
-        }   
+        }
     }, [successMessage, errorMessage]);
 
     if (product === undefined) {
