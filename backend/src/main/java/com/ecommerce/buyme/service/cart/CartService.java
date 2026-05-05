@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.buyme.dtos.CartDto;
 import com.ecommerce.buyme.dtos.CartItemDto;
+import com.ecommerce.buyme.dtos.ImageDto;
 import com.ecommerce.buyme.model.Cart;
 import com.ecommerce.buyme.model.CartItem;
 import com.ecommerce.buyme.model.User;
@@ -94,6 +95,11 @@ public class CartService implements ICartService {
             dto.setProductId(cartItem.getProduct().getId());
             dto.setProductName(cartItem.getProduct().getName());
             dto.setProductBrand(cartItem.getProduct().getBrand());
+
+            List<ImageDto> images = cartItem.getProduct().getImages().stream()
+                    .map(image -> new ImageDto(image.getId(), image.getFileName(), image.getDownloadUrl()))
+                    .collect(Collectors.toList());
+            dto.setImages(images);
         }
         return dto;
     }

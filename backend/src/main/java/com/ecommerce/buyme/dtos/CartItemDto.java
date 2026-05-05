@@ -1,6 +1,7 @@
 package com.ecommerce.buyme.dtos;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,4 +19,6 @@ public class CartItemDto {
     private Long productId;
     private String productName;
     private String productBrand;
+
+    private List<ImageDto> images;
 }
