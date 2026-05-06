@@ -101,6 +101,7 @@ export interface cartState {
     totalAmount: number;
     errorMessage?: string;
     successMessage?: string;
+    isLoading?: boolean;
 };
 
 const cartSlice = createSlice({
@@ -108,7 +109,8 @@ const cartSlice = createSlice({
     initialState: {
         cartId: -1,
         items: [],
-        totalAmount: 0
+        totalAmount: 0,
+        isLoading: true
     } as cartState,
     reducers: {},
     extraReducers: (builder) => {
@@ -135,6 +137,7 @@ const cartSlice = createSlice({
                 state.totalAmount = data.totalAmount;
                 state.successMessage = action.payload.message;
                 state.errorMessage = undefined; // Clear any previous error message on success
+                state.isLoading = false;
             })
             .addCase(getUserCarts.rejected, (state, action) => {
                 state.errorMessage = "Failed to fetch user carts: " + (action.payload || action.error.message);

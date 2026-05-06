@@ -3,17 +3,20 @@ import React from "react";
 import { Card } from "react-bootstrap";
 import { BsTrash } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { CartItemDto } from "../../dtos/CartItemDto";
 import { cartState, getUserCarts, removeCartItem, updateCartItemQuantity } from "../../store/features/cartSlice";
 import { AppDispatch } from "../../store/store";
 import ProductImage from "../common/utils/ProductImage";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
+import LoadSpinner from "../common/LoadSpinner";
+import { placeOrder } from "../../store/features/orderSlice";
 
 const Cart = () => {
     const { userId } = useParams();
     const dispatch = useDispatch<AppDispatch>();
-    const { items, cartId } = useSelector((state: { cart: cartState }) => state.cart);
+    const { items, cartId, isLoading } = useSelector((state: { cart: cartState }) => state.cart);
+    const navigate = useNavigate();
 
     React.useEffect(() => {
         if (userId) {
@@ -23,11 +26,22 @@ const Cart = () => {
 
 
 
-    const handleQuantityChange = React.useCallback((productId: number, quantity: number) => {
+    const handleQuantityChange = React.useCallback((productId: number, quantity: number) => () => {
         if (quantity >= 1) {
             dispatch(updateCartItemQuantity({ cartId, productId, quantity }));
         }
     }, [dispatch, cartId]);
+
+    const handlePlaceOrder = () => {
+        if(items.length > 0) {
+            dispatch(placeOrder(Number(userId)));
+            navigate("/orders/" + userId);
+        }
+    };
+
+    if (isLoading) {
+        return <LoadSpinner variant="secondary" />;
+    }
 
     return (
         <div className="container mt-5 mb-5 p-5">
@@ -66,13 +80,15 @@ const Cart = () => {
                                 <div className="text-center">
                                     <QuantityUpdater
                                         quantity={quantity}
-                                        increment={() => handleQuantityChange(productId, quantity + 1)}
-                                        decrement={() => handleQuantityChange(productId, quantity - 1)}
+                                        increment={handleQuantityChange(productId, quantity + 1)}
+                                        decrement={handleQuantityChange(productId, quantity - 1)}
                                     />
                                 </div>
                                 <div className="text-center">{(item.unitPrice * item.quantity).toFixed(2)}</div>
                                 <div className="text-center">
-                                    <button className="btn btn-sm btn-outline-danger" onClick={() => dispatch(removeCartItem({ cartId: cartId, productId: item.productId }))} >
+                                    <button className="btn btn-sm btn-outline-danger"
+                                        onClick={() => dispatch(removeCartItem({ cartId, productId }))}
+                                    >
                                         <BsTrash />
                                     </button>
                                 </div>
@@ -87,10 +103,10 @@ const Cart = () => {
                         Total cart amount: {_.sumBy(items, item => item.unitPrice * item.quantity).toFixed(2)}
                     </h4>
                     <div className="ms-auto checkout-links">
-                        <Link to={"#"} className="btn btn-outline-secondary me-2">
+                        <Link to={"#"} className="btn btn-outline-secondary me-2" onClick={() => navigate("/")} >
                             Continue shopping
                         </Link>
-                        <Link to={"#"} className="btn btn-primary">
+                        <Link to={"#"} className="btn btn-primary" onClick={handlePlaceOrder} >
                             Proceed to checkout
                         </Link>
                     </div>
