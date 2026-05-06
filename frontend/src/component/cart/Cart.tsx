@@ -21,11 +21,13 @@ const Cart = () => {
         }
     }, [userId, dispatch]);
 
-    const changeQuantity = (delta: number) => (item: CartItemDto) => {
-        return () => {
-            dispatch(updateCartItemQuantity({ cartId: cartId, productId: item.productId, quantity: item.quantity + delta }));
+
+
+    const handleQuantityChange = React.useCallback((productId: number, quantity: number) => {
+        if (quantity >= 1) {
+            dispatch(updateCartItemQuantity({ cartId, productId, quantity }));
         }
-    };
+    }, [dispatch, cartId]);
 
     return (
         <div className="container mt-5 mb-5 p-5">
@@ -41,6 +43,9 @@ const Cart = () => {
                 </div>
 
                 {_.map(items, (item: CartItemDto, idx) => {
+                    const productId = item.productId;
+                    const quantity = item.quantity;
+
                     const imageId: string | undefined = item.images.length === 0 ? undefined : item.images[0].id;
                     return (
                         <Card key={idx} className="mb-4">
@@ -60,9 +65,9 @@ const Cart = () => {
                                 <div className="text-center">{item.unitPrice.toFixed(2)}</div>
                                 <div className="text-center">
                                     <QuantityUpdater
-                                        quantity={item.quantity}
-                                        increment={changeQuantity(1)(item)}
-                                        decrement={changeQuantity(-1)(item)}
+                                        quantity={quantity}
+                                        increment={() => handleQuantityChange(productId, quantity + 1)}
+                                        decrement={() => handleQuantityChange(productId, quantity - 1)}
                                     />
                                 </div>
                                 <div className="text-center">{(item.unitPrice * item.quantity).toFixed(2)}</div>
