@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { addToCart, cartState } from "../../store/features/cartSlice";
-import { getProductById, ProductState } from "../../store/features/productSlice";
+import { decrementQuantity, getProductById, ProductState, incrementQuantity } from "../../store/features/productSlice";
 import { AppDispatch } from "../../store/store";
 import ImageZoomify from "../common/ImageZoomify";
 import LoadSpinner from "../common/LoadSpinner";
@@ -71,7 +71,11 @@ const ProductDetails = () => {
                         {product.inventory > 0 ? "In stock " + product.inventory : "Out of stock"}
                     </p>
                     <div className="product-category">Quantity:
-                        <QuantityUpdater />
+                        <QuantityUpdater
+                            quantity={quantity}
+                            increment={() =>dispatch(incrementQuantity())}
+                            decrement={() =>dispatch(decrementQuantity())}
+                        />
                     </div>
                 </div>
                 <div className="d-flex gap-2 mt-3" >

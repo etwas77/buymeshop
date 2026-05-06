@@ -7,6 +7,7 @@ import { CartItemDto } from "../../dtos/CartItemDto";
 import { BsDash, BsPlus, BsTrash } from "react-icons/bs";
 import { Card } from "react-bootstrap";
 import ProductImage from "../common/utils/ProductImage";
+import QuantityUpdater from "../common/utils/QuantityUpdater";
 
 const Cart = () => {
     const { userId } = useParams();
@@ -56,18 +57,15 @@ const Cart = () => {
                                 <div className="text-center">{item.productName}</div>
                                 <div className="text-center">{item.productBrand}</div>
                                 <div className="text-center">{item.unitPrice.toFixed(2)}</div>
-                                <div className="text-center">{item.quantity}</div>
+                                <div className="text-center">
+                                    <QuantityUpdater
+                                        quantity={item.quantity}
+                                        increment={changeQuantity(1)(item)}
+                                        decrement={changeQuantity(-1)(item)}
+                                    />
+                                </div>
                                 <div className="text-center">{(item.unitPrice * item.quantity).toFixed(2)}</div>
                                 <div className="text-center">
-                                    <button
-                                        disabled={item.quantity <= 1}
-                                        className="btn btn-sm btn-outline-secondary me-2"
-                                        onClick={changeQuantity(-1)(item)}>
-                                        <BsDash />
-                                    </button>
-                                    <button className="btn btn-sm btn-outline-secondary me-2" onClick={changeQuantity(1)(item)}>
-                                        <BsPlus />
-                                    </button>
                                     <button className="btn btn-sm btn-outline-danger" onClick={() => dispatch(removeCartItem({ cartId: cartId, productId: item.productId }))} >
                                         <BsTrash />
                                     </button>
