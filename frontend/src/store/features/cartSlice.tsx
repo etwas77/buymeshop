@@ -56,10 +56,9 @@ export const updateCartItemQuantity = createAsyncThunk(
     async (payload: { cartId: number; productId: number; quantity: number }, { rejectWithValue }) => {        
         const accessToken = localStorage.getItem("accessToken") ?? '';
         try {
-            const formData = new FormData();
-            formData.append("quantity", payload.quantity.toString());
-
-            const response = await api.put(`/cartItems/update/${payload.cartId}/${payload.productId}`, formData, {
+            const response = await api.put(`/cartItems/update/${payload.cartId}/${payload.productId}?quantity=${payload.quantity}`, 
+                {},
+                {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
                 },

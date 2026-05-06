@@ -1,11 +1,12 @@
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useParams } from "react-router-dom"; import { AppDispatch } from "../../store/store";
-import { cartState, getUserCarts, removeCartItem, updateCartItemQuantity } from "../../store/features/cartSlice";
-import React from "react";
 import _ from "lodash";
-import { CartItemDto } from "../../dtos/CartItemDto";
-import { BsDash, BsPlus, BsTrash } from "react-icons/bs";
+import React from "react";
 import { Card } from "react-bootstrap";
+import { BsTrash } from "react-icons/bs";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useParams } from "react-router-dom";
+import { CartItemDto } from "../../dtos/CartItemDto";
+import { cartState, getUserCarts, removeCartItem, updateCartItemQuantity } from "../../store/features/cartSlice";
+import { AppDispatch } from "../../store/store";
 import ProductImage from "../common/utils/ProductImage";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
 
