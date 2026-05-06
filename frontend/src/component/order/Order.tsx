@@ -29,57 +29,59 @@ const Order = () => {
     return (
         <div className="container mt-5 mb-5 p-5">
             <div className="d-flex flex-column">
-                <div className="d-flex justify-content-between mb-4 fw-bold">
-                    <div className="text-center">Order ID</div>
-                    <div className="text-center">Date</div>
-                    <div className="text-center">Status</div>
-                    <div className="text-center">Amount</div>
-                    <div className="text-center">Items</div>
-                </div>
+                <table className="table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th className="text-center">Date</th>
+                            <th className="text-center">Status</th>
+                            <th className="text-center">Amount</th>
+                            <th className="text-center">Items</th>
+                        </tr>
+                    </thead>
+                    <tbody>
 
-                {_.map(orders, (order: OrderDto, idx) => {
-                    return (
-                        <Card key={idx} className="mb-4">
-                            <Card.Body className="d-flex justify-content-between align-items-center shadow">
-
-                                <div className="text-center">{order.id}</div>
-                                <div className="text-center">{order.orderDate}</div>
-                                <div className="text-center">{order.status}</div>
-                                <div className="text-center">{order.totalAmount.toFixed(2)}</div>
-                                <div className="text-center">
-
-                                    <table className="table table-sm table-bordered mb-0">
-                                        <thead>
-                                            <tr>
-                                                <th>Item ID</th>
-                                                <th>Name</th>
-                                                <th>Brand</th>
-                                                <th>Quantity</th>
-                                                <th>Price</th>
-                                                <th>Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {_.map(order.orderItems, (item: OrderItemDto) => (
-                                                <tr key={item.id}>
-                                                    <td>{item.id}</td>
-                                                    <td>{item.productName}</td>
-                                                    <td>{item.productBrand}</td>
-                                                    <td>{item.quantity}</td>
-                                                    <td>{item.price.toFixed(2)}</td>
-                                                    <td>{(item.quantity * item.price).toFixed(2)}</td>
+                        {_.map(orders, (order: OrderDto, idx) => {
+                            return (
+                                <tr key={idx} >
+                                    <td className="text-center">{order.id}</td>
+                                    <td className="text-center">{order.orderDate}</td>
+                                    <td className="text-center">{order.status}</td>
+                                    <td className="text-center">{order.totalAmount.toFixed(2)}</td>
+                                    <td className="text-center">
+                                        <table className="table table-sm table-bordered mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th>Item ID</th>
+                                                    <th>Name</th>
+                                                    <th>Brand</th>
+                                                    <th>Quantity</th>
+                                                    <th>Price</th>
+                                                    <th>Total</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
+                                            </thead>
+                                            <tbody>
+                                                {_.map(order.orderItems, (item: OrderItemDto, idx) => (
+                                                    <tr key={item.id} className={idx % 2 === 0 ? "order-row-even" : "order-row-odd"} >
+                                                        <td>{item.id}</td>
+                                                        <td>{item.productName}</td>
+                                                        <td>{item.productBrand}</td>
+                                                        <td>{item.quantity}</td>
+                                                        <td>{item.price.toFixed(2)}</td>
+                                                        <td>{(item.quantity * item.price).toFixed(2)}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
 
-                                </div>
-                            </Card.Body>
-                        </Card>
-                    );
-                })}
 
+                                    </td>
+                                </tr>
+                            );
+                        })}
 
+                    </tbody>
+                </table>
                 <div className=" cart-footer d-flex align-items-center mt-4">
                     <div className="ms-auto checkout-links">
                         <Link to={"#"} className="btn btn-outline-secondary me-2" onClick={() => navigate("/")} >
