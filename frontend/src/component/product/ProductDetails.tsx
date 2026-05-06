@@ -72,6 +72,7 @@ const ProductDetails = () => {
                     </p>
                     <div className="product-category">Quantity:
                         <QuantityUpdater
+                            quantityLimit={product.inventory}
                             quantity={quantity}
                             increment={() =>dispatch(incrementQuantity())}
                             decrement={() =>dispatch(decrementQuantity())}

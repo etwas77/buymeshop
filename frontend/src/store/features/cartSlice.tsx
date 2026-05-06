@@ -6,7 +6,7 @@ import { CartItemDto } from "../../dtos/CartItemDto";
 export const addToCart = createAsyncThunk(
     "cart/addToCart",
     async (payload: { productId: string; quantity: number }, { rejectWithValue }) => {
-        const accessToken = localStorage.getItem("accessToken") ?? '';        
+        const accessToken = localStorage.getItem("accessToken") ?? '';
         try {
             const formData = new FormData();
             formData.append("productId", payload.productId);
@@ -53,19 +53,19 @@ export const getUserCarts = createAsyncThunk(
 
 export const updateCartItemQuantity = createAsyncThunk(
     "cart/updateCartItemQuantity",
-    async (payload: { cartId: number; productId: number; quantity: number }, { rejectWithValue }) => {        
+    async (payload: { cartId: number; productId: number; quantity: number }, { rejectWithValue }) => {
         const accessToken = localStorage.getItem("accessToken") ?? '';
         try {
-            const response = await api.put(`/cartItems/update/${payload.cartId}/${payload.productId}?quantity=${payload.quantity}`, 
+            const response = await api.put(`/cartItems/update/${payload.cartId}/${payload.productId}?quantity=${payload.quantity}`,
                 {},
                 {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                },
-                withCredentials: true
-            });
-            return {message: response.data.message as string, payload};
-        } catch (error: any) {            
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`
+                    },
+                    withCredentials: true
+                });
+            return { message: response.data.message as string, payload };
+        } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
                 return rejectWithValue(error.response.data.message);
             }
@@ -76,7 +76,7 @@ export const updateCartItemQuantity = createAsyncThunk(
 
 export const removeCartItem = createAsyncThunk(
     "cart/removeCartItem",
-    async (payload: { cartId: number; productId: number; }, { rejectWithValue }) => {        
+    async (payload: { cartId: number; productId: number; }, { rejectWithValue }) => {
         const accessToken = localStorage.getItem("accessToken") ?? '';
         try {
             const response = await api.delete(`/cartItems/remove/${payload.cartId}/${payload.productId}`, {
@@ -85,8 +85,8 @@ export const removeCartItem = createAsyncThunk(
                 },
                 withCredentials: true
             });
-            return {message: response.data.message as string, payload};
-        } catch (error: any) {            
+            return { message: response.data.message as string, payload };
+        } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
                 return rejectWithValue(error.response.data.message);
             }
@@ -116,9 +116,13 @@ const cartSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(addToCart.fulfilled, (state, action) => {
-                const data: CartDto = action.payload.data;           
+                const data: CartDto = action.payload.data;
                 state.cartId = data.id;
-                state.items.push(...data.items);
+                
+                const existingIds = new Set(state.items.map(item => item.productId));
+                const newItems = data.items.filter(item => !existingIds.has(item.productId));
+                state.items.push(...newItems);
+
                 state.totalAmount += data.totalAmount;
                 state.successMessage = action.payload.message;
                 state.errorMessage = undefined; // Clear any previous error message on success
@@ -127,7 +131,7 @@ const cartSlice = createSlice({
                 // Prefer payload (backend message) if available, else fallback to error.message
                 state.errorMessage = "Failed to add item to cart: " + (action.payload || action.error.message);
                 state.successMessage = undefined; // Clear any previous success message on error
-                
+
                 console.log('action.error.message', action.error, 'action.payload', action.payload);
             })
             .addCase(getUserCarts.fulfilled, (state, action) => {
@@ -142,15 +146,15 @@ const cartSlice = createSlice({
             .addCase(getUserCarts.rejected, (state, action) => {
                 state.errorMessage = "Failed to fetch user carts: " + (action.payload || action.error.message);
                 state.successMessage = undefined; // Clear any previous success message on error
-                
+
                 console.log('action.error.message', action.error, 'action.payload', action.payload);
             })
             .addCase(updateCartItemQuantity.fulfilled, (state, action) => {
                 const payload = action.payload.payload;
-                
-                const index = state.items.findIndex(item => item.productId === payload.productId);             
+
+                const index = state.items.findIndex(item => item.productId === payload.productId);
                 if (index !== -1) {
-                    state.items[index] = {...state.items[index], quantity: payload.quantity};                  
+                    state.items[index] = { ...state.items[index], quantity: payload.quantity };
                 }
                 state.successMessage = action.payload.message;
                 state.errorMessage = undefined; // Clear any previous error message on success
@@ -168,7 +172,7 @@ const cartSlice = createSlice({
             .addCase(removeCartItem.rejected, (state, action) => {
                 state.errorMessage = "Failed to remove cart item: " + (action.payload || action.error.message);
                 state.successMessage = undefined; // Clear any previous success message on error        
-                })
+            })
             ;
     }
 });

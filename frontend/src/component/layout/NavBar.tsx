@@ -1,12 +1,19 @@
 import React from "react";
 import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { AppDispatch } from "../../store/store";
+import { BiLogOut } from "react-icons/bi";
+import { FaReceipt, FaShoppingCart, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { cartState } from "../../store/features/cartSlice";
 import { LoginState, setAccessToken } from "../../store/features/loginSlice";
+import { OrderState } from "../../store/features/orderSlice";
+import { AppDispatch } from "../../store/store";
 
 const NavBar = () => {
     const { accessToken } = useSelector((state: { login: LoginState }) => state.login);
+    const { items } = useSelector((state: { cart: cartState }) => state.cart);
+    const { orders } = useSelector((state: { order: OrderState }) => state.order);
+
     const dispatch = useDispatch<AppDispatch>();
 
     const userId = accessToken ? JSON.parse(atob(accessToken.split('.')[1])).id : null;
@@ -38,7 +45,8 @@ const NavBar = () => {
                     </Nav>
                     <Nav className='me-auto'>
                         <Nav.Link to={`/cart/${userId}`} as={Link}>
-                            My Cart
+                            <FaShoppingCart />
+                            My Cart({items.length})
                         </Nav.Link>
                     </Nav>
                     {accessToken === undefined &&
@@ -52,13 +60,15 @@ const NavBar = () => {
                         <NavDropdown title='Account'>
                             <>
                                 <NavDropdown.Item to={"#"} as={Link}>
+                                    <FaUser />
                                     My Account
                                 </NavDropdown.Item>
 
                                 <NavDropdown.Divider />
 
                                 <NavDropdown.Item to={`/orders/${userId}`} as={Link}>
-                                    My Orders
+                                    <FaReceipt />
+                                    My Orders({orders.length})
                                 </NavDropdown.Item>
 
                                 <NavDropdown.Divider />
@@ -69,6 +79,7 @@ const NavBar = () => {
                                         dispatch(setAccessToken(undefined));
                                         setAccessToken(undefined);
                                     }}>
+                                        <BiLogOut />
                                         Log-out
                                     </NavDropdown.Item>
                                 }

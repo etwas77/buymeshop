@@ -1,7 +1,5 @@
 import _ from "lodash";
 import React from "react";
-import { Card } from "react-bootstrap";
-import { FaCartShopping } from 'react-icons/fa6';
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { OrderDto } from "../../dtos/OrderDto";

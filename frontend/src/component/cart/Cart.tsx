@@ -107,7 +107,7 @@ const Cart = () => {
                             Continue shopping
                         </Link>
                         <Link to={"#"} className="btn btn-primary" onClick={handlePlaceOrder} >
-                            Proceed to checkout
+                            Place order
                         </Link>
                     </div>
                 </div>
