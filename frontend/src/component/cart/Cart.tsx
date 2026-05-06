@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useParams } from "react-router-dom"; import { AppDispatch } from "../../store/store";
-import { cartState, getUserCarts, updateCartItemQuantity } from "../../store/features/cartSlice";
+import { cartState, getUserCarts, removeCartItem, updateCartItemQuantity } from "../../store/features/cartSlice";
 import React from "react";
 import _ from "lodash";
 import { CartItemDto } from "../../dtos/CartItemDto";
@@ -68,7 +68,7 @@ const Cart = () => {
                                     <button className="btn btn-sm btn-outline-secondary me-2" onClick={changeQuantity(1)(item)}>
                                         <BsPlus />
                                     </button>
-                                    <button className="btn btn-sm btn-outline-danger">
+                                    <button className="btn btn-sm btn-outline-danger" onClick={() => dispatch(removeCartItem({ cartId: cartId, productId: item.productId }))} >
                                         <BsTrash />
                                     </button>
                                 </div>

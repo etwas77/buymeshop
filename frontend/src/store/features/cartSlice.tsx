@@ -75,6 +75,27 @@ export const updateCartItemQuantity = createAsyncThunk(
     }
 );
 
+export const removeCartItem = createAsyncThunk(
+    "cart/removeCartItem",
+    async (payload: { cartId: number; productId: number; }, { rejectWithValue }) => {        
+        const accessToken = localStorage.getItem("accessToken") ?? '';
+        try {
+            const response = await api.delete(`/cartItems/remove/${payload.cartId}/${payload.productId}`, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                },
+                withCredentials: true
+            });
+            return {message: response.data.message as string, payload};
+        } catch (error: any) {            
+            if (error.response && error.response.data && error.response.data.message) {
+                return rejectWithValue(error.response.data.message);
+            }
+            return rejectWithValue(error.message || 'Unknown error');
+        }
+    }
+);
+
 export interface cartState {
     cartId: number;
     items: CartItemDto[];
@@ -135,7 +156,18 @@ const cartSlice = createSlice({
             .addCase(updateCartItemQuantity.rejected, (state, action) => {
                 state.errorMessage = "Failed to update cart item quantity: " + (action.payload || action.error.message);
                 state.successMessage = undefined; // Clear any previous success message on error
-            });
+            })
+            .addCase(removeCartItem.fulfilled, (state, action) => {
+                const payload = action.payload.payload;
+                state.items = state.items.filter(item => item.productId !== payload.productId);
+                state.successMessage = action.payload.message;
+                state.errorMessage = undefined; // Clear any previous error message on success
+            })
+            .addCase(removeCartItem.rejected, (state, action) => {
+                state.errorMessage = "Failed to remove cart item: " + (action.payload || action.error.message);
+                state.successMessage = undefined; // Clear any previous success message on error        
+                })
+            ;
     }
 });
 
