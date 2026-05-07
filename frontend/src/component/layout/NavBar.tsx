@@ -9,6 +9,7 @@ import { LoginState, setAccessToken } from "../../store/features/loginSlice";
 import { getOrdersByUserId, OrderState } from "../../store/features/orderSlice";
 import { AppDispatch } from "../../store/store";
 import { isValidToken } from "../common/utils/Functions";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const NavBar = () => {
     const { accessToken } = useSelector((state: { login: LoginState }) => state.login);
@@ -34,9 +35,9 @@ const NavBar = () => {
                 dispatch(getUserCarts({ userId }));
                 dispatch(getOrdersByUserId(Number(userId)));
             }
-            
+
         }
-    }, [accessToken, dispatch]);  
+    }, [accessToken, dispatch]);
 
     return (
         <Navbar expand='lg' sticky='top' className='nav-bg'>
@@ -56,12 +57,7 @@ const NavBar = () => {
                             Manage Products
                         </Nav.Link>
                     </Nav>
-                    <Nav className='me-auto'>
-                        <Nav.Link to={`/cart/${userId}`} as={Link}>
-                            <FaShoppingCart />
-                            My Cart({items.length})
-                        </Nav.Link>
-                    </Nav>
+
                     {accessToken === undefined &&
                         <Nav className='me-auto'>
                             <Nav.Link to={"/login"} as={Link}>
@@ -78,6 +74,10 @@ const NavBar = () => {
                                 </NavDropdown.Item>
 
                                 <NavDropdown.Divider />
+                                <NavDropdown.Item to={`/cart/${userId}`} as={Link}>
+                                    <FaShoppingCart />
+                                    My Cart({items.length})
+                                </NavDropdown.Item>
 
                                 <NavDropdown.Item to={`/orders/${userId}`} as={Link}>
                                     <FaReceipt />
@@ -99,9 +99,21 @@ const NavBar = () => {
                             </>
                         </NavDropdown>
                     </Nav>
+                    <OverlayTrigger
+                        placement="bottom"
+                        overlay={<Tooltip id="cart-tooltip">View Cart</Tooltip>}
+                    >
+                        <Nav.Link to={`/cart/${userId}`} as={Link}>
+
+                            <FaShoppingCart />
+
+                            ({items.length})
+
+                        </Nav.Link>
+                    </OverlayTrigger>
                 </Navbar.Collapse>
             </Container>
-        </Navbar>
+        </Navbar >
     );
 };
 
