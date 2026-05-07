@@ -2,10 +2,11 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { api } from "../../component/services/api";
 import { ProductDto } from "../../dtos/ProductDto";
+import { AddProductRequestDto } from "../../dtos/AddProductRequestDto";
 
 
 export const getAllProducts = createAsyncThunk(
-    "product/getAllProducts",
+    "products/getAllProducts",
     async () => {
         try {
             const response = await api.get("/products");
@@ -18,8 +19,22 @@ export const getAllProducts = createAsyncThunk(
     }
 );
 
+export const addNewProduct = createAsyncThunk(
+    "products/addNewProduct",
+    async (addProductRequest: AddProductRequestDto) => {
+        try {
+            const response = await api.post("/products/add", addProductRequest);
+            return response.data.data as ProductDto;
+        }
+        catch (error: any) {
+            toast.error("Error adding product: " + error.message);
+            return undefined;
+        }
+    }
+);
+
 export const getAllBrands = createAsyncThunk(
-    "product/getAllBrands",
+    "products/getAllBrands",
     async () => {
         try {
             const response = await api.get("/products/distinct/brands");
@@ -33,7 +48,7 @@ export const getAllBrands = createAsyncThunk(
 );
 
 export const getAllDistinctProducts = createAsyncThunk(
-    "product/getAllDistinctProducts",
+    "products/getAllDistinctProducts",
     async () => {
         try {
             const response = await api.get("/products/distinct/products");
@@ -47,7 +62,7 @@ export const getAllDistinctProducts = createAsyncThunk(
 );
 
 export const getProductById = createAsyncThunk(
-    "product/getProductById",
+    "products/getProductById",
     async (id: string) => {
         try {
             const response = await api.get("/products/product/" + id);
@@ -72,7 +87,7 @@ export interface ProductState {
 }
 
 const productSlice = createSlice({
-    name: "product",
+    name: "products",
     initialState: {
         products: [],
         distinctProducts: [],
@@ -96,6 +111,9 @@ const productSlice = createSlice({
         },
         decrementQuantity: (state: ProductState) => {
             state.quantity = state.quantity > 0 ? state.quantity - 1 : 0;
+        },
+        addBrand: (state: ProductState, action: PayloadAction<String>) => {
+            state.brands = [...state.brands, action.payload];
         }
     },
     extraReducers: (builder) => {
@@ -124,9 +142,22 @@ const productSlice = createSlice({
             .addCase(getAllProducts.pending, (state) => {
                 state.isLoading = true;
             })
+            .addCase(addNewProduct.fulfilled, (state, action) => {
+                if (action.payload) {
+                    state.products.push(action.payload);
+                    state.product = action.payload;
+                    toast.success("Product added successfully!");
+                }          
+                state.isLoading = false;
+            })
+            .addCase(addNewProduct.rejected, (state, action) => {
+                toast.error("Failed to add product: " + action.error.message);
+                state.errorMessage = action.error.message;
+                state.isLoading = false;
+            })
             ;
     }
 });
 
-export const { filterByBrand, incrementQuantity, decrementQuantity } = productSlice.actions;
+export const { filterByBrand, incrementQuantity, decrementQuantity, addBrand } = productSlice.actions;
 export default productSlice.reducer;

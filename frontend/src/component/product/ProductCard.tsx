@@ -29,6 +29,7 @@ const ProductCard = (p: ProductCardProps) => {
                         <Card className="mb-2 mt-2">
                             <Link to={"/products/" + product.id + "/details"} className="link" >
                                 {imageId && <ProductImage imageId={imageId} />}
+                                {!imageId && <div>no image available</div>}
                             </Link>
                             <Card.Body>
                                 <h4 className="price">${product.price}</h4>

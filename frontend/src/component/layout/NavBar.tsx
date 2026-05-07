@@ -53,7 +53,7 @@ const NavBar = () => {
                         </Nav.Link>
                     </Nav>
                     <Nav className='me-auto'>
-                        <Nav.Link to={"#"} as={Link}>
+                        <Nav.Link to={"/manage"} as={Link}>
                             Manage Products
                         </Nav.Link>
                     </Nav>

@@ -1,4 +1,4 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
 import { api } from "../../component/services/api";
 import { CategoryDto } from "../../dtos/CategoryDto";
@@ -30,23 +30,29 @@ const categorySlice = createSlice({
         categories: [],
         isLoading: false
     } as CategoryState,
-    reducers: {},
+    reducers: {
+        addCategory: (state, action: PayloadAction<CategoryDto | undefined>) => {
+            if (action.payload)
+                state.categories.push(action.payload);
+        }
+    },
     extraReducers: (builder) => {
         builder
-        .addCase(getAllCategories.fulfilled, (state, action) => {
-            state.categories = action.payload;
-            state.isLoading = false;
-        })
-        .addCase(getAllCategories.rejected, (state, action) => {
-            toast.error("Failed to fetch categories: " + action.error.message);
-            state.errorMessage = action.error.message;
-            state.isLoading = false;
-        })
-        .addCase(getAllCategories.pending, (state) => {
-            state.isLoading = true;
-        })
-        ;
+            .addCase(getAllCategories.fulfilled, (state, action) => {
+                state.categories = action.payload;
+                state.isLoading = false;
+            })
+            .addCase(getAllCategories.rejected, (state, action) => {
+                toast.error("Failed to fetch categories: " + action.error.message);
+                state.errorMessage = action.error.message;
+                state.isLoading = false;
+            })
+            .addCase(getAllCategories.pending, (state) => {
+                state.isLoading = true;
+            })
+            ;
     }
 });
 
+export const { addCategory } = categorySlice.actions;
 export default categorySlice.reducer;
