@@ -112,7 +112,11 @@ const cartSlice = createSlice({
         totalAmount: 0,
         isLoading: true
     } as cartState,
-    reducers: {},
+    reducers: {
+        setLoading(state, action) {
+            state.isLoading = action.payload;
+        },
+    },
     extraReducers: (builder) => {
         builder
             .addCase(addToCart.fulfilled, (state, action) => {
@@ -177,4 +181,5 @@ const cartSlice = createSlice({
     }
 });
 
+export const { setLoading } = cartSlice.actions;
 export default cartSlice.reducer;

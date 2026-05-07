@@ -4,10 +4,11 @@ import { BiLogOut } from "react-icons/bi";
 import { FaReceipt, FaShoppingCart, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { cartState } from "../../store/features/cartSlice";
+import { cartState, getUserCarts } from "../../store/features/cartSlice";
 import { LoginState, setAccessToken } from "../../store/features/loginSlice";
-import { OrderState } from "../../store/features/orderSlice";
+import { getOrdersByUserId, OrderState } from "../../store/features/orderSlice";
 import { AppDispatch } from "../../store/store";
+import { isValidToken } from "../common/utils/Functions";
 
 const NavBar = () => {
     const { accessToken } = useSelector((state: { login: LoginState }) => state.login);
@@ -21,9 +22,21 @@ const NavBar = () => {
     React.useEffect(() => {
         if (accessToken === undefined) {
             const accessToken = localStorage.getItem("accessToken");
-            dispatch(setAccessToken(accessToken ?? undefined));
+            if (accessToken)
+                dispatch(setAccessToken(accessToken));
         }
-    }, [accessToken, dispatch]);
+        else {
+            const valid = isValidToken(accessToken);
+            if (!valid) {
+                localStorage.removeItem("accessToken");
+            }
+            else {
+                dispatch(getUserCarts({ userId }));
+                dispatch(getOrdersByUserId(Number(userId)));
+            }
+            
+        }
+    }, [accessToken, dispatch]);  
 
     return (
         <Navbar expand='lg' sticky='top' className='nav-bg'>

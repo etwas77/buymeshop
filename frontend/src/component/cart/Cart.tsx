@@ -5,7 +5,7 @@ import { BsTrash } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CartItemDto } from "../../dtos/CartItemDto";
-import { cartState, getUserCarts, removeCartItem, updateCartItemQuantity } from "../../store/features/cartSlice";
+import { cartState, getUserCarts, removeCartItem, setLoading, updateCartItemQuantity } from "../../store/features/cartSlice";
 import { AppDispatch } from "../../store/store";
 import ProductImage from "../common/utils/ProductImage";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
@@ -18,9 +18,12 @@ const Cart = () => {
     const { items, cartId, isLoading } = useSelector((state: { cart: cartState }) => state.cart);
     const navigate = useNavigate();
 
-    React.useEffect(() => {
-        if (userId) {
+    React.useEffect(() => {        
+        if (userId !== undefined && userId !== "null") {            
             dispatch(getUserCarts({ userId }));
+        }
+        else {
+            dispatch(setLoading(false)); // No user ID, so we can stop loading immediately
         }
     }, [userId, dispatch]);
 
