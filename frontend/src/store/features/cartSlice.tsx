@@ -122,12 +122,9 @@ const cartSlice = createSlice({
             .addCase(addToCart.fulfilled, (state, action) => {
                 const data: CartDto = action.payload.data;
                 state.cartId = data.id;
-                
-                const existingIds = new Set(state.items.map(item => item.productId));
-                const newItems = data.items.filter(item => !existingIds.has(item.productId));
-                state.items.push(...newItems);
 
-                state.totalAmount += data.totalAmount;
+                state.items = data.items;
+                state.totalAmount = data.totalAmount;
                 state.successMessage = action.payload.message;
                 state.errorMessage = undefined; // Clear any previous error message on success
             })
@@ -158,8 +155,14 @@ const cartSlice = createSlice({
 
                 const index = state.items.findIndex(item => item.productId === payload.productId);
                 if (index !== -1) {
-                    state.items[index] = { ...state.items[index], quantity: payload.quantity };
+                    const unitPrice = state.items[index].unitPrice;
+                    state.items[index] = {
+                        ...state.items[index],
+                        quantity: payload.quantity,
+                        totalPrice: unitPrice * payload.quantity
+                    };
                 }
+                state.totalAmount = state.items.reduce((sum, item) => sum + item.totalPrice, 0);
                 state.successMessage = action.payload.message;
                 state.errorMessage = undefined; // Clear any previous error message on success
             })
@@ -170,6 +173,7 @@ const cartSlice = createSlice({
             .addCase(removeCartItem.fulfilled, (state, action) => {
                 const payload = action.payload.payload;
                 state.items = state.items.filter(item => item.productId !== payload.productId);
+                state.totalAmount = state.items.reduce((sum, item) => sum + item.totalPrice, 0);
                 state.successMessage = action.payload.message;
                 state.errorMessage = undefined; // Clear any previous error message on success
             })
