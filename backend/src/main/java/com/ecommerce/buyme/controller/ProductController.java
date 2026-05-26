@@ -70,6 +70,14 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @DeleteMapping("/{productId}/images/{imageId}")
+    public ResponseEntity<ApiResponse> removeImage(@PathVariable("productId") Long productId,
+            @PathVariable("imageId") Long imageId) {
+         ProductDto productDto = productService.removeImage(productId, imageId);
+        ApiResponse response = new ApiResponse("Image removed successfully", productDto);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("product/brandandname/{brand}/{name}")
     public ResponseEntity<ApiResponse> getByBrandAndName(@PathVariable("brand") String brand,
             @PathVariable("name") String name) {

@@ -15,6 +15,8 @@ public interface IProductService {
 
     Product getById(Long productId);
 
+    ProductDto removeImage(Long productId, Long imageId);
+
     void delete(Long productId);
 
     List<Product> getAll();

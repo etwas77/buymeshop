@@ -1,4 +1,5 @@
 import { CategoryDto } from "./CategoryDto";
+import { ImageDto } from "./ImageDto";
 
 export interface AddProductRequestDto {
     name: string;
@@ -7,4 +8,5 @@ export interface AddProductRequestDto {
     inventory: number;
     description: string;
     category: CategoryDto;
+    images?: ImageDto[];
 }

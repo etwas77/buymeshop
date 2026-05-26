@@ -1,11 +1,12 @@
+import { useParams } from "react-router-dom";
 import AddProduct from "./AddProduct";
 
 const ManageProducts = () => {
-
+const { productId } = useParams();
 
     return (
         <div>
-            <AddProduct />
+            <AddProduct productId={productId} />
 
         </div>
     );

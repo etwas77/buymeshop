@@ -19,7 +19,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/cart/:userId" element={<Cart />} />
                 <Route path="/orders/:userId" element={<Order />} />
-                <Route path="/manage" element={<ManageProducts />} />
+                <Route path="/manage/:productId?" element={<ManageProducts />} />
             </Route>
         )
     );

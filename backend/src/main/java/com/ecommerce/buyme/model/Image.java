@@ -2,7 +2,6 @@ package com.ecommerce.buyme.model;
 
 import java.sql.Blob;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -30,7 +29,7 @@ public class Image {
     @Lob
     private Blob image;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
 }

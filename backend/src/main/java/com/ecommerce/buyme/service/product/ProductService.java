@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ecommerce.buyme.dtos.ImageDto;
 import com.ecommerce.buyme.dtos.ProductDto;
@@ -78,6 +79,25 @@ public class ProductService implements IProductService {
     public Product getById(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
+    }
+
+    @Override
+    @Transactional
+    public ProductDto removeImage(Long productId, Long imageId) {
+        Product product = getById(productId);
+        Image image = imageRepository.findById(imageId)
+                .orElseThrow(() -> new EntityNotFoundException("Image not found with id: " + imageId));
+
+        if (image.getProduct() == null || !productId.equals(image.getProduct().getId())) {
+            throw new EntityNotFoundException(
+                    "Image with id: " + imageId + " does not belong to product with id: " + productId);
+        }
+
+        if (product.getImages() != null) {
+            product.getImages().removeIf(existing -> imageId.equals(existing.getId()));
+        }
+        imageRepository.delete(image);
+        return convertToDto(product);
     }
 
     private Product updateExistingProduct(Product product, ProductUpdateRequest request) {

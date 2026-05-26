@@ -1,8 +1,8 @@
 import _ from "lodash";
 import React from "react";
-import { FaShoppingBasket, FaShoppingCart } from "react-icons/fa";
+import { FaItunes, FaShoppingBasket, FaShoppingCart } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
 import { addToCart, cartState } from "../../store/features/cartSlice";
 import { decrementQuantity, getProductById, ProductState, incrementQuantity } from "../../store/features/productSlice";
@@ -18,6 +18,7 @@ const ProductDetails = () => {
     const { successMessage, errorMessage } = useSelector((state: { cart: cartState }) => state.cart);
 
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
 
     React.useEffect(() => {
         if (id) {
@@ -74,8 +75,8 @@ const ProductDetails = () => {
                         <QuantityUpdater
                             quantityLimit={product.inventory}
                             quantity={quantity}
-                            increment={() =>dispatch(incrementQuantity())}
-                            decrement={() =>dispatch(decrementQuantity())}
+                            increment={() => dispatch(incrementQuantity())}
+                            decrement={() => dispatch(decrementQuantity())}
                         />
                     </div>
                 </div>
@@ -88,6 +89,11 @@ const ProductDetails = () => {
                         <FaShoppingBasket />
                         {" buy now"}
 
+                    </button>
+
+                    <button className="buy-now-button" onClick={() => navigate("/manage/" + product.id)}>
+                        <FaItunes/>
+                        {"manage item"}
                     </button>
                 </div>
             </div>

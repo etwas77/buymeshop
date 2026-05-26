@@ -75,6 +75,34 @@ export const getProductById = createAsyncThunk(
     }
 );
 
+export const updateProductById = createAsyncThunk(
+    "products/updateProductById",
+    async (payload: { productUpdateRequest: AddProductRequestDto, id: string }) => {
+        try {
+            const response = await api.put("/products/update/" + payload.id, payload.productUpdateRequest);
+            return response.data.data as ProductDto;
+        }
+        catch (error: any) {
+            toast.error("Error updating product: " + error.message);
+            return undefined;
+        }
+    }
+);
+
+export const removeImageByIdProductById = createAsyncThunk(
+    "products/removeImageByIdProductById",
+    async (payload: { imageId: string, productId: string }) => {
+        try {
+            const response = await api.delete("/products/" + payload.productId + "/images/" + payload.imageId);
+            return response.data.data as ProductDto;
+        }
+        catch (error: any) {
+            toast.error("Error removing image: " + error.message);
+            return undefined;
+        }
+    }
+);
+
 export interface ProductState {
     products: ProductDto[];
     distinctProducts: ProductDto[];
@@ -155,6 +183,23 @@ const productSlice = createSlice({
                 state.errorMessage = action.error.message;
                 state.isLoading = false;
             })
+            .addCase(updateProductById.fulfilled, (state, action) => {
+                if (action.payload) {
+                    const index = state.products.findIndex(p => p.id === action.payload!.id);
+                    if (index !== -1) {
+                        state.products[index] = action.payload;
+                    }   
+                    state.product = action.payload;
+                    toast.success("Product updated successfully!");
+                }
+                state.isLoading = false;
+            })
+            .addCase(removeImageByIdProductById.fulfilled, (state, action) => {
+                if (state.product) {
+                    state.product = action.payload;
+                }   
+                state.isLoading = false;
+             })
             ;
     }
 });
