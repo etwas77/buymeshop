@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { uploadImages } from "../../store/features/imageSlice";
 import { getProductById } from "../../store/features/productSlice";
+import { toast, ToastContainer } from "react-toastify";
 
 const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 
@@ -42,6 +43,7 @@ const ImageUploader = (p: ImageUploaderProps) => {
             await dispatch(uploadImages({ files: images.map(img => img.file), productId }));            
             setImages([]);
             dispatch(getProductById(productId));
+            toast.success("Images uploaded successfully");
         };
     }
 

@@ -1,6 +1,7 @@
 import { Step, StepLabel, Stepper } from "@mui/material";
 import _ from "lodash";
 import React from "react";
+import { BsDash } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { AddProductRequestDto } from "../../dtos/AddProductRequestDto";
 import { CategoryDto } from "../../dtos/CategoryDto";
@@ -10,7 +11,6 @@ import BrandSelector from "../common/BrandSelector";
 import CategorySelector from "../common/CategorySelector";
 import ImageUploader from "../common/ImageUploader";
 import ImageZoomify from "../common/ImageZoomify";
-import { BsDash } from "react-icons/bs";
 
 export interface AddProductProps {
     productId?: string;
@@ -23,7 +23,6 @@ const AddProduct = (p: AddProductProps) => {
     const [brand, setBrand] = React.useState<string>();
     const [category, setCategory] = React.useState<CategoryDto>();
     const [activeStep, setActiveStep] = React.useState<number>(0);
-console.log('product', product);
 
     const steps = ["Add/Edit Product", "Upload product images", "Done"];
 
@@ -96,7 +95,6 @@ console.log('product', product);
                 <div className="d-flex justify-content-center">
                     <div className="col-md-6 col-xs-12">
                         <h4>{product === undefined ? "Add New Product" : "Edit Product"}</h4>
-
                         <Stepper activeStep={activeStep} className="mb-4">
                             {steps.map((label) => (
                                 <Step key={label}>
