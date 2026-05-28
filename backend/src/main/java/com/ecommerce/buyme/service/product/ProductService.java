@@ -107,12 +107,20 @@ public class ProductService implements IProductService {
         product.setInventory(request.getInventory());
         product.setDescription(request.getDescription());
         // Update images collection in-place and set product reference for each image
-        product.getImages().clear();
+        // product.getImages().clear();
+        // if (request.getImages() != null) {
+        // for (Image image : request.getImages()) {
+        // image.setProduct(product);
+        // product.getImages().add(image);
+        // }
+        // }
+
+        // Only touch images when client explicitly sends images.
+        // null = keep current images unchanged.
         if (request.getImages() != null) {
-            for (Image image : request.getImages()) {
-                image.setProduct(product);
-                product.getImages().add(image);
-            }
+            List<Image> resolvedImages = resolveImagesForProductUpdate(product, request.getImages());
+            product.getImages().clear();
+            product.getImages().addAll(resolvedImages);
         }
 
         Category cat = request.getCategory();
@@ -211,6 +219,30 @@ public class ProductService implements IProductService {
 
     @Override
     public List<String> getAllDistinctBrands() {
-        return productRepository.findAll().stream().map(Product :: getBrand).distinct().toList();
+        return productRepository.findAll().stream().map(Product::getBrand).distinct().toList();
+    }
+
+    private List<Image> resolveImagesForProductUpdate(Product product, List<ImageDto> imageDtos) {
+        List<Image> resolved = new ArrayList<>();
+
+        for (ImageDto dto : imageDtos) {
+            if (dto.getId() == null) {
+                throw new EntityNotFoundException("Image id is required in product update payload");
+            }
+
+            Image image = imageRepository.findById(dto.getId())
+                    .orElseThrow(() -> new EntityNotFoundException("Image not found with id: " + dto.getId()));
+
+            // Prevent attaching an image belonging to another product
+            if (image.getProduct() != null && !product.getId().equals(image.getProduct().getId())) {
+                throw new EntityNotFoundException(
+                        "Image with id: " + dto.getId() + " does not belong to product with id: " + product.getId());
+            }
+
+            image.setProduct(product);
+            resolved.add(image);
+        }
+
+        return resolved;
     }
 }

@@ -3,8 +3,8 @@ package com.ecommerce.buyme.request;
 import java.math.BigDecimal;
 import java.util.List;
 
+import com.ecommerce.buyme.dtos.ImageDto;
 import com.ecommerce.buyme.model.Category;
-import com.ecommerce.buyme.model.Image;
 
 import lombok.Data;
 
@@ -19,5 +19,5 @@ public class ProductUpdateRequest {
     private String description;
 
     private Category category;
-    private List<Image> images;
+    private List<ImageDto> images;
 }

@@ -4,6 +4,7 @@ import React from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../store/store";
 import { uploadImages } from "../../store/features/imageSlice";
+import { getProductById } from "../../store/features/productSlice";
 
 const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 
@@ -38,8 +39,9 @@ const ImageUploader = (p: ImageUploaderProps) => {
             return;
         }
         if (images.length > 0) {
-            dispatch(uploadImages({ files: images.map(img => img.file), productId }));
+            await dispatch(uploadImages({ files: images.map(img => img.file), productId }));            
             setImages([]);
+            dispatch(getProductById(productId));
         };
     }
 

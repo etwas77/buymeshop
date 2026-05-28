@@ -4,12 +4,13 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AddProductRequestDto } from "../../dtos/AddProductRequestDto";
 import { CategoryDto } from "../../dtos/CategoryDto";
-import { addNewProduct, getProductById, ProductState, removeImageByIdProductById, unsetProduct } from "../../store/features/productSlice";
+import { addNewProduct, getProductById, ProductState, removeImageByIdProductById, unsetProduct, updateProductById } from "../../store/features/productSlice";
 import { AppDispatch } from "../../store/store";
 import BrandSelector from "../common/BrandSelector";
 import CategorySelector from "../common/CategorySelector";
 import ImageUploader from "../common/ImageUploader";
 import ImageZoomify from "../common/ImageZoomify";
+import { BsDash } from "react-icons/bs";
 
 export interface AddProductProps {
     productId?: string;
@@ -22,8 +23,9 @@ const AddProduct = (p: AddProductProps) => {
     const [brand, setBrand] = React.useState<string>();
     const [category, setCategory] = React.useState<CategoryDto>();
     const [activeStep, setActiveStep] = React.useState<number>(0);
+console.log('product', product);
 
-    const steps = ["Add new Product", "Upload product images", "Done"];
+    const steps = ["Add/Edit Product", "Upload product images", "Done"];
 
     const [name, setName] = React.useState<string>("");
     const [price, setPrice] = React.useState<string>("");
@@ -33,7 +35,10 @@ const AddProduct = (p: AddProductProps) => {
     const handleAddNewProduct = React.useCallback((event: React.SubmitEvent<HTMLFormElement>) => {
         event.preventDefault();
 
-        if (!brand || !category || !name || !price || !inventory || !description) {
+        const parsedPrice = Number(price);
+        const parsedInventory = Number(inventory);
+
+        if (!brand || !category || !name || !description || !Number.isFinite(parsedPrice) || parsedPrice <= 0 || !Number.isFinite(parsedInventory) || parsedInventory <= 0) {
             console.log("fill in all values first");
             return;
         }
@@ -41,13 +46,17 @@ const AddProduct = (p: AddProductProps) => {
         const req: AddProductRequestDto = {
             name,
             brand,
-            price: Number(price),
-            inventory: Number(inventory),
+            price: parsedPrice,
+            inventory: parsedInventory,
             description,
-            category
+            category,
         };
-        dispatch(addNewProduct(req));
-    }, [brand, category, dispatch, name, price, inventory, description]);
+
+        if (product === undefined)
+            dispatch(addNewProduct(req));
+        else
+            dispatch(updateProductById({ productUpdateRequest: req, id: product.id }));
+    }, [brand, category, dispatch, name, price, inventory, description, product]);
 
     const deleteImage = React.useCallback((imageId: string) => () => {
         dispatch(removeImageByIdProductById({ imageId, productId: productId! }));
@@ -137,7 +146,7 @@ const AddProduct = (p: AddProductProps) => {
                                             <div className="image-container flex-shrink-0">
                                                 <ImageZoomify imageId={image.id} />
                                             </div>
-                                            <button type="button" className="btn btn-sm btn-danger" onClick={deleteImage(image.id)}>Delete image</button>
+                                            <button type="button" className="btn btn-sm btn-danger" onClick={deleteImage(image.id)}><BsDash /></button>
                                         </div>
                                     );
                                 })}
