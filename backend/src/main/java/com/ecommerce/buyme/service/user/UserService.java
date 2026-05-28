@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.buyme.dtos.UserDto;
 import com.ecommerce.buyme.model.User;
+import com.ecommerce.buyme.repository.AddressRepository;
 import com.ecommerce.buyme.repository.UserRepository;
 import com.ecommerce.buyme.request.CreateUserRequest;
 import com.ecommerce.buyme.request.UpdateUserRequest;
@@ -26,6 +27,7 @@ public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
+    private final AddressRepository addressRepository;
 
     @Override
     public User create(CreateUserRequest request) {
@@ -36,7 +38,16 @@ public class UserService implements IUserService {
                     user.setLastName(req.getLastName());
                     user.setEmail(req.getEmail());
                     user.setPassword(passwordEncoder.encode(req.getPassword()));
-                    return userRepository.save(user);
+                    User savedUser = userRepository.save(user);
+
+                    Optional.ofNullable(req.getAddresses()).ifPresent(addresses -> {
+                        addresses.forEach(address -> {
+                            address.setUser(savedUser);
+                            addressRepository.save(address);
+                        });
+                    });
+
+                    return savedUser;
                 })
                 .orElseThrow(() -> new EntityExistsException("user with " + request.getEmail() + " already exists."));
     }

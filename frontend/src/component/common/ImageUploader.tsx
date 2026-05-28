@@ -2,10 +2,10 @@ import _ from "lodash";
 import { nanoid } from "nanoid";
 import React from "react";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../store/store";
+import { toast } from "react-toastify";
 import { uploadImages } from "../../store/features/imageSlice";
 import { getProductById } from "../../store/features/productSlice";
-import { toast, ToastContainer } from "react-toastify";
+import { AppDispatch } from "../../store/store";
 
 const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 
