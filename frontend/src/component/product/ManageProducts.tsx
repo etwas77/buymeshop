@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import AddProduct from "./AddProduct";
 
 const ManageProducts = () => {
-const { productId } = useParams();
+    const { productId } = useParams();    
 
     return (
         <div>

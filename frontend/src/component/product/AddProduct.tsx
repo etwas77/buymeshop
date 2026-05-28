@@ -4,7 +4,7 @@ import React from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AddProductRequestDto } from "../../dtos/AddProductRequestDto";
 import { CategoryDto } from "../../dtos/CategoryDto";
-import { addNewProduct, getProductById, ProductState, removeImageByIdProductById } from "../../store/features/productSlice";
+import { addNewProduct, getProductById, ProductState, removeImageByIdProductById, unsetProduct } from "../../store/features/productSlice";
 import { AppDispatch } from "../../store/store";
 import BrandSelector from "../common/BrandSelector";
 import CategorySelector from "../common/CategorySelector";
@@ -68,6 +68,16 @@ const AddProduct = (p: AddProductProps) => {
     React.useEffect(() => {
         if (productId) {
             dispatch(getProductById(productId));
+        }
+        else {
+            dispatch(unsetProduct());
+            setName("");
+            setPrice("");
+            setInventory("");
+            setDescription("");
+            setCategory(undefined);
+            setBrand(undefined);
+            setActiveStep(0);
         }
     }, [productId]);
 

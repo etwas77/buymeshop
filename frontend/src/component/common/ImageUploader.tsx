@@ -21,9 +21,6 @@ const ImageUploader = (p: ImageUploaderProps) => {
     const [images, setImages] = React.useState<ImagePreview[]>([]);
     const dispatch = useAppDispatch();
 
-    console.log('images', images);
-
-
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
             const imagePreviews: ImagePreview[] = _.map(Array.from(event.target.files), (file) => ({

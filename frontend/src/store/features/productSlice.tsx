@@ -142,6 +142,9 @@ const productSlice = createSlice({
         },
         addBrand: (state: ProductState, action: PayloadAction<String>) => {
             state.brands = [...state.brands, action.payload];
+        },
+        unsetProduct: (state: ProductState) => {
+            state.product = undefined;
         }
     },
     extraReducers: (builder) => {
@@ -204,5 +207,5 @@ const productSlice = createSlice({
     }
 });
 
-export const { filterByBrand, incrementQuantity, decrementQuantity, addBrand } = productSlice.actions;
+export const { filterByBrand, incrementQuantity, decrementQuantity, addBrand, unsetProduct } = productSlice.actions;
 export default productSlice.reducer;
