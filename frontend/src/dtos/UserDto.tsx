@@ -1,3 +1,4 @@
+import { AddressDto } from "./AddressDto";
 import { CartDto } from "./CartDto";
 import { OrderDto } from "./OrderDto";
 
@@ -8,6 +9,7 @@ export interface UserDto {
     lastName: string;
     email: string;
     role: string;
-    cart: CartDto[];
+    cart: CartDto;
     orders: OrderDto[];
+    addresses: AddressDto[];
 }

@@ -8,7 +8,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.buyme.dtos.AddressDto;
 import com.ecommerce.buyme.dtos.UserDto;
+import com.ecommerce.buyme.model.Address;
 import com.ecommerce.buyme.model.User;
 import com.ecommerce.buyme.repository.AddressRepository;
 import com.ecommerce.buyme.repository.UserRepository;
@@ -81,7 +83,10 @@ public class UserService implements IUserService {
 
     @Override
     public UserDto convertToDto(User user) {
-        return modelMapper.map(user, UserDto.class);
+        List<Address> addresses = addressRepository.findByUserId(user.getId());
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+        userDto.setAddresses(addresses.stream().map(address -> modelMapper.map(address, AddressDto.class)).toList());
+        return userDto;
     }
 
     @Override

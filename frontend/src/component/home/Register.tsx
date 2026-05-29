@@ -1,14 +1,22 @@
 import _ from "lodash";
 import React from "react";
 import { BsPlus } from "react-icons/bs";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { AddressDto, AddressType } from "../../dtos/AddressDto";
 import { CreateUserRequestDto } from "../../dtos/CreateUserRequestDto";
-import { createUser } from "../../store/features/userSlice";
+import { createUser, getUsers, UserState } from "../../store/features/userSlice";
 import { AppDispatch } from "../../store/store";
 
 const Register = () => {
     const dispatch = useDispatch<AppDispatch>();
+    const { users } = useSelector((state: { user: UserState }) => state.user);
+
+    console.log('users', users);
+
+    React.useEffect(() => {
+        dispatch(getUsers());
+    }, [dispatch]);
+
     const [req, setReq] = React.useState<CreateUserRequestDto>({
         firstName: "",
         lastName: "",

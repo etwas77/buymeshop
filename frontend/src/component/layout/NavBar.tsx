@@ -1,5 +1,5 @@
 import React from "react";
-import { Container, Nav, Navbar, NavDropdown } from "react-bootstrap";
+import { Container, Nav, Navbar, NavDropdown, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { BiLogOut } from "react-icons/bi";
 import { FaReceipt, FaShoppingCart, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,9 +7,9 @@ import { Link } from "react-router-dom";
 import { cartState, getUserCarts } from "../../store/features/cartSlice";
 import { LoginState, setAccessToken } from "../../store/features/loginSlice";
 import { getOrdersByUserId, OrderState } from "../../store/features/orderSlice";
+import { getUserById } from "../../store/features/userSlice";
 import { AppDispatch } from "../../store/store";
 import { isValidToken } from "../common/utils/Functions";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const NavBar = () => {
     const { accessToken } = useSelector((state: { login: LoginState }) => state.login);
@@ -34,6 +34,7 @@ const NavBar = () => {
             else {
                 dispatch(getUserCarts({ userId }));
                 dispatch(getOrdersByUserId(Number(userId)));
+                dispatch(getUserById(userId));
             }
 
         }
@@ -68,7 +69,7 @@ const NavBar = () => {
                     <Nav className='ms-auto'>
                         <NavDropdown title='Account'>
                             <>
-                                <NavDropdown.Item to={"#"} as={Link}>
+                                <NavDropdown.Item to={"/account"} as={Link}>
                                     <FaUser />
                                     My Account
                                 </NavDropdown.Item>

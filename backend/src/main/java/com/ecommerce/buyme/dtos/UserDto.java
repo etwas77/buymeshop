@@ -1,5 +1,6 @@
 package com.ecommerce.buyme.dtos;
 
+import java.util.List;
 import java.util.Set;
 
 import lombok.Data;
@@ -16,4 +17,6 @@ public class UserDto {
     private CartDto cart;
 
     private Set<OrderDto> orders;
+
+    private List<AddressDto> addresses;
 }

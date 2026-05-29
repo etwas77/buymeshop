@@ -15,7 +15,7 @@ export const getUserById = createAsyncThunk(
         catch (error: any) {
             toast.error("Error fetching user: " + error.message);
             return undefined;
-        }   
+        }
     }
 );
 export const getUsers = createAsyncThunk(
@@ -28,7 +28,7 @@ export const getUsers = createAsyncThunk(
         catch (error: any) {
             toast.error("Error fetching user: " + error.message);
             return undefined;
-        }   
+        }
     }
 );
 export const createUser = createAsyncThunk(
@@ -41,13 +41,13 @@ export const createUser = createAsyncThunk(
         catch (error: any) {
             toast.error("Error creating user: " + error.message);
             return undefined;
-        }   
+        }
     }
 );
 export const deleteUser = createAsyncThunk(
     "user/deleteUser",
     async (userId: number) => {
-        try {            
+        try {
             await api.delete("/users/user/" + userId);
             toast.success("User deleted successfully");
         }
@@ -57,12 +57,56 @@ export const deleteUser = createAsyncThunk(
     }
 );
 
+export const updateAddress = createAsyncThunk(
+    "user/updateAddress",
+    async (payload: { addressId: string; address: AddressDto }) => {
+        const { addressId, address } = payload;
+        try {
+            const response = await api.put("/addresses/" + addressId, address);
+            toast.success("Address updated successfully");
+            return response.data.data as AddressDto;
+        }
+        catch (error: any) {
+            toast.error("Error updating address: " + error.message);
+            return undefined;
+        }
+    }
+);
+export const deleteAddress = createAsyncThunk(
+    "user/deleteAddress",
+    async (payload: { addressId: string; }) => {
+        try {
+            await api.delete("/addresses/" + payload.addressId);
+            toast.success("Address deleted successfully");
+            return;
+        }
+        catch (error: any) {
+            toast.error("Error deleting address: " + error.message);
+            return;
+        }
+    }
+);
+
+export const createAddresses = createAsyncThunk(
+    "user/createAddresses",
+    async (payload: { addresses: AddressDto[]; }) => {
+        try {
+            const response = await api.post("/addresses", payload.addresses);
+            toast.success("Addresses created successfully");
+            return response.data.data as AddressDto[];
+        }
+        catch (error: any) {
+            toast.error("Error creating addresses: " + error.message);
+            return undefined;
+        }
+    }
+);
+
 export interface UserState {
     users?: UserDto[];
     user?: UserDto;
     loading: boolean;
     error?: string;
-    addresses?: AddressDto[];
 }
 
 const userSlice = createSlice({
@@ -73,6 +117,9 @@ const userSlice = createSlice({
         error: undefined,
     } as UserState,
     reducers: {
+        setUser: (state, action) => {
+            state.user = action.payload;
+        },
     },
     extraReducers: (builder) => {
         builder.addCase(getUserById.fulfilled, (state, action) => {
@@ -85,17 +132,42 @@ const userSlice = createSlice({
             state.loading = false;
             if (action.payload) {
                 state.users = action.payload;
-            }   
+            }
         });
         builder.addCase(createUser.fulfilled, (state, action) => {
             state.loading = false;
             if (action.payload) {
                 state.user = action.payload;
             }
-        }); 
+        });
         builder.addCase(deleteUser.fulfilled, (state) => {
             state.loading = false;
             state.user = undefined;
+        });
+        builder.addCase(updateAddress.fulfilled, (state, action) => {
+            state.loading = false;
+            if (action.payload) {
+                const updatedAddress = action.payload;
+                if (state.user) {
+                    const index = state.user.addresses?.findIndex(addr => addr.id === updatedAddress.id);
+                    if (index !== undefined && index !== -1 && state.user.addresses) {
+                        state.user.addresses[index] = updatedAddress;
+                    }
+                }
+            }
+        });
+        builder.addCase(deleteAddress.fulfilled, (state, action) => {
+            state.loading = false;
+            const deletedAddressId = action.meta.arg.addressId;
+            if (state.user && state.user.addresses) {
+                state.user.addresses = state.user.addresses.filter(addr => addr.id !== deletedAddressId);
+            }
+        });
+        builder.addCase(createAddresses.fulfilled, (state, action) => {
+            state.loading = false;
+            if (action.payload && state.user) {
+                state.user.addresses = [...(state.user.addresses ?? []), ...action.payload];
+            }
         });
         builder.addMatcher(
             (action) => action.type.startsWith("user/") && action.type.endsWith("/pending"),
@@ -103,9 +175,9 @@ const userSlice = createSlice({
                 state.loading = true;
                 state.error = undefined;
             }
-        );       
+        );
     },
 });
 
-export const {  } = userSlice.actions;
+export const { setUser } = userSlice.actions;
 export default userSlice.reducer;
