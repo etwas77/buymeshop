@@ -8,6 +8,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import Cart from "./component/cart/Cart";
 import Order from "./component/order/Order";
 import ManageProducts from "./component/product/ManageProducts";
+import Register from "./component/home/Register";
 
 function App() {
     const router = createBrowserRouter(
@@ -20,6 +21,7 @@ function App() {
                 <Route path="/cart/:userId" element={<Cart />} />
                 <Route path="/orders/:userId" element={<Order />} />
                 <Route path="/manage/:productId?" element={<ManageProducts />} />
+                <Route path="/register" element={<Register />} />
             </Route>
         )
     );

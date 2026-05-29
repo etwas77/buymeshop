@@ -85,12 +85,12 @@ public class AddressController {
             return ResponseEntity.badRequest().body(response);
         }
 
-        boolean hasInvalidItem = addressesDto.stream()
-                .anyMatch(dto -> dto == null || dto.getUserId() == null);
-        if (hasInvalidItem) {
-            ApiResponse response = new ApiResponse("Each address must include a valid userId", null);
-            return ResponseEntity.badRequest().body(response);
-        }
+        // boolean hasInvalidItem = addressesDto.stream()
+        //         .anyMatch(dto -> dto == null || dto.getUserId() == null);
+        // if (hasInvalidItem) {
+        //     ApiResponse response = new ApiResponse("Each address must include a valid userId", null);
+        //     return ResponseEntity.badRequest().body(response);
+        // }
 
         Map<Long, User> usersById = new HashMap<>();
        

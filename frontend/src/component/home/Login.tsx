@@ -38,8 +38,9 @@ const Login = () => {
                     className="form-control mb-3"
                     style={{ maxWidth: "300px" }}
                 />
-                <div className="text-center">
+                <div className="text-center d-flex justify-content-center gap-3">
                     <button className="btn btn-primary" onClick={() => userLogin(email, password)}>Login</button>
+                    <button className="btn btn-secondary" onClick={() => navigate("/register")}>Register</button>
                 </div>
             </div>
         </div>
