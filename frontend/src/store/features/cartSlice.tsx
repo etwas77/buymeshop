@@ -6,7 +6,7 @@ import { CartItemDto } from "../../dtos/CartItemDto";
 export const addToCart = createAsyncThunk(
     "cart/addToCart",
     async (payload: { productId: string; quantity: number }, { rejectWithValue }) => {
-        const accessToken = localStorage.getItem("accessToken") ?? '';
+        const accessToken = localStorage.getItem("authToken") ?? '';
         try {
             const formData = new FormData();
             formData.append("productId", payload.productId);
@@ -31,7 +31,7 @@ export const addToCart = createAsyncThunk(
 export const getUserCarts = createAsyncThunk(
     "cart/getUserCarts",
     async (payload: { userId: string; }, { rejectWithValue }) => {
-        const accessToken = localStorage.getItem("accessToken") ?? '';
+        const accessToken = localStorage.getItem("authToken") ?? '';
         try {
             const response = await api.get("/carts/user/" + payload.userId, {
                 headers: {
@@ -54,7 +54,7 @@ export const getUserCarts = createAsyncThunk(
 export const updateCartItemQuantity = createAsyncThunk(
     "cart/updateCartItemQuantity",
     async (payload: { cartId: number; productId: number; quantity: number }, { rejectWithValue }) => {
-        const accessToken = localStorage.getItem("accessToken") ?? '';
+        const accessToken = localStorage.getItem("authToken") ?? '';
         try {
             const response = await api.put(`/cartItems/update/${payload.cartId}/${payload.productId}?quantity=${payload.quantity}`,
                 {},
@@ -77,7 +77,7 @@ export const updateCartItemQuantity = createAsyncThunk(
 export const removeCartItem = createAsyncThunk(
     "cart/removeCartItem",
     async (payload: { cartId: number; productId: number; }, { rejectWithValue }) => {
-        const accessToken = localStorage.getItem("accessToken") ?? '';
+        const accessToken = localStorage.getItem("authToken") ?? '';
         try {
             const response = await api.delete(`/cartItems/remove/${payload.cartId}/${payload.productId}`, {
                 headers: {

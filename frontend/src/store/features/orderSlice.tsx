@@ -6,7 +6,7 @@ import { OrderDto } from "../../dtos/OrderDto";
 export const placeOrder = createAsyncThunk(
     "order/placeOrder",
     async (userId: number) => {
-        const accessToken = localStorage.getItem("accessToken") ?? '';
+        const accessToken = localStorage.getItem("authToken") ?? '';
         try {
             const response = await api.post("/orders/order?userId=" + userId, {}, {
                 headers: { Authorization: `Bearer ${accessToken}` },
@@ -24,7 +24,7 @@ export const placeOrder = createAsyncThunk(
 export const getOrdersByUserId = createAsyncThunk(
     "order/getOrdersByUserId",
     async (userId: number) => {
-        const accessToken = localStorage.getItem("accessToken") ?? '';
+        const accessToken = localStorage.getItem("authToken") ?? '';
         try {
             const response = await api.get("/orders/user/" + userId, {
                 headers: { Authorization: `Bearer ${accessToken}` },

@@ -1,44 +1,23 @@
-import React from "react";
 import { Container, Nav, Navbar, NavDropdown, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { BiLogOut } from "react-icons/bi";
 import { FaReceipt, FaShoppingCart, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-import { cartState, getUserCarts } from "../../store/features/cartSlice";
-import { LoginState, setAccessToken } from "../../store/features/loginSlice";
-import { getOrdersByUserId, OrderState } from "../../store/features/orderSlice";
-import { getUserById } from "../../store/features/userSlice";
+import { AuthState, logout } from "../../store/features/authSlice";
+import { cartState } from "../../store/features/cartSlice";
+import { OrderState } from "../../store/features/orderSlice";
 import { AppDispatch } from "../../store/store";
-import { isValidToken } from "../common/utils/Functions";
 
 const NavBar = () => {
-    const { accessToken } = useSelector((state: { login: LoginState }) => state.login);
+
     const { items } = useSelector((state: { cart: cartState }) => state.cart);
     const { orders } = useSelector((state: { order: OrderState }) => state.order);
+    const { isAuthenticated } = useSelector((state: { auth: AuthState }) => state.auth);
 
     const dispatch = useDispatch<AppDispatch>();
 
-    const userId = accessToken ? JSON.parse(atob(accessToken.split('.')[1])).id : null;
-
-    React.useEffect(() => {
-        if (accessToken === undefined) {
-            const accessToken = localStorage.getItem("accessToken");
-            if (accessToken)
-                dispatch(setAccessToken(accessToken));
-        }
-        else {
-            const valid = isValidToken(accessToken);
-            if (!valid) {
-                localStorage.removeItem("accessToken");
-            }
-            else {
-                dispatch(getUserCarts({ userId }));
-                dispatch(getOrdersByUserId(Number(userId)));
-                dispatch(getUserById(userId));
-            }
-
-        }
-    }, [accessToken, dispatch]);
+    const userId = localStorage.getItem("userId");
+    const authToken = localStorage.getItem("authToken") ?? undefined;
 
     return (
         <Navbar expand='lg' sticky='top' className='nav-bg'>
@@ -59,7 +38,7 @@ const NavBar = () => {
                         </Nav.Link>
                     </Nav>
 
-                    {accessToken === undefined &&
+                    {!isAuthenticated &&
                         <Nav className='me-auto'>
                             <Nav.Link to={"/login"} as={Link}>
                                 Log-in
@@ -87,11 +66,9 @@ const NavBar = () => {
 
                                 <NavDropdown.Divider />
 
-                                {accessToken !== undefined &&
+                                {isAuthenticated &&
                                     <NavDropdown.Item onClick={() => {
-                                        localStorage.removeItem("accessToken");
-                                        dispatch(setAccessToken(undefined));
-                                        setAccessToken(undefined);
+                                        dispatch(logout());
                                     }}>
                                         <BiLogOut />
                                         Log-out
