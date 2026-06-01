@@ -116,6 +116,14 @@ const cartSlice = createSlice({
         setLoading(state, action) {
             state.isLoading = action.payload;
         },
+        resetCart(state) {
+            state.cartId = -1;
+            state.items = [];
+            state.totalAmount = 0;
+            state.errorMessage = undefined;
+            state.successMessage = undefined;
+            state.isLoading = false;
+        },
     },
     extraReducers: (builder) => {
         builder
@@ -185,5 +193,5 @@ const cartSlice = createSlice({
     }
 });
 
-export const { setLoading } = cartSlice.actions;
+export const { setLoading, resetCart } = cartSlice.actions;
 export default cartSlice.reducer;

@@ -16,7 +16,7 @@ const Order = () => {
     const navigate = useNavigate();
 
     React.useEffect(() => {
-        if (userId) {
+        if (userId) {            
             dispatch(getOrdersByUserId(Number(userId)));
         }
     }, [dispatch, userId]);

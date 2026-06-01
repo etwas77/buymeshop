@@ -10,7 +10,6 @@ import { AppDispatch } from "../../store/store";
 import { isAdmin } from "../common/utils/Functions";
 
 const NavBar = () => {
-
     const { items } = useSelector((state: { cart: cartState }) => state.cart);
     const { orders } = useSelector((state: { order: OrderState }) => state.order);
     const { isAuthenticated } = useSelector((state: { auth: AuthState }) => state.auth);
@@ -18,6 +17,7 @@ const NavBar = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     const userId = localStorage.getItem("userId");
+
 
     return (
         <Navbar expand='lg' sticky='top' className='nav-bg'>

@@ -10,6 +10,7 @@ import { AppDispatch } from "../../store/store";
 import ImageZoomify from "../common/ImageZoomify";
 import LoadSpinner from "../common/LoadSpinner";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
+import { isAdmin } from "../common/utils/Functions";
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -19,6 +20,8 @@ const ProductDetails = () => {
 
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+
+    const visibleAdmin = isAdmin();
 
     React.useEffect(() => {
         if (id) {
@@ -91,10 +94,11 @@ const ProductDetails = () => {
 
                     </button>
 
-                    <button className="buy-now-button" onClick={() => navigate("/manage/" + product.id)}>
+                    {visibleAdmin &&
+                        <button className="buy-now-button" onClick={() => navigate("/manage/" + product.id)}>
                         <FaItunes/>
                         {"manage item"}
-                    </button>
+                    </button>}
                 </div>
             </div>
 
