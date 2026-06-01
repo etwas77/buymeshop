@@ -4,10 +4,11 @@ import { FaReceipt, FaShoppingCart, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { AuthState, logout } from "../../store/features/authSlice";
-import { cartState } from "../../store/features/cartSlice";
-import { OrderState } from "../../store/features/orderSlice";
+import { cartState, getUserCarts } from "../../store/features/cartSlice";
+import { getOrdersByUserId, OrderState } from "../../store/features/orderSlice";
 import { AppDispatch } from "../../store/store";
 import { isAdmin } from "../common/utils/Functions";
+import React from "react";
 
 const NavBar = () => {
     const { items } = useSelector((state: { cart: cartState }) => state.cart);
@@ -17,6 +18,14 @@ const NavBar = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     const userId = localStorage.getItem("userId");
+
+    React.useEffect(() => {
+        if (userId) {
+            //console.log('first time after login, getting cart and orders for userId in navbar:', userId);
+            dispatch(getUserCarts({ userId }));
+            dispatch(getOrdersByUserId(Number(userId)));
+        }
+    }, [userId, dispatch]);
 
 
     return (
