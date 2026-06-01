@@ -1,28 +1,29 @@
 import _ from "lodash";
 import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { createAddresses, deleteAddress, getUserById, updateAddress, UserState } from "../../store/features/userSlice";
-import { AddressDto, AddressType } from "../../dtos/AddressDto";
-import { AppDispatch } from "../../store/store";
 import { BsPlus, BsSave, BsTrash } from "react-icons/bs";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { AddressDto, AddressType } from "../../dtos/AddressDto";
+import { createAddresses, deleteAddress, getUserById, updateAddress, UserState } from "../../store/features/userSlice";
+import { AppDispatch } from "../../store/store";
 
 const Account = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector((state: { user: UserState }) => state.user);
     const [addresses, setAddresses] = React.useState<AddressDto[]>([]);
-    const navigate = useNavigate();
+    const navigate = useNavigate();    
 
     React.useEffect(() => {
-        if (user === undefined) {
-            const userId = localStorage.getItem("userId");
-            if (userId !== null) {
-                dispatch(getUserById(Number(userId)));
-            }
-            else
-                navigate("/login");
+        const userId = localStorage.getItem("userId");
+        if (userId === null) {
+            navigate("/login");
+            return;
         }
-    }, [user]);
+
+        if (!user || String(user.id) !== userId) {
+            dispatch(getUserById(Number(userId)));
+        }
+    }, [dispatch, navigate, user]);
 
     React.useEffect(() => {
         setAddresses(user?.addresses ?? []);
@@ -91,8 +92,8 @@ const Account = () => {
                             <td><input className="form-control" type="email" value={user?.email ?? ""} readOnly /></td>
                         </tr>
                         <tr>
-                            <td><label className="mb-0">Role:</label></td>
-                            <td><input className="form-control" type="text" value={user?.role ?? ""} readOnly /></td>
+                            <td><label className="mb-0">Roles:</label></td>
+                            <td><input className="form-control" type="text" value={user?.roles?.map((role: any) => role?.name ?? role).join(", ") ?? ""} readOnly /></td>
                         </tr>
                     </tbody>
                 </table>

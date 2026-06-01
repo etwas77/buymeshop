@@ -1,3 +1,5 @@
+import { useSelector } from "react-redux";
+import { AuthState } from "../../../store/features/authSlice";
 
 export const isValidToken = (token: string) => {
     if (!token) {
@@ -22,4 +24,12 @@ export const isValidToken = (token: string) => {
         console.log("token is invalid");
         return false;
     }
+}
+
+export const isAdmin = () => {
+    const { token, isAuthenticated, roles } = useSelector((state: { auth: AuthState }) => state.auth);
+    if(isAuthenticated && token) {
+        return roles.some(role => role.toLowerCase() === "admin");
+    }
+    return false;
 }

@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../component/services/api";
+import { jwtDecode } from "jwt-decode";
 import { LoginCredentials } from "../../component/auth/Login";
-import { InvalidTokenError, jwtDecode } from "jwt-decode";
+import { api } from "../../component/services/api";
 
 export const login = createAsyncThunk(
     "auth/login",

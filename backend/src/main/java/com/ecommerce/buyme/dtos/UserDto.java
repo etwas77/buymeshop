@@ -19,4 +19,6 @@ public class UserDto {
     private Set<OrderDto> orders;
 
     private List<AddressDto> addresses;
+
+    private Set<RoleDto> roles;
 }

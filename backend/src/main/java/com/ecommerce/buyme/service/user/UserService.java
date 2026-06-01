@@ -2,6 +2,8 @@ package com.ecommerce.buyme.service.user;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.security.core.Authentication;
 import org.modelmapper.ModelMapper;
@@ -9,10 +11,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.buyme.dtos.AddressDto;
+import com.ecommerce.buyme.dtos.RoleDto;
 import com.ecommerce.buyme.dtos.UserDto;
 import com.ecommerce.buyme.model.Address;
+import com.ecommerce.buyme.model.Role;
 import com.ecommerce.buyme.model.User;
 import com.ecommerce.buyme.repository.AddressRepository;
+import com.ecommerce.buyme.repository.RoleRepository;
 import com.ecommerce.buyme.repository.UserRepository;
 import com.ecommerce.buyme.request.CreateUserRequest;
 import com.ecommerce.buyme.request.UpdateUserRequest;
@@ -30,9 +35,13 @@ public class UserService implements IUserService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final AddressRepository addressRepository;
+    private final RoleRepository roleRepository;
 
     @Override
     public User create(CreateUserRequest request) {
+        Role userRole = Optional.ofNullable(roleRepository.findByName("ROLE_USER"))
+                .orElseThrow(() -> new EntityNotFoundException("Role not found."));
+                
         return Optional.of(request).filter(user -> !userRepository.existsByEmail(user.getEmail()))
                 .map(req -> {
                     User user = new User();
@@ -40,6 +49,7 @@ public class UserService implements IUserService {
                     user.setLastName(req.getLastName());
                     user.setEmail(req.getEmail());
                     user.setPassword(passwordEncoder.encode(req.getPassword()));
+                    user.setRoles(Set.of(userRole));
                     User savedUser = userRepository.save(user);
 
                     Optional.ofNullable(req.getAddresses()).ifPresent(addresses -> {
@@ -60,6 +70,16 @@ public class UserService implements IUserService {
                 .map(user -> {
                     user.setFirstName(request.getFirstName());
                     user.setLastName(request.getLastName());
+
+                    if (request.getRoles() != null) {
+                        Set<Role> incomingRoles = request.getRoles().stream()
+                            .map(RoleDto::getName)
+                            .map(roleName -> Optional.ofNullable(roleRepository.findByName(roleName))
+                                .orElseThrow(() -> new EntityNotFoundException("Role not found: " + roleName)))
+                                .collect(Collectors.toSet());
+                        user.setRoles(incomingRoles);
+                    }
+
                     return userRepository.save(user);
                 })
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));

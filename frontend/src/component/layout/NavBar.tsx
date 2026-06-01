@@ -7,6 +7,7 @@ import { AuthState, logout } from "../../store/features/authSlice";
 import { cartState } from "../../store/features/cartSlice";
 import { OrderState } from "../../store/features/orderSlice";
 import { AppDispatch } from "../../store/store";
+import { isAdmin } from "../common/utils/Functions";
 
 const NavBar = () => {
 
@@ -17,7 +18,6 @@ const NavBar = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     const userId = localStorage.getItem("userId");
-    const authToken = localStorage.getItem("authToken") ?? undefined;
 
     return (
         <Navbar expand='lg' sticky='top' className='nav-bg'>
@@ -37,6 +37,14 @@ const NavBar = () => {
                             Manage Products
                         </Nav.Link>
                     </Nav>
+
+                    {isAdmin() &&
+                        <Nav className='me-auto'>
+                            <Nav.Link to={"/admin"} as={Link}>
+                                Admin Panel
+                            </Nav.Link>
+                        </Nav>
+                    }
 
                     {!isAuthenticated &&
                         <Nav className='me-auto'>

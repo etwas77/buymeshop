@@ -10,11 +10,8 @@ export interface LoginCredentials {
 }
 
 const Login = () => {
-    const { token, isAuthenticated, roles } = useSelector((state: { auth: AuthState }) => state.auth);
-    console.log('token', token);
-    console.log('isAuthenticated', isAuthenticated);
-    console.log('roles', roles);
-
+    const { isAuthenticated } = useSelector((state: { auth: AuthState }) => state.auth);
+ 
     const [credentials, setCredentials] = React.useState<LoginCredentials>({ email: "", password: "" });
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();

@@ -4,6 +4,7 @@ import { api } from "../../component/services/api";
 import { toast } from "react-toastify";
 import { CreateUserRequestDto } from "../../dtos/CreateUserRequestDto";
 import { AddressDto } from "../../dtos/AddressDto";
+import { logout } from "./authSlice";
 
 export const getUserById = createAsyncThunk(
     "user/getUserById",
@@ -102,6 +103,26 @@ export const createAddresses = createAsyncThunk(
     }
 );
 
+export const updateUser = createAsyncThunk(
+    "user/updateUser",
+    async (user: UserDto) => {
+        try {
+            const body = {
+                firstName: user.firstName,
+                lastName: user.lastName,
+                roles: user.roles.map(role => ({ name: role.name })),
+            };
+            const response = await api.put("/users/update/" + user.id, body);
+            toast.success("User updated successfully");
+            return response.data.data as UserDto;
+        }
+        catch (error: any) {
+            toast.error("Error updating user: " + error.message);
+            return undefined;
+        }
+    }
+);
+
 export interface UserState {
     users?: UserDto[];
     user?: UserDto;
@@ -168,6 +189,18 @@ const userSlice = createSlice({
             if (action.payload && state.user) {
                 state.user.addresses = [...(state.user.addresses ?? []), ...action.payload];
             }
+        });
+        builder.addCase(updateUser.fulfilled, (state, action) => {
+            state.loading = false;
+            if (action.payload) {
+                state.user = action.payload;
+            }
+        });
+        builder.addCase(logout, (state) => {
+            state.loading = false;
+            state.error = undefined;
+            state.user = undefined;
+            state.users = undefined;
         });
         builder.addMatcher(
             (action) => action.type.startsWith("user/") && action.type.endsWith("/pending"),

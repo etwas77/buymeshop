@@ -11,6 +11,7 @@ import ManageProducts from "./component/product/ManageProducts";
 import Register from "./component/auth/Register";
 import Account from "./component/auth/Account";
 import ProtectedRoute from "./component/auth/ProtectedRoute";
+import AdminPanel from "./component/admin/AdminPanel";
 
 function App() {
     const router = createBrowserRouter(
@@ -31,6 +32,7 @@ function App() {
 
                 <Route element={<ProtectedRoute useOutlet allowRoles={["ADMIN"]} />}>
                     <Route path="/manage/:productId?" element={<ManageProducts />} /> {/* needs authentication AND specific (ADMIN) role/s */}
+                    <Route path="/admin" element={<AdminPanel />} /> {/* needs authentication AND specific (ADMIN) role/s */}
                 </Route>
             </Route>
         )
