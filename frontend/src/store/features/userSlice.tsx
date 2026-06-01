@@ -194,6 +194,7 @@ const userSlice = createSlice({
             state.loading = false;
             if (action.payload) {
                 state.user = action.payload;
+                state.users = state.users?.map(u => u.id === action.payload?.id ? action.payload : u);
             }
         });
         builder.addCase(logout, (state) => {
