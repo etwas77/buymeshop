@@ -11,12 +11,13 @@ const AdminPanel = () => {
     const dispatch = useDispatch<AppDispatch>();
     const [selectedUser, setSelectedUser] = React.useState<UserDto>();
     const [rolesInput, setRolesInput] = React.useState("");
+    const [emailFilter, setEmailFilter] = React.useState("");
 
     React.useEffect(() => {
         dispatch(getUsers());
     }, [dispatch]);
 
- 
+
     const onSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const userId = e.target.value;
         const matchedUser = users?.find((user: UserDto) => String(user.id) === userId);
@@ -30,7 +31,7 @@ const AdminPanel = () => {
         }
 
         const roleNames = (selectedUser.roles as RoleDto[])
-            .map((role) =>  role.name)
+            .map((role) => role.name)
             .join(", ");
 
         setRolesInput(roleNames);
@@ -55,41 +56,54 @@ const AdminPanel = () => {
     };
 
     const onClickUpdateUser = (): void => {
-        if(selectedUser) {
+        if (selectedUser) {
             dispatch(updateUser(selectedUser));
         }
     }
 
+    const filteredUsers = users?.filter((user: UserDto) =>
+        user.email?.toLowerCase().includes(emailFilter.toLowerCase().trim())
+    );
+
     return (
         <div>
             <h1 className="text-center mt-5">Admin Panel</h1>
-            <ToastContainer />
-            <div>
-                <button className="btn btn-sm btn-primary ms-3" onClick={() => dispatch(getUsers())}>get users</button>
+            <div className="mx-auto" style={{ maxWidth: "550px" }}>
 
-                <div className="ms-3 mt-3">
-                    <select className="form-select" defaultValue="" onChange={onSelect}>
-                        <option value="">Select user by email</option>
-                        {users?.map((user: UserDto) => (
-                            <option key={user.id} value={user.id}>
-                                {user.firstName} {user.lastName}, {user.email}
-                            </option>
-                        ))}
-                    </select>
-                </div>
-            </div>
-            {selectedUser && (
+                <ToastContainer />
                 <div>
-                    <h2>Edit User Details</h2>
-                    <p>First Name: {selectedUser.firstName}</p>
-                    <p>Last Name: {selectedUser.lastName}</p>
-                    <p>Email: {selectedUser.email}</p>
-                    <p>Roles:
-                        <input type="text" className="form-control" value={rolesInput} onChange={onRolesChange} />
-                    </p>
+                    <div className="mt-3 mx-auto mb-3" style={{ maxWidth: "500px" }}>
+                        <input
+                            type="text"
+                            className="form-control mb-2"
+                            placeholder="Type email to filter users"
+                            value={emailFilter}
+                            onChange={(e) => setEmailFilter(e.target.value)}
+                        />
+                        <select className="form-select" defaultValue="" onChange={onSelect}>
+                            <option value="">Select user by email</option>
+                            {filteredUsers?.map((user: UserDto) => (
+                                <option key={user.id} value={user.id}>
+                                    {user.firstName} {user.lastName}, {user.email}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
-            )}
-            <button className="btn btn-sm btn-success ms-3" onClick={onClickUpdateUser}>update user</button>
+                {selectedUser && (
+                    <div className="mt-3 mx-auto" style={{ maxWidth: "500px" }}>
+                        <h3>Edit User Details</h3>
+                        <p>First Name: {selectedUser.firstName}</p>
+                        <p>Last Name: {selectedUser.lastName}</p>
+                        <p>Email: {selectedUser.email}</p>
+                        <p>Roles:
+                            <input type="text" className="form-control" value={rolesInput} onChange={onRolesChange} />
+                        </p>
+                        <button className="btn btn-sm btn-success d-block mx-auto mt-3 mb-3" onClick={onClickUpdateUser}>update user</button>
+                    </div>
+                )}
+                
+            </div>
         </div>
     );
 };
