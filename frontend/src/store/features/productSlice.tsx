@@ -23,7 +23,12 @@ export const addNewProduct = createAsyncThunk(
     "products/addNewProduct",
     async (addProductRequest: AddProductRequestDto) => {
         try {
-            const response = await api.post("/products/add", addProductRequest);
+            const response = await api.post("/products/add", addProductRequest, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("authToken")}`
+                },
+                withCredentials: true
+            });
             return response.data.data as ProductDto;
         }
         catch (error: any) {
@@ -79,7 +84,12 @@ export const updateProductById = createAsyncThunk(
     "products/updateProductById",
     async (payload: { productUpdateRequest: AddProductRequestDto, id: string }) => {
         try {
-            const response = await api.put("/products/update/" + payload.id, payload.productUpdateRequest);
+            const response = await api.put("/products/update/" + payload.id, payload.productUpdateRequest, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("authToken")}`
+                },
+                withCredentials: true
+            });
             return response.data.data as ProductDto;
         }
         catch (error: any) {

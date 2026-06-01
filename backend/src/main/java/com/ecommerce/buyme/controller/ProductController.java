@@ -3,6 +3,7 @@ package com.ecommerce.buyme.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,6 +46,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PostMapping("/add")
     public ResponseEntity<ApiResponse> add(@RequestBody AddProductRequest request) {
         Product product = productService.add(request);
@@ -53,6 +55,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/update/{productId}")
     public ResponseEntity<ApiResponse> update(@RequestBody ProductUpdateRequest request,
             @PathVariable("productId") Long productId) {
@@ -63,6 +66,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/delete/{productId}")
     public ResponseEntity<ApiResponse> delete(@PathVariable("productId") Long productId) {
         productService.delete(productId);
@@ -73,7 +77,7 @@ public class ProductController {
     @DeleteMapping("/{productId}/images/{imageId}")
     public ResponseEntity<ApiResponse> removeImage(@PathVariable("productId") Long productId,
             @PathVariable("imageId") Long imageId) {
-         ProductDto productDto = productService.removeImage(productId, imageId);
+        ProductDto productDto = productService.removeImage(productId, imageId);
         ApiResponse response = new ApiResponse("Image removed successfully", productDto);
         return ResponseEntity.ok(response);
     }
@@ -138,7 +142,8 @@ public class ProductController {
 
     @GetMapping("/distinct/brands")
     public ResponseEntity<ApiResponse> getDistinctBrands() {
-        ApiResponse response = new ApiResponse("Distinct brands retrieved successfully", productService.getAllDistinctBrands());
+        ApiResponse response = new ApiResponse("Distinct brands retrieved successfully",
+                productService.getAllDistinctBrands());
         return ResponseEntity.ok(response);
     }
 
