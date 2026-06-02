@@ -62,6 +62,7 @@ const Home = () => {
                         <Card key={product.id} className="home-product-card">
                             <Link to={"/products/" + product.id + "/details"} className="link" >
                                 {imageId && <ProductImage imageId={imageId} />}
+                                {imageId === undefined && <div className="no-image text-center">No Image</div>}
                             </Link>
                             <Card.Body>
                                 <h4 className="price">${product.price}</h4>

@@ -65,11 +65,11 @@ public class AuthController {
                     tokens.put("accessToken", newAccessTocken);
                     return ResponseEntity.ok(tokens);
                 } else {
-                    return ResponseEntity.status(500).body("Failed to generate new access token");
+                    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to generate new access token");
                 }
             }
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired access token");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Missing, invalid, or expired refresh token");
     }
 
 }

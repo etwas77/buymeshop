@@ -1,17 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-import { api } from "../../component/services/api";
+import { authApi } from "../../component/services/api";
 import { OrderDto } from "../../dtos/OrderDto";
 
 export const placeOrder = createAsyncThunk(
     "order/placeOrder",
     async (userId: number) => {
-        const accessToken = localStorage.getItem("authToken") ?? '';
         try {
-            const response = await api.post("/orders/order?userId=" + userId, {}, {
-                headers: { Authorization: `Bearer ${accessToken}` },
-                withCredentials: true
-            });
+            const response = await authApi.post("/orders/order?userId=" + userId, {});
             return response.data.data as OrderDto;
         }
         catch (error: any) {
@@ -24,12 +20,8 @@ export const placeOrder = createAsyncThunk(
 export const getOrdersByUserId = createAsyncThunk(
     "order/getOrdersByUserId",
     async (userId: number) => {
-        const accessToken = localStorage.getItem("authToken") ?? '';
         try {
-            const response = await api.get("/orders/user/" + userId, {
-                headers: { Authorization: `Bearer ${accessToken}` },
-                withCredentials: true
-            });
+            const response = await authApi.get("/orders/user/" + userId);
             return response.data.data as OrderDto[];
         }
         catch (error: any) {

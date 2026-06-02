@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { jwtDecode } from "jwt-decode";
 import { LoginCredentials } from "../../component/auth/Login";
-import { api } from "../../component/services/api";
+import { authApi } from "../../component/services/api";
 
 export const login = createAsyncThunk(
     "auth/login",
     async (credentials: LoginCredentials) => {
-        const response = await api.post("/auth/login", credentials);
+        const response = await authApi.post("/auth/login", credentials);
         return response.data as { accessToken: string };
     }
 );

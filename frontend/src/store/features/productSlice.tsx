@@ -1,8 +1,8 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-import { api } from "../../component/services/api";
-import { ProductDto } from "../../dtos/ProductDto";
+import { api, authApi } from "../../component/services/api";
 import { AddProductRequestDto } from "../../dtos/AddProductRequestDto";
+import { ProductDto } from "../../dtos/ProductDto";
 
 
 export const getAllProducts = createAsyncThunk(
@@ -23,12 +23,7 @@ export const addNewProduct = createAsyncThunk(
     "products/addNewProduct",
     async (addProductRequest: AddProductRequestDto) => {
         try {
-            const response = await api.post("/products/add", addProductRequest, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("authToken")}`
-                },
-                withCredentials: true
-            });
+            const response = await authApi.post("/products/add", addProductRequest);
             return response.data.data as ProductDto;
         }
         catch (error: any) {
@@ -84,12 +79,7 @@ export const updateProductById = createAsyncThunk(
     "products/updateProductById",
     async (payload: { productUpdateRequest: AddProductRequestDto, id: string }) => {
         try {
-            const response = await api.put("/products/update/" + payload.id, payload.productUpdateRequest, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("authToken")}`
-                },
-                withCredentials: true
-            });
+            const response = await authApi.put("/products/update/" + payload.id, payload.productUpdateRequest);
             return response.data.data as ProductDto;
         }
         catch (error: any) {
@@ -103,12 +93,7 @@ export const deleteProductById = createAsyncThunk(
     "products/deleteProductById",
     async (productId: string) => {
         try {
-            const response = await api.delete("/products/delete/" + productId, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("authToken")}`
-                },
-                withCredentials: true
-            });
+            const response = await authApi.delete("/products/delete/" + productId);
             return response.data as {message: string};
         }
         catch (error: any) {
@@ -122,7 +107,7 @@ export const removeImageByIdProductById = createAsyncThunk(
     "products/removeImageByIdProductById",
     async (payload: { imageId: string, productId: string }) => {
         try {
-            const response = await api.delete("/products/" + payload.productId + "/images/" + payload.imageId);
+            const response = await authApi.delete("/products/" + payload.productId + "/images/" + payload.imageId);
             return response.data.data as ProductDto;
         }
         catch (error: any) {

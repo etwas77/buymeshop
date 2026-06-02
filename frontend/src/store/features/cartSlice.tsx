@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { api } from "../../component/services/api";
+import { authApi } from "../../component/services/api";
 import { CartDto } from "../../dtos/CartDto";
 import { CartItemDto } from "../../dtos/CartItemDto";
 
@@ -12,12 +12,7 @@ export const addToCart = createAsyncThunk(
             formData.append("productId", payload.productId);
             formData.append("quantity", payload.quantity.toString());
 
-            const response = await api.post("/cartItems/add", formData, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                },
-                withCredentials: true
-            });
+            const response = await authApi.post("/cartItems/add", formData);
             return response.data;
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
@@ -33,12 +28,7 @@ export const getUserCarts = createAsyncThunk(
     async (payload: { userId: string; }, { rejectWithValue }) => {
         const accessToken = localStorage.getItem("authToken") ?? '';
         try {
-            const response = await api.get("/carts/user/" + payload.userId, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                },
-                withCredentials: true
-            });
+            const response = await authApi.get("/carts/user/" + payload.userId);
             return response.data;
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
@@ -54,16 +44,8 @@ export const getUserCarts = createAsyncThunk(
 export const updateCartItemQuantity = createAsyncThunk(
     "cart/updateCartItemQuantity",
     async (payload: { cartId: number; productId: number; quantity: number }, { rejectWithValue }) => {
-        const accessToken = localStorage.getItem("authToken") ?? '';
         try {
-            const response = await api.put(`/cartItems/update/${payload.cartId}/${payload.productId}?quantity=${payload.quantity}`,
-                {},
-                {
-                    headers: {
-                        Authorization: `Bearer ${accessToken}`
-                    },
-                    withCredentials: true
-                });
+            const response = await authApi.put(`/cartItems/update/${payload.cartId}/${payload.productId}?quantity=${payload.quantity}`);
             return { message: response.data.message as string, payload };
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
@@ -77,14 +59,8 @@ export const updateCartItemQuantity = createAsyncThunk(
 export const removeCartItem = createAsyncThunk(
     "cart/removeCartItem",
     async (payload: { cartId: number; productId: number; }, { rejectWithValue }) => {
-        const accessToken = localStorage.getItem("authToken") ?? '';
         try {
-            const response = await api.delete(`/cartItems/remove/${payload.cartId}/${payload.productId}`, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                },
-                withCredentials: true
-            });
+            const response = await authApi.delete(`/cartItems/remove/${payload.cartId}/${payload.productId}`);
             return { message: response.data.message as string, payload };
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
