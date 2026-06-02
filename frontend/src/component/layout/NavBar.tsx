@@ -7,7 +7,7 @@ import { AuthState, logout } from "../../store/features/authSlice";
 import { cartState, getUserCarts } from "../../store/features/cartSlice";
 import { getOrdersByUserId, OrderState } from "../../store/features/orderSlice";
 import { AppDispatch } from "../../store/store";
-import { isAdmin } from "../common/utils/Functions";
+import { isAdmin, isValidToken } from "../common/utils/Functions";
 import React from "react";
 
 const NavBar = () => {
@@ -18,14 +18,15 @@ const NavBar = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("authToken") ?? "";
 
     React.useEffect(() => {
-        if (userId) {
+        if (userId && isValidToken(token)) {
             //console.log('first time after login, getting cart and orders for userId in navbar:', userId);
             dispatch(getUserCarts({ userId }));
             dispatch(getOrdersByUserId(Number(userId)));
         }
-    }, [userId, dispatch]);
+    }, [userId, dispatch, token]);
 
 
     return (

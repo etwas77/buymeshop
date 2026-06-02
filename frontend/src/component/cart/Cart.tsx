@@ -11,21 +11,23 @@ import ProductImage from "../common/utils/ProductImage";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
 import LoadSpinner from "../common/LoadSpinner";
 import { placeOrder } from "../../store/features/orderSlice";
+import { isValidToken } from "../common/utils/Functions";
 
 const Cart = () => {
     const { userId } = useParams();
     const dispatch = useDispatch<AppDispatch>();
     const { items, cartId, isLoading } = useSelector((state: { cart: cartState }) => state.cart);
     const navigate = useNavigate();
+    const token = localStorage.getItem("authToken") ?? "";
 
-    React.useEffect(() => {        
-        if (userId !== undefined && userId !== "null") {            
+    React.useEffect(() => {
+        if (userId !== undefined && userId !== "null" && isValidToken(token)) {
             dispatch(getUserCarts({ userId }));
         }
         else {
             dispatch(setLoading(false)); // No user ID, so we can stop loading immediately
         }
-    }, [userId, dispatch]);
+    }, [userId, dispatch, token]);
 
 
 

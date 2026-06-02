@@ -6,7 +6,6 @@ import { CartItemDto } from "../../dtos/CartItemDto";
 export const addToCart = createAsyncThunk(
     "cart/addToCart",
     async (payload: { productId: string; quantity: number }, { rejectWithValue }) => {
-        const accessToken = localStorage.getItem("authToken") ?? '';
         try {
             const formData = new FormData();
             formData.append("productId", payload.productId);
@@ -26,7 +25,6 @@ export const addToCart = createAsyncThunk(
 export const getUserCarts = createAsyncThunk(
     "cart/getUserCarts",
     async (payload: { userId: string; }, { rejectWithValue }) => {
-        const accessToken = localStorage.getItem("authToken") ?? '';
         try {
             const response = await authApi.get("/carts/user/" + payload.userId);
             return response.data;
@@ -36,6 +34,15 @@ export const getUserCarts = createAsyncThunk(
             }
             return rejectWithValue(error.message || 'Unknown error');
         }
+    },
+    {
+        condition: (payload, { getState }) => {
+            const state = getState() as { cart: cartState };
+            const { requestStatus, currentUserId } = state.cart;
+
+            // Prevent duplicate in-flight requests for the same user.
+            return !(requestStatus === "loading" && currentUserId === payload.userId);
+        },
     }
 );
 
@@ -78,6 +85,8 @@ export interface cartState {
     errorMessage?: string;
     successMessage?: string;
     isLoading?: boolean;
+    requestStatus?: "idle" | "loading" | "succeeded" | "failed";
+    currentUserId?: string;
 };
 
 const cartSlice = createSlice({
@@ -86,7 +95,9 @@ const cartSlice = createSlice({
         cartId: -1,
         items: [],
         totalAmount: 0,
-        isLoading: true
+        isLoading: true,
+        requestStatus: "idle",
+        currentUserId: undefined,
     } as cartState,
     reducers: {
         setLoading(state, action) {
@@ -99,10 +110,18 @@ const cartSlice = createSlice({
             state.errorMessage = undefined;
             state.successMessage = undefined;
             state.isLoading = false;
+            state.requestStatus = "idle";
+            state.currentUserId = undefined;
         },
     },
     extraReducers: (builder) => {
         builder
+            .addCase(getUserCarts.pending, (state, action) => {
+                state.isLoading = true;
+                state.errorMessage = undefined;
+                state.requestStatus = "loading";
+                state.currentUserId = action.meta.arg.userId;
+            })
             .addCase(addToCart.fulfilled, (state, action) => {
                 const data: CartDto = action.payload.data;
                 state.cartId = data.id;
@@ -127,10 +146,14 @@ const cartSlice = createSlice({
                 state.successMessage = action.payload.message;
                 state.errorMessage = undefined; // Clear any previous error message on success
                 state.isLoading = false;
+                state.requestStatus = "succeeded";
+                state.currentUserId = action.meta.arg.userId;
             })
             .addCase(getUserCarts.rejected, (state, action) => {
                 state.errorMessage = "Failed to fetch user carts: " + (action.payload || action.error.message);
                 state.successMessage = undefined; // Clear any previous success message on error
+                state.isLoading = false;
+                state.requestStatus = "failed";
 
                 console.log('action.error.message', action.error, 'action.payload', action.payload);
             })
