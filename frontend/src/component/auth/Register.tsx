@@ -6,12 +6,18 @@ import { AddressDto, AddressType } from "../../dtos/AddressDto";
 import { CreateUserRequestDto } from "../../dtos/CreateUserRequestDto";
 import { createUser, getUsers, UserState } from "../../store/features/userSlice";
 import { AppDispatch } from "../../store/store";
+import { useNavigate } from "react-router-dom";
 
 const Register = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { users } = useSelector((state: { user: UserState }) => state.user);
-
-    console.log('users', users);
+    const { users, user } = useSelector((state: { user: UserState }) => state.user);
+    const navigate = useNavigate();
+    
+    React.useEffect(() => {
+        if(user) {
+            navigate("/login");
+        }
+    }, [user]);
 
     React.useEffect(() => {
         dispatch(getUsers());

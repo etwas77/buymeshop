@@ -12,6 +12,7 @@ import QuantityUpdater from "../common/utils/QuantityUpdater";
 import LoadSpinner from "../common/LoadSpinner";
 import { placeOrder } from "../../store/features/orderSlice";
 import { isValidToken } from "../common/utils/Functions";
+import { getUserById } from "../../store/features/userSlice";
 
 const Cart = () => {
     const { userId } = useParams();
@@ -39,9 +40,13 @@ const Cart = () => {
 
     const handlePlaceOrder = () => {
         if(items.length > 0) {
-            dispatch(placeOrder(Number(userId)));
-            dispatch(resetCart());
-            navigate("/orders/" + userId);
+            dispatch(placeOrder(Number(userId))).unwrap().then(() => {
+                dispatch(resetCart());
+                dispatch(getUserById(Number(userId)));
+                navigate("/orders/" + userId);
+            }).catch((error) => {
+                console.error("Failed to place order:", error);
+            });
         }
     };
 
