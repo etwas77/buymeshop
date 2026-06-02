@@ -99,6 +99,25 @@ export const updateProductById = createAsyncThunk(
     }
 );
 
+export const deleteProductById = createAsyncThunk(
+    "products/deleteProductById",
+    async (productId: string) => {
+        try {
+            const response = await api.delete("/products/delete/" + productId, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("authToken")}`
+                },
+                withCredentials: true
+            });
+            return response.data as {message: string};
+        }
+        catch (error: any) {
+            toast.error("Error deleting product: " + error.message);
+            return undefined;
+        }
+    }
+);
+
 export const removeImageByIdProductById = createAsyncThunk(
     "products/removeImageByIdProductById",
     async (payload: { imageId: string, productId: string }) => {
@@ -188,7 +207,7 @@ const productSlice = createSlice({
                     state.products.push(action.payload);
                     state.product = action.payload;
                     toast.success("Product added successfully!");
-                }          
+                }
                 state.isLoading = false;
             })
             .addCase(addNewProduct.rejected, (state, action) => {
@@ -201,7 +220,7 @@ const productSlice = createSlice({
                     const index = state.products.findIndex(p => p.id === action.payload!.id);
                     if (index !== -1) {
                         state.products[index] = action.payload;
-                    }   
+                    }
                     state.product = action.payload;
                     toast.success("Product updated successfully!");
                 }
@@ -210,7 +229,15 @@ const productSlice = createSlice({
             .addCase(removeImageByIdProductById.fulfilled, (state, action) => {
                 if (state.product) {
                     state.product = action.payload;
-                }   
+                }
+                state.isLoading = false;
+            })
+            .addCase(deleteProductById.fulfilled, (state, action) => {
+                if (action.payload) {
+                    state.products = state.products.filter(p => p.id !== state.product?.id);
+                    state.product = undefined;
+                    toast.success("Product deleted successfully!");
+                }                
                 state.isLoading = false;
              })
             ;

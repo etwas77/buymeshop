@@ -1,11 +1,11 @@
 import { Step, StepLabel, Stepper } from "@mui/material";
 import _ from "lodash";
 import React from "react";
-import { BsDash } from "react-icons/bs";
+import { BsDash, BsTrash } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { AddProductRequestDto } from "../../dtos/AddProductRequestDto";
 import { CategoryDto } from "../../dtos/CategoryDto";
-import { addNewProduct, getProductById, ProductState, removeImageByIdProductById, unsetProduct, updateProductById } from "../../store/features/productSlice";
+import { addNewProduct, deleteProductById, getProductById, ProductState, removeImageByIdProductById, unsetProduct, updateProductById } from "../../store/features/productSlice";
 import { AppDispatch } from "../../store/store";
 import BrandSelector from "../common/BrandSelector";
 import CategorySelector from "../common/CategorySelector";
@@ -89,6 +89,12 @@ const AddProduct = (p: AddProductProps) => {
         }
     }, [productId]);
 
+    const deleteProduct = React.useCallback(() => {
+        if (productId) {
+            dispatch(deleteProductById(productId));
+        }
+    }, [dispatch, productId, name, brand, price, inventory, description, category]);
+
     return (
         <div>
             <section className="container mt-5 mb-5">
@@ -155,6 +161,7 @@ const AddProduct = (p: AddProductProps) => {
                                     </div>
                                 }
                                 <button type="submit" className="btn btn-secondary btn-sm">{"Submit"}</button>
+                                <button type="button" className="btn btn-outline-danger btn-sm" onClick={deleteProduct}><BsTrash />{"Delete"}</button>
                             </form>
                         </div>
                     </div>
