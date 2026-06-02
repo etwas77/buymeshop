@@ -33,3 +33,11 @@ export const isAdmin = () => {
     }
     return false;
 }
+
+export const clearAuthAndRedirect = () => {
+    console.log('clear auth and redirect called');  
+    localStorage.removeItem("authToken");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("userId");
+    window.location.href = "/login";
+};

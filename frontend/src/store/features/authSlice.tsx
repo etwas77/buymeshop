@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { jwtDecode } from "jwt-decode";
 import { LoginCredentials } from "../../component/auth/Login";
 import { authApi } from "../../component/services/api";
+import { clearAuthAndRedirect } from "../../component/common/utils/Functions";
 
 export const login = createAsyncThunk(
     "auth/login",
@@ -33,9 +34,7 @@ const authSlice = createSlice({
             state.token = undefined;
             state.roles = [];
             state.error = undefined;
-            localStorage.removeItem("authToken");
-            localStorage.removeItem("userId");
-            localStorage.removeItem("userRoles");
+            clearAuthAndRedirect();
         },
     },
     extraReducers: (builder) => {

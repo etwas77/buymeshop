@@ -1,4 +1,5 @@
 import axios from "axios";
+import { clearAuthAndRedirect } from "../common/utils/Functions";
 
 const baseURL = "http://localhost:9090/api/v1";
 
@@ -10,14 +11,6 @@ export const authApi = axios.create({
 export const api = axios.create({
     baseURL,
 });
-
-const clearAuthAndRedirect = () => {
-    console.log('clear auth and redirect called');  
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userRole");
-    localStorage.removeItem("userId");
-    window.location.href = "/login";
-};
 
 authApi.interceptors.request.use(
     (config) => {
@@ -37,12 +30,8 @@ authApi.interceptors.request.use(
 );
 
 const refreshToken = async (): Promise<string> => {
-    try {
-        console.log('refresh called');
-        
-        const response = await authApi.post("/auth/refresh-token");
-        console.log('refresh response', response);
-        
+    try {        
+        const response = await authApi.post("/auth/refresh-token");        
         return response.data.accessToken;
     } catch (error) {
         return Promise.reject(error);
