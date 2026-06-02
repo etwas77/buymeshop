@@ -37,6 +37,7 @@ const Register = () => {
             street: "",
             city: "",
             country: "",
+            phone: "",
             addressType: AddressType.HOME,
         };
         setReq((prevReq) => ({
@@ -54,7 +55,7 @@ const Register = () => {
             }));
         };
 
-    const handleAddressChange = (index: number, field: "street" | "city" | "country" | "addressType") =>
+    const handleAddressChange = (index: number, field: "street" | "city" | "country" | "phone" | "addressType") =>
         (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
             const { value } = e.target;
             setReq((prevReq) => ({
@@ -125,6 +126,7 @@ const Register = () => {
                             <input type="text" placeholder="Street" className="form-control mb-1" value={address.street} onChange={handleAddressChange(index, "street")} />
                             <input type="text" placeholder="City" className="form-control mb-1" value={address.city} onChange={handleAddressChange(index, "city")} />
                             <input type="text" placeholder="Country" className="form-control mb-1" value={address.country} onChange={handleAddressChange(index, "country")} />
+                            <input type="text" placeholder="Phone" className="form-control mb-1" value={address.phone} onChange={handleAddressChange(index, "phone")} />
                             <select className="form-control mb-1" value={address.addressType} onChange={handleAddressChange(index, "addressType")}>
                                 {_.map(Object.values(AddressType), (type) => (
                                     <option key={type} value={type}>{type}</option>

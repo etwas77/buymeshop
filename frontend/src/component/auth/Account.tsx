@@ -11,7 +11,7 @@ const Account = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector((state: { user: UserState }) => state.user);
     const [addresses, setAddresses] = React.useState<AddressDto[]>([]);
-    const navigate = useNavigate();    
+    const navigate = useNavigate();
 
     React.useEffect(() => {
         const userId = localStorage.getItem("userId");
@@ -66,6 +66,7 @@ const Account = () => {
             street: "",
             city: "",
             country: "",
+            phone: "",
             addressType: AddressType.HOME,
         };
         setAddresses((prev) => [...prev, newAddress]);
@@ -139,6 +140,17 @@ const Account = () => {
                                                 type="text"
                                                 value={address.country ?? ""}
                                                 onChange={(event) => handleAddressChange(index, "country", event.target.value)}
+                                            />
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><label className="mb-0">Phone:</label></td>
+                                        <td>
+                                            <input
+                                                className="form-control"
+                                                type="text"
+                                                value={address.phone ?? ""}
+                                                onChange={(event) => handleAddressChange(index, "phone", event.target.value)}
                                             />
                                         </td>
                                     </tr>
