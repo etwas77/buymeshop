@@ -64,11 +64,11 @@ const NavBar = () => {
                         </Nav>
                     }
                     <Nav className='ms-auto'>
-                        <NavDropdown title='Account'>
+                        <NavDropdown title='Account' id='profile-dropdown' align="end">
                             <>
-                                <NavDropdown.Item to={"/account"} as={Link}>
+                                <NavDropdown.Item to={"/profile"} as={Link}>
                                     <FaUser />
-                                    My Account
+                                    Profile
                                 </NavDropdown.Item>
 
                                 <NavDropdown.Divider />

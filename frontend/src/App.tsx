@@ -27,7 +27,7 @@ function App() {
                 <Route element={<ProtectedRoute useOutlet />}>          
                     <Route path="/cart/:userId" element={<Cart />} />       {/* needs authentication */}
                     <Route path="/orders/:userId" element={<Order />} />    {/* needs authentication */}
-                    <Route path="/account" element={<Account />} />         {/* needs authentication */}
+                    <Route path="/profile" element={<Account />} />         {/* needs authentication */}
                 </Route>
 
                 <Route element={<ProtectedRoute useOutlet allowRoles={["ADMIN"]} />}>

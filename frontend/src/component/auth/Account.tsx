@@ -1,17 +1,20 @@
 import _ from "lodash";
 import React from "react";
-import { BsPlus, BsSave, BsTrash } from "react-icons/bs";
+import { BsPencilSquare, BsPlus, BsSave, BsTrash, BsX, BsXCircle } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { AddressDto, AddressType } from "../../dtos/AddressDto";
 import { createAddresses, deleteAddress, getUserById, updateAddress, UserState } from "../../store/features/userSlice";
 import { AppDispatch } from "../../store/store";
+import { Card } from "react-bootstrap";
 
 const Account = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector((state: { user: UserState }) => state.user);
     const [addresses, setAddresses] = React.useState<AddressDto[]>([]);
+    const [address, setAddress] = React.useState<AddressDto>();
     const navigate = useNavigate();
+    console.log('address', address);
 
     React.useEffect(() => {
         const userId = localStorage.getItem("userId");
@@ -29,18 +32,16 @@ const Account = () => {
         setAddresses(user?.addresses ?? []);
     }, [user?.addresses]);
 
-    const handleAddressChange = (index: number, field: keyof AddressDto, value: string) => {
-        setAddresses((prev) =>
-            prev.map((address, i) => {
-                if (i !== index) {
-                    return address;
-                }
-                if (field === "addressType") {
-                    return { ...address, addressType: value as AddressType };
-                }
-                return { ...address, [field]: value };
-            })
-        );
+    const handleAddressChange = (field: keyof AddressDto, value: string) => {
+        setAddress((prev) => {
+            if (!prev) {
+                return prev;
+            }
+            if (field === "addressType") {
+                return { ...prev, addressType: value as AddressType };
+            }   
+            return { ...prev, [field]: value };
+        });
     };
 
     const handleAddressSubmit = (event: React.FormEvent<HTMLFormElement>, index: number) => {
@@ -52,6 +53,26 @@ const Account = () => {
             return;
         }
         dispatch(updateAddress({ addressId: address.id, address }));
+    };
+
+    const saveAddress = () => {
+        if (address) {
+            setAddresses((prev) => [...prev, address]);
+            setAddress(undefined);
+            if (!address?.id) {
+                address.userId = user?.id;
+                dispatch(createAddresses({ addresses: [address] }));
+                return;
+            }
+            dispatch(updateAddress({ addressId: address.id, address }));
+        }
+    };
+
+    const editAddress = (addressId?: string) => () => {
+        if (!addressId) {
+            return;
+        }
+        setAddress(addresses.find((a) => a.id === addressId));
     };
 
     const handleDeleteAddress = (id?: string): void => {
@@ -69,7 +90,7 @@ const Account = () => {
             phone: "",
             addressType: AddressType.HOME,
         };
-        setAddresses((prev) => [...prev, newAddress]);
+        setAddress(newAddress);
     }
 
     return (
@@ -105,11 +126,23 @@ const Account = () => {
                 <button className="btn btn-success mb-3" onClick={addAddress}>
                     <BsPlus />
                 </button>
-                <div>
-                    {_.map(addresses, (address, index) => (
-                        <form key={index} className="mb-3 p-3 border rounded" onSubmit={(event) => handleAddressSubmit(event, index)}>
-                            <table className="table table-borderless mb-0">
+                {address &&
+                    <Card className="mb-3 p-3 border rounded" style={{ width: "100%" }}>
+                        <Card.Body>
+                            <h4>EDIT: {user?.firstName} {user?.lastName}</h4>
+                            <table className="table table-borderless mb-3">
                                 <tbody>
+                                    <tr>
+                                        <td style={{ width: "180px" }}><label className="mb-0">Name (optional):</label></td>
+                                        <td>
+                                            <input
+                                                className="form-control"
+                                                type="text"
+                                                value={address.optionalName ?? ""}
+                                                onChange={(event) => handleAddressChange("optionalName", event.target.value)}
+                                            />
+                                        </td>
+                                    </tr>
                                     <tr>
                                         <td style={{ width: "180px" }}><label className="mb-0">Street:</label></td>
                                         <td>
@@ -117,7 +150,7 @@ const Account = () => {
                                                 className="form-control"
                                                 type="text"
                                                 value={address.street ?? ""}
-                                                onChange={(event) => handleAddressChange(index, "street", event.target.value)}
+                                                onChange={(event) => handleAddressChange("street", event.target.value)}
                                             />
                                         </td>
                                     </tr>
@@ -128,7 +161,7 @@ const Account = () => {
                                                 className="form-control"
                                                 type="text"
                                                 value={address.city ?? ""}
-                                                onChange={(event) => handleAddressChange(index, "city", event.target.value)}
+                                                onChange={(event) => handleAddressChange("city", event.target.value)}
                                             />
                                         </td>
                                     </tr>
@@ -139,7 +172,7 @@ const Account = () => {
                                                 className="form-control"
                                                 type="text"
                                                 value={address.country ?? ""}
-                                                onChange={(event) => handleAddressChange(index, "country", event.target.value)}
+                                                onChange={(event) => handleAddressChange("country", event.target.value)}
                                             />
                                         </td>
                                     </tr>
@@ -150,7 +183,7 @@ const Account = () => {
                                                 className="form-control"
                                                 type="text"
                                                 value={address.phone ?? ""}
-                                                onChange={(event) => handleAddressChange(index, "phone", event.target.value)}
+                                                onChange={(event) => handleAddressChange("phone", event.target.value)}
                                             />
                                         </td>
                                     </tr>
@@ -160,7 +193,7 @@ const Account = () => {
                                             <select
                                                 className="form-control mb-1"
                                                 value={address.addressType}
-                                                onChange={(event) => handleAddressChange(index, "addressType", event.target.value)}
+                                                onChange={(event) => handleAddressChange("addressType", event.target.value)}
                                             >
                                                 {_.map(Object.values(AddressType), (type) => (
                                                     <option key={type} value={type}>{type}</option>
@@ -168,21 +201,35 @@ const Account = () => {
                                             </select>
                                         </td>
                                     </tr>
-                                    <tr>
-                                        <td />
-                                        <td>
-                                            <button className="btn btn-primary" type="submit" >
-                                                <BsSave /> {address.id ? "" : "Create"}
-                                            </button>
-                                            <button className="btn btn-danger" type="button" disabled={!address.id} onClick={() => handleDeleteAddress(address.id)}>
-                                                <BsTrash />
-                                            </button>
-                                        </td>
-                                    </tr>
                                 </tbody>
                             </table>
-                        </form>
-                    ))}
+                            <button className="btn btn-secondary me-2" type="button" onClick={saveAddress}>
+                                <BsSave />
+                            </button>
+                            <button className="btn btn-secondary" type="button" onClick={() => { setAddress(undefined) }}>
+                                <BsXCircle />
+                            </button>
+                        </Card.Body>
+                    </Card>
+                }
+                <div className="d-flex flex-wrap justify-content-center p-5">
+                    {_.map(addresses, (address, index) => {
+                        return <Card key={index} className="mb-3 p-3 border rounded" style={{ width: "100%" }}>
+                            <Card.Body>
+                                <h4>{user?.firstName} {user?.lastName}</h4>
+                                {address.optionalName && <p>Optional name: {address.optionalName}</p>}
+                                <p> {address.street}, {address.city}, {address.country}</p>
+                                <p> {address.phone}</p>
+                                <p><strong>Type:</strong> {address.addressType}</p>
+                                <button className="btn btn-primary me-2" type="button" disabled={!address.id} onClick={editAddress(address.id)}>
+                                    <BsPencilSquare />
+                                </button>
+                                <button className="btn btn-danger" type="button" disabled={!address.id} onClick={() => handleDeleteAddress(address.id)}>
+                                    <BsTrash />
+                                </button>
+                            </Card.Body>
+                        </Card>;
+                    })}
                 </div>
             </section>
             <section>

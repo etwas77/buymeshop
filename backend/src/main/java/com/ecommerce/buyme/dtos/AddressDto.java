@@ -20,4 +20,5 @@ public class AddressDto {
     private AddressType addressType;
 
     private Long userId;
+    private String optionalName;
 }

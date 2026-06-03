@@ -46,6 +46,8 @@ public class AddressService implements IAddressService {
         existingAddress.setCity(updatedAddress.getCity());
         existingAddress.setCountry(updatedAddress.getCountry());
         existingAddress.setAddressType(updatedAddress.getAddressType());
+        existingAddress.setPhone(updatedAddress.getPhone());
+        existingAddress.setOptionalName(updatedAddress.getOptionalName());
 
         return addressRepository.save(existingAddress);
     }

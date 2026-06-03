@@ -14,4 +14,5 @@ export interface AddressDto {
 
     addressType: AddressType;
     userId?: string;
+    optionalName?: string;
 }

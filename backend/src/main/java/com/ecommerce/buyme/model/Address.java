@@ -29,6 +29,7 @@ public class Address {
     private String city;
     private String street;
     private String phone;
+    private String optionalName;
 
     @Enumerated(EnumType.STRING)
     private AddressType addressType;
