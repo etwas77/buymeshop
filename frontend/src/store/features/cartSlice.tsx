@@ -80,6 +80,7 @@ export const removeCartItem = createAsyncThunk(
 
 export interface cartState {
     cartId: number;
+    cart?: CartDto;
     items: CartItemDto[];
     totalAmount: number;
     errorMessage?: string;
@@ -93,6 +94,7 @@ const cartSlice = createSlice({
     name: "cart",
     initialState: {
         cartId: -1,
+        cart: undefined,
         items: [],
         totalAmount: 0,
         isLoading: true,
@@ -124,6 +126,7 @@ const cartSlice = createSlice({
             })
             .addCase(addToCart.fulfilled, (state, action) => {
                 const data: CartDto = action.payload.data;
+                state.cart = data;
                 state.cartId = data.id;
 
                 state.items = data.items;

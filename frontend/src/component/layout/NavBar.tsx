@@ -1,6 +1,7 @@
+import React from "react";
 import { Container, Nav, Navbar, NavDropdown, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { BiLogOut } from "react-icons/bi";
-import { FaReceipt, FaShoppingCart, FaUser } from "react-icons/fa";
+import { FaCheck, FaReceipt, FaShoppingCart, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { AuthState, logout } from "../../store/features/authSlice";
@@ -8,7 +9,6 @@ import { cartState, getUserCarts } from "../../store/features/cartSlice";
 import { getOrdersByUserId, OrderState } from "../../store/features/orderSlice";
 import { AppDispatch } from "../../store/store";
 import { isAdmin, isValidToken } from "../common/utils/Functions";
-import React from "react";
 
 const NavBar = () => {
     const { items } = useSelector((state: { cart: cartState }) => state.cart);
@@ -80,6 +80,11 @@ const NavBar = () => {
                                 <NavDropdown.Item to={`/orders/${userId}`} as={Link}>
                                     <FaReceipt />
                                     My Orders({orders.length})
+                                </NavDropdown.Item>
+
+                                <NavDropdown.Item to={`/checkout/${userId}`} as={Link}>
+                                    <FaCheck />
+                                    Checkout
                                 </NavDropdown.Item>
 
                                 <NavDropdown.Divider />

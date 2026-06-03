@@ -5,14 +5,12 @@ import { BsTrash } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CartItemDto } from "../../dtos/CartItemDto";
-import { cartState, getUserCarts, removeCartItem, resetCart, setLoading, updateCartItemQuantity } from "../../store/features/cartSlice";
+import { cartState, getUserCarts, removeCartItem, setLoading, updateCartItemQuantity } from "../../store/features/cartSlice";
 import { AppDispatch } from "../../store/store";
+import LoadSpinner from "../common/LoadSpinner";
+import { isValidToken } from "../common/utils/Functions";
 import ProductImage from "../common/utils/ProductImage";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
-import LoadSpinner from "../common/LoadSpinner";
-import { placeOrder } from "../../store/features/orderSlice";
-import { isValidToken } from "../common/utils/Functions";
-import { getUserById } from "../../store/features/userSlice";
 
 const Cart = () => {
     const { userId } = useParams();
@@ -39,15 +37,16 @@ const Cart = () => {
     }, [dispatch, cartId]);
 
     const handlePlaceOrder = () => {
-        if(items.length > 0) {
-            dispatch(placeOrder(Number(userId))).unwrap().then(() => {
-                dispatch(resetCart());
-                dispatch(getUserById(Number(userId)));
-                navigate("/orders/" + userId);
-            }).catch((error) => {
-                console.error("Failed to place order:", error);
-            });
-        }
+        navigate("/checkout/" + userId);
+        // if(items.length > 0) {
+        //     dispatch(placeOrder(Number(userId))).unwrap().then(() => {
+        //         dispatch(resetCart());
+        //         dispatch(getUserById(Number(userId)));
+        //         navigate("/orders/" + userId);
+        //     }).catch((error) => {
+        //         console.error("Failed to place order:", error);
+        //     });
+        // }
     };
 
     if (isLoading) {
@@ -118,7 +117,7 @@ const Cart = () => {
                             Continue shopping
                         </Link>
                         <Link to={"#"} className="btn btn-primary" onClick={handlePlaceOrder} >
-                            Place order
+                            Continue to checkout
                         </Link>
                     </div>
                 </div>

@@ -12,6 +12,7 @@ import Register from "./component/auth/Register";
 import Account from "./component/auth/Account";
 import ProtectedRoute from "./component/auth/ProtectedRoute";
 import AdminPanel from "./component/admin/AdminPanel";
+import Checkout from "./component/checkout/Checkout";
 
 function App() {
     const router = createBrowserRouter(
@@ -28,6 +29,7 @@ function App() {
                     <Route path="/cart/:userId" element={<Cart />} />       {/* needs authentication */}
                     <Route path="/orders/:userId" element={<Order />} />    {/* needs authentication */}
                     <Route path="/profile" element={<Account />} />         {/* needs authentication */}
+                    <Route path="/checkout/:userId" element={<Checkout />} />       
                 </Route>
 
                 <Route element={<ProtectedRoute useOutlet allowRoles={["ADMIN"]} />}>
