@@ -2,15 +2,15 @@ import _ from "lodash";
 import React from "react";
 import { BsPlus } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { AddressDto, AddressType } from "../../dtos/AddressDto";
 import { CreateUserRequestDto } from "../../dtos/CreateUserRequestDto";
 import { createUser, getUsers, UserState } from "../../store/features/userSlice";
 import { AppDispatch } from "../../store/store";
-import { useNavigate } from "react-router-dom";
 
 const Register = () => {
     const dispatch = useDispatch<AppDispatch>();
-    const { users, user } = useSelector((state: { user: UserState }) => state.user);
+    const { user } = useSelector((state: { user: UserState }) => state.user);
     const navigate = useNavigate();
     
     React.useEffect(() => {
