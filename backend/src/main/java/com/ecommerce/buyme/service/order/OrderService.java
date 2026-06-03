@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,11 @@ import com.ecommerce.buyme.model.OrderItem;
 import com.ecommerce.buyme.model.Product;
 import com.ecommerce.buyme.repository.OrderRepository;
 import com.ecommerce.buyme.repository.ProductRepository;
+import com.ecommerce.buyme.request.PaymentRequest;
 import com.ecommerce.buyme.service.cart.ICartService;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
+import com.stripe.param.PaymentIntentCreateParams;
 
 import lombok.RequiredArgsConstructor;
 
@@ -74,6 +79,18 @@ public class OrderService implements IOrderService {
     @Override
     public OrderDto convertToDto(Order order) {
         return modelMapper.map(order, OrderDto.class);
+    }
+
+    @Override
+    public String createPaymentIntent(PaymentRequest paymentRequest) throws StripeException {
+        long amountInSmallestUnit = Math.round(paymentRequest.getAmount() * 100);
+        PaymentIntent paymentIntent = PaymentIntent.create(
+            PaymentIntentCreateParams.builder()
+                .setAmount(amountInSmallestUnit)
+                .setCurrency(paymentRequest.getCurrency())
+                .addPaymentMethodType("card")                   // only allow card payments
+                .build());
+        return paymentIntent.getClientSecret();
     }
 
 }

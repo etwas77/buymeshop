@@ -29,6 +29,7 @@
 	<properties>
 		<java.version>25</java.version>
 		<jjwt.version>0.11.5</jjwt.version>
+        <stripe.version>32.2.0</stripe.version>
 	</properties>
 	<dependencies>
         <dependency>
@@ -93,6 +94,12 @@
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>${stripe.version}</version>
+        </dependency>
 	</dependencies>
 
 	<build>
