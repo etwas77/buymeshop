@@ -1,12 +1,12 @@
 import _ from "lodash";
 import React from "react";
-import { BsPencilSquare, BsPlus, BsSave, BsTrash, BsX, BsXCircle } from "react-icons/bs";
+import { Card } from "react-bootstrap";
+import { BsPencilSquare, BsPlus, BsSave, BsTrash, BsXCircle } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { AddressDto, AddressType } from "../../dtos/AddressDto";
 import { createAddresses, deleteAddress, getUserById, updateAddress, UserState } from "../../store/features/userSlice";
 import { AppDispatch } from "../../store/store";
-import { Card } from "react-bootstrap";
 
 const Account = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -14,11 +14,10 @@ const Account = () => {
     const [addresses, setAddresses] = React.useState<AddressDto[]>([]);
     const [address, setAddress] = React.useState<AddressDto>();
     const navigate = useNavigate();
-    console.log('address', address);
 
     React.useEffect(() => {
         const userId = localStorage.getItem("userId");
-        if (userId === null) {
+        if (userId === null || isNaN(Number(userId))) {
             navigate("/login");
             return;
         }
@@ -44,20 +43,14 @@ const Account = () => {
         });
     };
 
-    const handleAddressSubmit = (event: React.FormEvent<HTMLFormElement>, index: number) => {
-        event.preventDefault();
-        const address = addresses[index];
-        if (!address?.id) {
-            address.userId = user?.id;
-            dispatch(createAddresses({ addresses: [address] }));
-            return;
-        }
-        dispatch(updateAddress({ addressId: address.id, address }));
-    };
-
     const saveAddress = () => {
         if (address) {
-            setAddresses((prev) => [...prev, address]);
+            setAddresses((prev) => {
+                if (!address.id) {
+                    return [...prev, address];
+                }
+                return prev.map((item) => (item.id === address.id ? address : item));
+            });
             setAddress(undefined);
             if (!address?.id) {
                 address.userId = user?.id;
