@@ -64,7 +64,7 @@ const ProductDetails = () => {
                 </div>
                 <div className="col-md-8 details-container">
                     <h1 className="product-name">{product.name}</h1>
-                    <h4 className="price">${product.price}</h4>
+                    <h4 className="price">€{product.price}</h4>
                     <p className="product-description">{product.description}</p>
                     <p className="product-name">Brand: {product.brand}</p>
                     <p className="product-name">

@@ -32,7 +32,7 @@ const ProductCard = (p: ProductCardProps) => {
                                 {!imageId && <div>no image available</div>}
                             </Link>
                             <Card.Body>
-                                <h4 className="price">${product.price}</h4>
+                                <h4 className="price">€{product.price}</h4>
                                 <p className={product.inventory > 0 ? "text-success" : "text-failure"}>
                                     {product.inventory > 0 ? "In stock " + product.inventory : "Out of stock"}
                                 </p>

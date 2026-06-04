@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-import { api, authApi } from "../../component/services/api";
+import { authApi } from "../../component/services/api";
 import { OrderDto } from "../../dtos/OrderDto";
 
 export const placeOrder = createAsyncThunk(

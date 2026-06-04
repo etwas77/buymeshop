@@ -1,4 +1,5 @@
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { StripeCardElementChangeEvent } from "@stripe/stripe-js";
 import { PaymentMethodCreateParams } from "@stripe/stripe-js/dist/api/payment-methods";
 import { PaymentIntentResult } from "@stripe/stripe-js/dist/stripe-js/stripe";
 import _ from "lodash";
@@ -7,11 +8,12 @@ import { Card, Col, Container, Form, FormGroup, Row } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
+import { AddressDto } from "../../dtos/AddressDto";
 import { cartState, getUserCarts, resetCart } from "../../store/features/cartSlice";
 import { createPaymentIntent, placeOrder } from "../../store/features/orderSlice";
 import { getUserById, UserState } from "../../store/features/userSlice";
 import { AppDispatch } from "../../store/store";
-import { AddressDto } from "../../dtos/AddressDto";
+import { cardElementOptions } from "./CardElementOptions";
 
 interface UserInfo {
     firstName?: string;
@@ -35,6 +37,7 @@ const Checkout = () => {
     const stripe = useStripe();
     const elements = useElements();
     const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
+    const [cardError, setCardError] = React.useState<string>();
 
     React.useEffect(() => {
         if (user === undefined) {
@@ -148,6 +151,16 @@ const Checkout = () => {
         setSelectedAddress(address);
     };
 
+    const handleStripeError = (event: StripeCardElementChangeEvent) => {
+        if (event.error) {
+            setCardError(event.error ? event.error.message : "");
+        }
+        else {
+            setCardError("");
+        }
+    };
+
+
     return (
         <Container className="mt-5 mb-5">
             <h1 className="text-center">Checkout Page</h1>
@@ -197,7 +210,7 @@ const Checkout = () => {
                                 />
                             </FormGroup>
                             <div>
-                                <h2>select billing address</h2>
+                                <h4>select billing address</h4>
                                 <Form.Select
                                     aria-label="Select billing address"
                                     value={selectedAddress?.id || ""}
@@ -221,19 +234,22 @@ const Checkout = () => {
                             </div>
                             <div className="form-group">
                                 <label htmlFor="card-element" className="form-label">
-                                    <h6>credit or debit card</h6>
+                                    <h4>credit or debit card</h4>
                                 </label>
                                 <div id="card-element" className="form-control">
-                                    <CardElement options={{ hidePostalCode: true }} />
+                                    <CardElement 
+                                        options={cardElementOptions}
+                                        onChange={handleStripeError}
+                                    />
+                                    {cardError && <div className="text-danger mt-2">{cardError}</div>}
                                 </div>
                             </div>
                         </Form>
                     </Col>
                     <Col md={4}>
-                        <h6 className="mt-4 text-center cart-title">summary</h6>
+                        <h6 className="mt-4 text-center cart-title">Summary</h6>
                         <hr />
                         <Card style={{ backgroundColor: "#f8f9fa", padding: "20px" }}>
-                            <h6>total amount: €{cart?.totalAmount.toFixed(2) || "0.00"}</h6>
                             <Card.Body>
                                 <Card.Title className="mb-2 text-muted text-success">
                                     Total amount: {cart?.totalAmount.toFixed(2) || "undefined"}
@@ -248,7 +264,7 @@ const Checkout = () => {
                                 {isProcessing ? "Processing..." : "Pay Now"}
                             </button>
                         </Card>
-                    </Col>
+                    </Col>  
                 </Row>
             </div>
         </Container>
