@@ -1,3 +1,15 @@
+export enum CountryEnum {
+    GERMANY = 'DE', 
+    USA = 'US',
+    CANADA = 'CA',
+    UK = 'GB',
+    FRANCE = 'FR',
+    AUSTRALIA = 'AU',
+    INDIA = 'IN',
+    JAPAN = 'JP',
+    CHINA = 'CN',
+    BRAZIL = 'BR',
+}
 
 export enum AddressType {
     HOME = 'HOME',

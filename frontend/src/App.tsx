@@ -14,7 +14,7 @@ import ProtectedRoute from "./component/auth/ProtectedRoute";
 import AdminPanel from "./component/admin/AdminPanel";
 import Checkout from "./component/checkout/Checkout";
 
-function App() {
+function App() {    
     const router = createBrowserRouter(
         createRoutesFromElements(
             <Route path="/" element={<RootLayout />} >

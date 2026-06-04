@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { toast } from "react-toastify";
-import { authApi } from "../../component/services/api";
+import { api, authApi } from "../../component/services/api";
 import { OrderDto } from "../../dtos/OrderDto";
 
 export const placeOrder = createAsyncThunk(
@@ -31,10 +31,19 @@ export const getOrdersByUserId = createAsyncThunk(
     }
 );
 
+export const createPaymentIntent = createAsyncThunk(
+    "order/createPaymentIntent",
+    async (intent: {amount: number, currency: string}) => {
+        const responce = await authApi.post("/orders/create-payment-intent", intent);
+        return responce.data.data as string;
+    }
+);
+
 
 export interface OrderState {
     orders: OrderDto[];
     isLoading: boolean;
+    clientSecret?: string;
 }
 
 const orderSlice = createSlice({
@@ -63,6 +72,9 @@ const orderSlice = createSlice({
             })
             .addCase(getOrdersByUserId.rejected, (state) => {
                 state.isLoading = false;
+            })
+            .addCase(createPaymentIntent.fulfilled, (state, action) => {
+                state.clientSecret = action.payload;
             })
             ;
     }

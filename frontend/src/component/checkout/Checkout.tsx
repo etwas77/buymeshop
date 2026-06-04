@@ -1,17 +1,23 @@
-import React from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
-import { getUserById, UserState } from "../../store/features/userSlice";
-import { AppDispatch } from "../../store/store";
-import { cartState, getUserCarts, resetCart } from "../../store/features/cartSlice";
-import { useElements, useStripe, CardElement } from "@stripe/react-stripe-js";
-import { toast } from "react-toastify";
-import { api } from "../services/api";
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { PaymentMethodCreateParams } from "@stripe/stripe-js/dist/api/payment-methods";
 import { PaymentIntentResult } from "@stripe/stripe-js/dist/stripe-js/stripe";
 import _ from "lodash";
-import { PaymentMethodCreateParams } from "@stripe/stripe-js/dist/api/payment-methods";
-import { placeOrder } from "../../store/features/orderSlice";
+import React, { ChangeEvent } from "react";
+import { Card, Col, Container, Form, FormGroup, Row } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { useParams } from "react-router-dom";
+import { toast } from "react-toastify";
+import { cartState, getUserCarts, resetCart } from "../../store/features/cartSlice";
+import { createPaymentIntent, placeOrder } from "../../store/features/orderSlice";
+import { getUserById, UserState } from "../../store/features/userSlice";
+import { AppDispatch } from "../../store/store";
+import { AddressDto } from "../../dtos/AddressDto";
 
+interface UserInfo {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+}
 
 const Checkout = () => {
     const { userId } = useParams();
@@ -19,19 +25,31 @@ const Checkout = () => {
     const { cart } = useSelector((state: { cart: cartState }) => state.cart);
     const dispatch = useDispatch<AppDispatch>();
 
+    const [userInfo, setUserInfo] = React.useState<UserInfo>({
+        firstName: user?.firstName,
+        lastName: user?.lastName,
+        email: user?.email,
+    });
+    const [selectedAddress, setSelectedAddress] = React.useState<AddressDto>();
+
     const stripe = useStripe();
     const elements = useElements();
-    const [cardError, setCardError] = React.useState<string>();
     const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
-
-    console.log('cart', cart);
-    console.log('user', user);
-
 
     React.useEffect(() => {
         if (user === undefined) {
             if (userId && !isNaN(Number(userId))) {
                 dispatch(getUserById(Number(userId)));
+            }
+        }
+        if (user) {
+            setUserInfo({
+                firstName: user.firstName,
+                lastName: user.lastName,
+                email: user.email,
+            });
+            if (user.addresses && user.addresses.length > 0) {
+                setSelectedAddress(user.addresses[0]);
             }
         }
     }, [user, dispatch, userId]);
@@ -51,28 +69,28 @@ const Checkout = () => {
             toast.error("Stripe has not loaded yet. Please try again.");
             return;
         }
+        if (cart === undefined) {
+            setIsProcessing(false);
+            toast.error("Cart is empty. Please add items to your cart before checkout.");
+            return;
+        }
 
         // create payment intent with card details by backend
-        const cardElement = elements.getElement(CardElement);
+        const cardElement: any = elements.getElement(CardElement);
         try {
-            const intent = { amount: cart?.totalAmount, currency: "EUR" };
-            const responce = await api.post("/orders/create-payment-intent", intent);
-            const clientSecret = responce.data.data.clientSecret;
+            const intent = { amount: cart.totalAmount, currency: "EUR" };
+            const clientSecret = await dispatch(createPaymentIntent(intent)).unwrap();
 
-            let addr = _.find(user?.addresses, addr => addr.addressType === "SHIPPING");
-            if (addr === undefined) {
-                addr = (user?.addresses !== undefined && user.addresses.length > 0) ? user.addresses[0] : undefined;
-                if (addr === undefined) {
-                    setIsProcessing(false);
-                    toast.error("No address found for user. Please add an address before checkout.");
-                    return;
-                }
+            if (selectedAddress === undefined) {
+                setIsProcessing(false);
+                toast.error("Please select a billing address.");
+                return;
             }
             const address: PaymentMethodCreateParams.BillingDetails.Address = {
-                line1: addr.optionalName,
-                line2: addr.street,
-                city: addr.city,
-                country: addr.country,
+                line1: selectedAddress.optionalName,
+                line2: selectedAddress.street,
+                city: selectedAddress.city,
+                country: selectedAddress.country,
             }
 
             // confirm payment intent with card details
@@ -80,14 +98,14 @@ const Checkout = () => {
                 payment_method: {
                     card: cardElement!,
                     billing_details: {
-                        name: user?.firstName + " " + user?.lastName,
-                        email: user?.email,
+                        name: userInfo.firstName + " " + userInfo.lastName,
+                        email: userInfo.email,
                         address,
                     },
                 },
             });
-            console.log('paymentResult', paymentResult);
-            
+            //console.log('paymentResult.paymentIntent', paymentResult);
+
             // place order if payment successful, else show error message
             if (paymentResult.paymentIntent?.status === "succeeded") {
                 dispatch(placeOrder(Number(userId))).unwrap().then(() => {
@@ -104,16 +122,136 @@ const Checkout = () => {
         }
         catch (err: any) {
             setIsProcessing(false);
-            toast.error("Payment failed: " + err.message);
+            console.log('err', err);
+
+            toast.error("Error processing payment");
             return;
         }
         setIsProcessing(false);
     };
 
+    const handleInputChange = (event: ChangeEvent<HTMLInputElement>): void => {
+        const { name, value } = event.target;
+        setUserInfo((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
+
+    const normalizeString = (str: string | undefined): string => {
+        return str ? str.trim().toLowerCase() : "";
+    };
+
+    const handleAddressChange = (event: ChangeEvent<HTMLSelectElement>): void => {
+        const selectedId: string = normalizeString(event.target.value);
+        const address = user?.addresses?.find((a) => normalizeString(String(a.id ?? "undefined")) === selectedId);
+        setSelectedAddress(address);
+    };
+
     return (
-        <div>
-            <h1>Checkout Page</h1>
-        </div>
+        <Container className="mt-5 mb-5">
+            <h1 className="text-center">Checkout Page</h1>
+            <div className="d-flex justify-content-center">
+                <Row>
+                    <Col md={8}>
+                        <Form
+                            className="p-4 border rounded shadow"
+                        >
+                            <Row>
+                                <Col md={6}>
+                                    <FormGroup>
+                                        <label htmlFor="firstName" className="form-label">First Name</label>
+                                        <input
+                                            type="text"
+                                            id="name"
+                                            name="firstName"
+                                            className="form-control mb-2"
+                                            value={userInfo.firstName || ""}
+                                            onChange={handleInputChange}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                                <Col md={6}>
+                                    <FormGroup>
+                                        <label htmlFor="lastName" className="form-label">Last Name</label>
+                                        <input
+                                            type="text"
+                                            id="lastName"
+                                            name="lastName"
+                                            className="form-control mb-2"
+                                            value={userInfo.lastName || ""}
+                                            onChange={handleInputChange}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                            </Row>
+                            <FormGroup>
+                                <label htmlFor="email" className="form-label">Email</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    className="form-control mb-2"
+                                    value={userInfo.email || ""}
+                                    onChange={handleInputChange}
+                                />
+                            </FormGroup>
+                            <div>
+                                <h2>select billing address</h2>
+                                <Form.Select
+                                    aria-label="Select billing address"
+                                    value={selectedAddress?.id || ""}
+                                    onChange={handleAddressChange}
+                                    className="mb-3"
+                                >
+                                    {(user?.addresses || []).length === 0 && (
+                                        <option value="">No address available</option>
+                                    )}
+
+                                    {_.map(user?.addresses, address => {
+                                        const label = `${address.addressType} - ${address?.optionalName ? address.optionalName + "," : userInfo.firstName + " " + userInfo.lastName} 
+                                                        ${address.street}, ${address.city}, ${address.country}`.trim();
+                                        return (
+                                            <option key={address.id} value={address.id}>
+                                                {label}
+                                            </option>
+                                        );
+                                    })}
+                                </Form.Select>
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="card-element" className="form-label">
+                                    <h6>credit or debit card</h6>
+                                </label>
+                                <div id="card-element" className="form-control">
+                                    <CardElement options={{ hidePostalCode: true }} />
+                                </div>
+                            </div>
+                        </Form>
+                    </Col>
+                    <Col md={4}>
+                        <h6 className="mt-4 text-center cart-title">summary</h6>
+                        <hr />
+                        <Card style={{ backgroundColor: "#f8f9fa", padding: "20px" }}>
+                            <h6>total amount: €{cart?.totalAmount.toFixed(2) || "0.00"}</h6>
+                            <Card.Body>
+                                <Card.Title className="mb-2 text-muted text-success">
+                                    Total amount: {cart?.totalAmount.toFixed(2) || "undefined"}
+                                </Card.Title>
+                            </Card.Body>
+                            <button
+                                className="btn btn-warning mt-3"
+                                type="submit"
+                                disabled={!stripe || isProcessing}
+                                onClick={handlePaymentAndOrder}
+                            >
+                                {isProcessing ? "Processing..." : "Pay Now"}
+                            </button>
+                        </Card>
+                    </Col>
+                </Row>
+            </div>
+        </Container>
     );
 };
 

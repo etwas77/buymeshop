@@ -4,7 +4,7 @@ import { Card } from "react-bootstrap";
 import { BsPencilSquare, BsPlus, BsSave, BsTrash, BsXCircle } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { AddressDto, AddressType } from "../../dtos/AddressDto";
+import { AddressDto, AddressType, CountryEnum } from "../../dtos/AddressDto";
 import { createAddresses, deleteAddress, getUserById, updateAddress, UserState } from "../../store/features/userSlice";
 import { AppDispatch } from "../../store/store";
 
@@ -39,6 +39,9 @@ const Account = () => {
             if (field === "addressType") {
                 return { ...prev, addressType: value as AddressType };
             }   
+            if (field === "country") {
+                return { ...prev, country: value as CountryEnum };
+            } 
             return { ...prev, [field]: value };
         });
     };
@@ -161,12 +164,15 @@ const Account = () => {
                                     <tr>
                                         <td><label className="mb-0">Country:</label></td>
                                         <td>
-                                            <input
-                                                className="form-control"
-                                                type="text"
-                                                value={address.country ?? ""}
+                                            <select
+                                                className="form-control mb-1"
+                                                value={address.country}
                                                 onChange={(event) => handleAddressChange("country", event.target.value)}
-                                            />
+                                            >
+                                                {_.map(Object.values(CountryEnum), (type) => (
+                                                    <option key={type} value={type}>{type}</option>
+                                                ))}
+                                            </select>
                                         </td>
                                     </tr>
                                     <tr>

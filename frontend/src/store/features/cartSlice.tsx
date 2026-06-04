@@ -26,7 +26,7 @@ export const getUserCarts = createAsyncThunk(
     "cart/getUserCarts",
     async (payload: { userId: string; }, { rejectWithValue }) => {
         try {
-            const response = await authApi.get("/carts/user/" + payload.userId);
+            const response = await authApi.get("/carts/user/" + payload.userId);            
             return response.data;
         } catch (error: any) {
             if (error.response && error.response.data && error.response.data.message) {
@@ -143,6 +143,7 @@ const cartSlice = createSlice({
             })
             .addCase(getUserCarts.fulfilled, (state, action) => {
                 const data: CartDto = action.payload.data;
+                state.cart = data;
                 state.cartId = data.id;
                 state.items = data.items;
                 state.totalAmount = data.totalAmount;
