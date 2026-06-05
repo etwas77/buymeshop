@@ -1,27 +1,50 @@
-{"properties": [
-  {
-    "name": "api.prefix",
-    "type": "java.lang.String",
-    "description": "A description for 'api.prefix'"
-  },
-  {
-    "name": "auth..access-expiration-in-mils",
-    "type": "java.lang.String",
-    "description": "A description for 'auth..access-expiration-in-mils'"
-  },
-  {
-    "name": "auth..refresh-expiration-in-mils",
-    "type": "java.lang.String",
-    "description": "A description for 'auth..refresh-expiration-in-mils'"
-  },
-  {
-    "name": "auth..secret",
-    "type": "java.lang.String",
-    "description": "A description for 'auth..secret'"
-  },
-  {
-    "name": "app.use-secure-cookie",
-    "type": "java.lang.Boolean",
-    "description": "Enable secure cookies (HTTPS only, SameSite=None)"
-  }
-]}
+{
+    "properties": [
+        {
+            "name": "api.prefix",
+            "type": "java.lang.String",
+            "description": "A description for 'api.prefix'"
+        },
+        {
+            "name": "auth..access-expiration-in-mils",
+            "type": "java.lang.String",
+            "description": "A description for 'auth..access-expiration-in-mils'"
+        },
+        {
+            "name": "auth..refresh-expiration-in-mils",
+            "type": "java.lang.String",
+            "description": "A description for 'auth..refresh-expiration-in-mils'"
+        },
+        {
+            "name": "auth..secret",
+            "type": "java.lang.String",
+            "description": "A description for 'auth..secret'"
+        },
+        {
+            "name": "app.use-secure-cookie",
+            "type": "java.lang.Boolean",
+            "description": "Enable secure cookies (HTTPS only, SameSite=None)"
+        },
+        {
+            "name": "stripe.secret.key",
+            "type": "java.lang.String",
+            "description": "Stripe secret key for payment processing"
+        },
+        {
+            "name": "auth.token.secret",
+            "type": "java.lang.String",
+            "description": "Secret key used for signing authentication tokens"
+        },
+        {
+            "name": "auth.token.access-expiration-in-mils",
+            "type": "java.lang.Long",
+            "description": "Expiration time for access tokens in milliseconds"
+        },
+        {
+            "name": "auth.token.refresh-expiration-in-mils",
+            "type": "java.lang.Long",
+            "description": "Expiration time for refresh tokens in milliseconds"
+        }
+
+    ]
+}
