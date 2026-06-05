@@ -1,7 +1,7 @@
 import axios from "axios";
 import { clearAuthAndRedirect } from "../common/utils/Functions";
 
-const baseURL = "http://localhost:9090/api/v1";
+export const baseURL = import.meta.env.VITE_BASE_URL;
 
 export const authApi = axios.create({
     baseURL,
