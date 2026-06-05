@@ -512,11 +512,72 @@
     background-color: transparent !important;
 }
 
+/* start image search area */
+.image-search-container {
+    text-align: center;
+}
+
+.search-image-icon {
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    margin-left: 10px;
+    background-color: var(--light-gray);
+}
+.image-uploader {
+    border: 2px dashed var(--light-gray);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    width: 500px;
+    height: 200px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    background-color: #828282;
+    border-radius: 10px;
+}
+.image-uploader:hover {
+    background-color: #6b6b6b;
+    border-color: #6b6b6b;
+}   
+.image-uploader svg {
+    margin-bottom: 20px;
+    fill: var(--light-gray);
+}
+.image-uploader img {
+    max-width: 100%;
+    max-height: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    object-fit: contain;
+}
+.image-url-input {
+    text-align: center;
+    margin-top: 10px;
+}
+.image.search-button {
+    padding: 10px 20px;
+    background-color: #484848;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+}
+.image-search-button:hover {
+    background-color: var(--search-button-color);
+}
+/* end image search area */
 
 :root {
     --search-button-color: #c38212;
     --dark-background: #000000b3;
     --nav-background: #f1f0f0;
+    --image-search-color: #828282;
+    --light-gray: #ccc;
 
     /* Default color */
 }
