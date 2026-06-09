@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { authApi } from "../../component/services/api";
+import { api } from "../../component/services/api";
 
 export const searchByImage = createAsyncThunk(
     "search/searchByImage",
     async (imageFile: File) => {
         const formData = new FormData();
         formData.append("file", imageFile);
-        const response = await authApi.post("/search/image", formData);
+        const response = await api.post("/products/search-by-image", formData);
         return response.data;
     }
 );
@@ -14,6 +14,7 @@ export interface SearchState {
     searchQuery: string;
     selectedCategory: string;
     imageSearch?: string;
+    imageSearchResults?: any[];
 }
 
 const searchSlice = createSlice({
@@ -32,6 +33,8 @@ const searchSlice = createSlice({
         clearFilter: (state: SearchState) => {
             state.searchQuery = "";
             state.selectedCategory = "All Categories";
+            state.imageSearch = undefined;
+            state.imageSearchResults = undefined;
         },
         setImageSearch(state: SearchState, action: PayloadAction<string>) {
             state.imageSearch = action.payload;
@@ -39,7 +42,7 @@ const searchSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder.addCase(searchByImage.fulfilled, (state, action) => {
-            state.imageSearch = action.payload;
+            state.imageSearchResults = action.payload;
         });
     }
 });

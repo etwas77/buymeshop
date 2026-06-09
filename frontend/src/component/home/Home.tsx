@@ -13,12 +13,11 @@ import Paginator from "../common/Paginator";
 import ProductImage from "../common/utils/ProductImage";
 import Hero from "../hero/Hero";
 import LoadSpinner from "../common/LoadSpinner";
+import { SearchState } from "../../store/features/searchSlice";
 
 const Home = () => {
     const [filteredProducts, setFilteredProducts] = React.useState<ProductDto[]>([]);
-    //const [products, setProducts] = React.useState<ProductDto[]>([]);
-    //const [error, setError] = React.useState<string | null>(null);
-    const { searchQuery, selectedCategory } = useSelector((state: any) => state.search);
+    const { searchQuery, selectedCategory, imageSearchResults } = useSelector((state: { search: SearchState }) => state.search);
     const { itemsPerPage, currentPage } = useSelector((state: { pagination: PaginationState }) => state.pagination);
     const { distinctProducts: products, isLoading } = useSelector((state: { products: ProductState }) => state.products);
     const dispatch = useDispatch<AppDispatch>();
@@ -40,10 +39,11 @@ const Home = () => {
             const matchesCategory = selectedCategory === 'All Categories'
                 || product.category.name.toLowerCase().includes(selectedCategory.toLowerCase());
             const matchesSearchQuery = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-            return matchesCategory && matchesSearchQuery;
+            const matchesImageSearch = !imageSearchResults || imageSearchResults.includes(product.id);
+            return matchesCategory && matchesSearchQuery && matchesImageSearch;
         });
         setFilteredProducts(filtered);
-    }, [products, searchQuery, selectedCategory]);
+    }, [products, searchQuery, selectedCategory, imageSearchResults]);
 
     if (isLoading) {
         return <div>
