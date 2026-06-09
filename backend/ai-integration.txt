@@ -1,0 +1,12 @@
+task: user supplies image and backend should find corresponing product in db, using that image.
+in order to integrate ai:
+https://docs.spring.io/spring-ai/reference/getting-started.html
+- https://start.spring.io/ add dependencies: 
+    - OpenAI
+    - Chroma Vector Database
+- generate api key to use open ai:
+    - https://platform.openai.com/api-keys, create new key
+    - https://developers.openai.com/api/reference/overview
+    - set link to key using application.properties
+- .\mvnw.cmd clean install
+- stoped development at this point. do not want to spend money on openai usage.

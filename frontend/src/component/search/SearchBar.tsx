@@ -1,6 +1,5 @@
 import _ from "lodash";
 import React from "react";
-import { BsSearch } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { CategoryDto } from "../../dtos/CategoryDto";
 import { getAllCategories } from "../../store/features/categorySlice";
@@ -12,7 +11,7 @@ const SearchBar = () => {
     const { categories } = useSelector((state: { category: { categories: CategoryDto[] } }) => state.category);
     const { searchQuery, selectedCategory } = useSelector((state: { search: SearchState }) => state.search);
     const dispatch = useDispatch<AppDispatch>();
-    const [showImageSearch, setShowImageSearch] = React.useState<boolean>(false);
+    const [showImageSearch, ] = React.useState<boolean>(false);
 
     React.useEffect(() => {
         dispatch(getAllCategories());
@@ -40,7 +39,7 @@ const SearchBar = () => {
                 value={searchQuery}
                 onChange={(e) => dispatch(setSearchQuery(e.target.value))}
             />
-            <button className="search-button me-2" onClick={() => setShowImageSearch((prev) => !prev)}><BsSearch />by Image</button>
+            {/* <button className="search-button me-2" onClick={() => setShowImageSearch((prev) => !prev)}><BsSearch />by Image</button> */}
             <button className="search-button" onClick={() => dispatch(clearFilter())}>Clear Filter</button>
         </div>
         {showImageSearch && <ImageSearch />}
