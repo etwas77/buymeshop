@@ -17,7 +17,6 @@ import com.ecommerce.buyme.model.User;
 import com.ecommerce.buyme.repository.CartItemRepository;
 import com.ecommerce.buyme.repository.CartRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,20 +27,20 @@ public class CartService implements ICartService {
     private final CartItemRepository cartItemRepository;
 
     @Override
-    public Cart getById(Long cartId) {
+    public Cart getById(String cartId) {
         return cartRepository.findById(cartId)
-                .orElseThrow(() -> new EntityNotFoundException("Cart not found with id: " + cartId));
+                .orElseThrow(() -> new RuntimeException("Cart not found with id: " + cartId));
     }
 
     @Override
-    public Cart getByUserId(Long userId) {
+    public Cart getByUserId(String userId) {
         return cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("Cart not found for user id: " + userId));
+                .orElseThrow(() -> new RuntimeException("Cart not found for user id: " + userId));
     }
 
     @Transactional
     @Override
-    public void clear(Long cartId) {
+    public void clear(String cartId) {
         Cart cart = getById(cartId);
         cartItemRepository.deleteAllByCartId(cartId);
         cart.getItems().clear();
@@ -60,7 +59,7 @@ public class CartService implements ICartService {
     }
 
     @Override
-    public BigDecimal getTotalPrice(Long cartId) {
+    public BigDecimal getTotalPrice(String cartId) {
         return getById(cartId).getTotalAmount();
     }
 

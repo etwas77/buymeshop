@@ -10,15 +10,15 @@ import com.ecommerce.buyme.model.User;
 public interface ICartService {
     List<Cart> getAll();
 
-    Cart getById(Long cartId);
+    Cart getById(String cartId);
 
-    Cart getByUserId(Long userId);
+    Cart getByUserId(String userId);
 
-    void clear(Long cartId);
+    void clear(String cartId);
 
     Cart initializeCartForUser(User user);
 
-    BigDecimal getTotalPrice(Long cartId);
+    BigDecimal getTotalPrice(String cartId);
 
 
     CartDto mapToCartDto(Cart cart);

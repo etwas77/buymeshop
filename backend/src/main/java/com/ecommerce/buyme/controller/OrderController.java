@@ -27,14 +27,14 @@ public class OrderController {
     private final IOrderService orderService;
 
     @PostMapping("/order")
-    public ResponseEntity<ApiResponse> placeOrder(@RequestParam Long userId) {
+    public ResponseEntity<ApiResponse> placeOrder(@RequestParam String userId) {
         Order order = orderService.placeOrder(userId);
         OrderDto orderDto = orderService.convertToDto(order);
         return ResponseEntity.ok(new ApiResponse("Order placed successfully", orderDto));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse> getOrdersByUserId(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse> getOrdersByUserId(@PathVariable String userId) {
         List<OrderDto> orders = orderService.getOrdersByUserId(userId);
         return ResponseEntity.ok(new ApiResponse("Orders retrieved successfully", orders));
     }

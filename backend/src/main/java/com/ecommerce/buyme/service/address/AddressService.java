@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import com.ecommerce.buyme.model.Address;
 import com.ecommerce.buyme.repository.AddressRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,26 +20,26 @@ public class AddressService implements IAddressService {
     }
 
     @Override
-    public List<Address> getAddressesByUserId(Long userId) {
+    public List<Address> getAddressesByUserId(String userId) {
         return addressRepository.findByUserId(userId);
     }
 
     @Override
-    public Address getAddressById(Long addressId) {
-        return addressRepository.findById(addressId).orElseThrow(() -> new EntityNotFoundException("Address not found with id: " + addressId));
+    public Address getAddressById(String addressId) {
+        return addressRepository.findById(addressId).orElseThrow(() -> new RuntimeException("Address not found with id: " + addressId));
     }
 
     @Override
-    public void deleteAddress(Long addressId) {
+    public void deleteAddress(String addressId) {
         if (!addressRepository.existsById(addressId)) {
-            throw new EntityNotFoundException("Address not found with id: " + addressId);
+            throw new RuntimeException("Address not found with id: " + addressId);
         }
         addressRepository.deleteById(addressId);
     }
 
     @Override
-    public Address updateAddress(Long addressId, Address updatedAddress) {
-        Address existingAddress = addressRepository.findById(addressId).orElseThrow(() -> new EntityNotFoundException("Address not found with id: " + addressId));
+    public Address updateAddress(String addressId, Address updatedAddress) {
+        Address existingAddress = addressRepository.findById(addressId).orElseThrow(() -> new RuntimeException("Address not found with id: " + addressId));
 
         existingAddress.setStreet(updatedAddress.getStreet());
         existingAddress.setCity(updatedAddress.getCity());

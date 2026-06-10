@@ -8,7 +8,7 @@ import { logout } from "./authSlice";
 
 export const getUserById = createAsyncThunk(
     "user/getUserById",
-    async (userId: number) => {
+    async (userId: string) => {
         try {
             const response = await api.get("/users/user/" + userId);
             return response.data.data as UserDto;

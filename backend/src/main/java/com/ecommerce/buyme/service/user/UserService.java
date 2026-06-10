@@ -22,8 +22,6 @@ import com.ecommerce.buyme.repository.UserRepository;
 import com.ecommerce.buyme.request.CreateUserRequest;
 import com.ecommerce.buyme.request.UpdateUserRequest;
 
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.context.SecurityContextHolder;
 
@@ -40,7 +38,7 @@ public class UserService implements IUserService {
     @Override
     public User create(CreateUserRequest request) {
         Role userRole = Optional.ofNullable(roleRepository.findByName("ROLE_USER"))
-                .orElseThrow(() -> new EntityNotFoundException("Role not found."));
+                .orElseThrow(() -> new RuntimeException("Role not found."));
                 
         return Optional.of(request).filter(user -> !userRepository.existsByEmail(user.getEmail()))
                 .map(req -> {
@@ -61,11 +59,11 @@ public class UserService implements IUserService {
 
                     return savedUser;
                 })
-                .orElseThrow(() -> new EntityExistsException("user with " + request.getEmail() + " already exists."));
+                .orElseThrow(() -> new RuntimeException("user with " + request.getEmail() + " already exists."));
     }
 
     @Override
-    public User update(UpdateUserRequest request, Long userId) {
+    public User update(UpdateUserRequest request, String userId) {
         return userRepository.findById(userId)
                 .map(user -> {
                     user.setFirstName(request.getFirstName());
@@ -75,18 +73,18 @@ public class UserService implements IUserService {
                         Set<Role> incomingRoles = request.getRoles().stream()
                             .map(RoleDto::getName)
                             .map(roleName -> Optional.ofNullable(roleRepository.findByName(roleName))
-                                .orElseThrow(() -> new EntityNotFoundException("Role not found: " + roleName)))
+                                .orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
                                 .collect(Collectors.toSet());
                         user.setRoles(incomingRoles);
                     }
 
                     return userRepository.save(user);
                 })
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
     }
 
     @Override
-    public void delete(Long userId) {
+    public void delete(String userId) {
         userRepository.deleteById(userId);
     }
 
@@ -96,9 +94,9 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public User getUserById(Long userId) {
+    public User getUserById(String userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
     }
 
     @Override
@@ -115,7 +113,7 @@ public class UserService implements IUserService {
 
         String email = authentication.getName();
         return Optional.ofNullable(userRepository.findByEmail(email))
-                .orElseThrow(() -> new EntityNotFoundException("Login required to access this resource"));
+                .orElseThrow(() -> new RuntimeException("Login required to access this resource"));
     }
 
 }

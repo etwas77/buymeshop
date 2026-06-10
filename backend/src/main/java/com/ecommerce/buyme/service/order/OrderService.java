@@ -36,7 +36,7 @@ public class OrderService implements IOrderService {
 
     @Transactional
     @Override
-    public Order placeOrder(Long userId) {
+    public Order placeOrder(String userId) {
         Cart cart = cartService.getByUserId(userId);
         Order order = createOrder(cart);
         List<OrderItem> orderItems = createOrderItems(order, cart);
@@ -70,7 +70,7 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public List<OrderDto> getOrdersByUserId(Long userId) {
+    public List<OrderDto> getOrdersByUserId(String userId) {
         List<Order> orders = orderRepository.findByUserId(userId);
         return orders.stream().map(this::convertToDto).toList();
     }

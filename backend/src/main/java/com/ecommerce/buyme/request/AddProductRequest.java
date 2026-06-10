@@ -8,7 +8,7 @@ import lombok.Data;
 
 @Data
 public class AddProductRequest {
-    private Long id;
+    private StringBuilder id;
 
     private String name;
     private String brand;

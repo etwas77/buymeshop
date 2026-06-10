@@ -2,12 +2,12 @@ package com.ecommerce.buyme.repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.ecommerce.buyme.model.Order;
 
-public interface OrderRepository extends JpaRepository<Order, Long> {
+public interface OrderRepository extends MongoRepository<Order, String> {
 
-    List<Order> findByUserId(Long userId);
+    List<Order> findByUserId(String userId);
 
 }

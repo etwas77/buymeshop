@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CartDto {
-    private Long id;
+    private String id;
     private BigDecimal totalAmount;
-    private Long userId;
+    private String userId;
     private Set<CartItemDto> items;
 }

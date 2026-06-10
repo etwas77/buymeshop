@@ -8,9 +8,9 @@ import com.ecommerce.buyme.request.PaymentRequest;
 import com.stripe.exception.StripeException;
 
 public interface IOrderService {
-    Order placeOrder(Long userId);
+    Order placeOrder(String userId);
 
-    List<OrderDto> getOrdersByUserId(Long userId);
+    List<OrderDto> getOrdersByUserId(String userId);
 
     OrderDto convertToDto(Order order);
 

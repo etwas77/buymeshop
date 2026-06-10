@@ -4,13 +4,13 @@ import com.ecommerce.buyme.model.CartItem;
 import java.util.List;
 import java.util.Optional;
 
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface CartItemRepository extends JpaRepository<CartItem, Long> {
+public interface CartItemRepository extends MongoRepository<CartItem, String> {
 
-    List<CartItem> findByProductId(Long productId);
+    List<CartItem> findByProductId(String productId);
 
-    Optional<CartItem> findByCartIdAndProductId(Long cartId, Long productId);
+    Optional<CartItem> findByCartIdAndProductId(String cartId, String productId);
 
-    void deleteAllByCartId(Long cartId);
+    void deleteAllByCartId(String cartId);
 }

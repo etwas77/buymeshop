@@ -32,7 +32,7 @@ public class CartItemController {
     private final ICartService cartService;
 
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse> addItemToCart(@RequestParam Long productId, @RequestParam int quantity) {
+    public ResponseEntity<ApiResponse> addItemToCart(@RequestParam String productId, @RequestParam int quantity) {
         User user = userService.getAuthenticatedUser();
         Cart cart = cartService.initializeCartForUser(user);
         Cart saved = cartItemService.addItemToCart(cart.getId(), productId, quantity);
@@ -41,20 +41,20 @@ public class CartItemController {
     }
 
     @DeleteMapping("/remove/{cartId}/{productId}")
-    public ResponseEntity<ApiResponse> remove(@PathVariable Long cartId, @PathVariable Long productId) {
+    public ResponseEntity<ApiResponse> remove(@PathVariable String cartId, @PathVariable String productId) {
         cartItemService.remove(cartId, productId);
         return ResponseEntity.ok(new ApiResponse("Cart item removed successfully", null));
     }
 
     @PutMapping("/update/{cartId}/{productId}")
-    public ResponseEntity<ApiResponse> updateQuantity(@PathVariable Long cartId, @PathVariable Long productId,
+    public ResponseEntity<ApiResponse> updateQuantity(@PathVariable String cartId, @PathVariable String productId,
             @RequestParam int quantity) {
         cartItemService.updateQuantity(cartId, productId, quantity);
         return ResponseEntity.ok(new ApiResponse("Cart item quantity updated successfully", null));
     }
 
     @GetMapping("/item/{cartId}/{productId}")
-    public ResponseEntity<ApiResponse> getCartItemById(@PathVariable Long cartId, @PathVariable Long productId) {
+    public ResponseEntity<ApiResponse> getCartItemById(@PathVariable String cartId, @PathVariable String productId) {
         CartItem cartItem = cartItemService.getCartItemById(cartId, productId);
         return ResponseEntity.ok(new ApiResponse("Cart item retrieved successfully", cartItem));
     }

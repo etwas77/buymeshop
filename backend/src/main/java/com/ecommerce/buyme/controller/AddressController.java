@@ -34,7 +34,7 @@ public class AddressController {
     private final ModelMapper modelMapper;
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse> getAddressesByUserId(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse> getAddressesByUserId(@PathVariable String userId) {
         List<Address> addresses = addressService.getAddressesByUserId(userId);
         List<AddressDto> addressDtos = addresses.stream()
                 .map(address -> modelMapper.map(address, AddressDto.class))
@@ -45,7 +45,7 @@ public class AddressController {
     }
 
     @GetMapping("/{addressId}")
-    public ResponseEntity<ApiResponse> getAddressById(@PathVariable Long addressId) {
+    public ResponseEntity<ApiResponse> getAddressById(@PathVariable String addressId) {
         Address address = addressService.getAddressById(addressId);
         AddressDto addressDto = modelMapper.map(address, AddressDto.class);
 
@@ -54,7 +54,7 @@ public class AddressController {
     }
 
     @PutMapping("/{addressId}")
-    public ResponseEntity<ApiResponse> updateAddress(@PathVariable Long addressId, @RequestBody AddressDto request) {
+    public ResponseEntity<ApiResponse> updateAddress(@PathVariable String addressId, @RequestBody AddressDto request) {
         if (request == null || request.getCountry() == null || request.getCountry().isBlank()
                 || request.getCity() == null || request.getCity().isBlank()
                 || request.getStreet() == null || request.getStreet().isBlank()
@@ -72,7 +72,7 @@ public class AddressController {
     }
 
     @DeleteMapping("/{addressId}")
-    public ResponseEntity<ApiResponse> deleteAddress(@PathVariable Long addressId) {
+    public ResponseEntity<ApiResponse> deleteAddress(@PathVariable String addressId) {
         addressService.deleteAddress(addressId);
         ApiResponse response = new ApiResponse("Address deleted successfully", null);
         return ResponseEntity.ok(response);
@@ -92,7 +92,7 @@ public class AddressController {
         //     return ResponseEntity.badRequest().body(response);
         // }
 
-        Map<Long, User> usersById = new HashMap<>();
+        Map<String, User> usersById = new HashMap<>();
        
         List<Address> addresses = addressesDto.stream().map(dto -> {
             Address address = new Address();
@@ -102,7 +102,7 @@ public class AddressController {
             address.setAddressType(dto.getAddressType());
             
             // create address w/o user is ok, can be added later, but if userId is provided, we need to validate it and set the user
-            Long userId = dto.getUserId();
+            String userId = dto.getUserId();
             if(userId != null) {
                 User user = usersById.computeIfAbsent(userId, userService::getUserById);
                 address.setUser(user);

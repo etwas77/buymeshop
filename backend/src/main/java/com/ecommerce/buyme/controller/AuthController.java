@@ -50,7 +50,7 @@ public class AuthController {
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshAccessTocken(HttpServletRequest request) {
+    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request) {
         cookieUtils.logCookies(request);
         String refreshToken = cookieUtils.getRefreshTokenFromCookies(request);
         if (refreshToken != null) {
@@ -58,11 +58,11 @@ public class AuthController {
             if (isValid) {
                 String userName = jwtUtils.getEmailFromToken(refreshToken);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-                String newAccessTocken = jwtUtils.generateAccessTokenForUser(
+                String newAccessToken = jwtUtils.generateAccessTokenForUser(
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
-                if (newAccessTocken != null) {
+                if (newAccessToken != null) {
                     Map<String, String> tokens = new HashMap<>();
-                    tokens.put("accessToken", newAccessTocken);
+                    tokens.put("accessToken", newAccessToken);
                     return ResponseEntity.ok(tokens);
                 } else {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to generate new access token");

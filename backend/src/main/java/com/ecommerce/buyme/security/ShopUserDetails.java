@@ -22,7 +22,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ShopUserDetails implements UserDetails {
 
-    private Long id;
+    private String id;
     private String email;
     private String password;
     private Collection<GrantedAuthority> authorities;

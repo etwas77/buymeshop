@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderDto {
-    private Long id;
+    private String id;
 
     private LocalDate orderDate;
 
@@ -22,7 +22,7 @@ public class OrderDto {
 
     private OrderStatus status;
 
-    private Long userId;
+    private String userId;
 
     private Set<OrderItemDto> orderItems;
 }
