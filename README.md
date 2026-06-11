@@ -6,6 +6,4 @@ example implementation of ecommerce web application.
     - some frontend routes are secured;
     - some endpoint within controller are secured using Role;
 - mysql as db (branch "mysql");
-- mongodb as db (branch "develop", in progress)
-
-in development, see develop branch.
+- mongodb as db (branch "mongo")
