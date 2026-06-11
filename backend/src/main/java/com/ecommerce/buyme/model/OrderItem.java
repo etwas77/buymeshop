@@ -20,14 +20,14 @@ public class OrderItem {
     private int quantity;
     private BigDecimal price;
 
-    private Order order;
+    private String orderId;
 
     private Product product;
 
-    public OrderItem(Order order, Product product, BigDecimal price, int quantity) {
+    public OrderItem(String orderId, Product product, BigDecimal price, int quantity) {
         this.quantity = quantity;
         this.price = price;
-        this.order = order;
+        this.orderId = orderId;
         this.product = product;
     }
 }

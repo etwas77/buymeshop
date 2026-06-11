@@ -13,9 +13,11 @@ import com.ecommerce.buyme.dtos.CartItemDto;
 import com.ecommerce.buyme.dtos.ImageDto;
 import com.ecommerce.buyme.model.Cart;
 import com.ecommerce.buyme.model.CartItem;
+import com.ecommerce.buyme.model.Image;
 import com.ecommerce.buyme.model.User;
 import com.ecommerce.buyme.repository.CartItemRepository;
 import com.ecommerce.buyme.repository.CartRepository;
+import com.ecommerce.buyme.repository.ImageRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,8 +25,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class CartService implements ICartService {
 
+    //private final ImageService imageService;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final ImageRepository imageRepository;
+
+    // CartService(ImageService imageService) {
+    //     this.imageService = imageService;
+    // }
 
     @Override
     public Cart getById(String cartId) {
@@ -94,11 +102,17 @@ public class CartService implements ICartService {
             dto.setProductId(cartItem.getProduct().getId());
             dto.setProductName(cartItem.getProduct().getName());
             dto.setProductBrand(cartItem.getProduct().getBrand());
-
-            List<ImageDto> images = cartItem.getProduct().getImages().stream()
-                    .map(image -> new ImageDto(image.getId(), image.getFileName(), image.getDownloadUrl()))
+            String productId = cartItem.getProduct().getId();
+            List<Image> images = imageRepository.findByProductId(productId);
+            List<ImageDto> imageDtos = images.stream()
+                    .map(image -> {
+                        ImageDto imageDto = new ImageDto();
+                        imageDto.setId(image.getId());
+                        imageDto.setDownloadUrl(image.getDownloadUrl());
+                        return imageDto;
+                    })
                     .collect(Collectors.toList());
-            dto.setImages(images);
+            dto.setImages(imageDtos);
         }
         return dto;
     }

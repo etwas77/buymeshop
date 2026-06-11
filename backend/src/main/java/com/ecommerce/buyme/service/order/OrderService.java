@@ -60,7 +60,7 @@ public class OrderService implements IOrderService {
             Product product = cartItem.getProduct();
             product.setInventory(product.getInventory() - cartItem.getQuantity());
             productRepository.save(product);
-            return new OrderItem(order, product, cartItem.getUnitPrice(), cartItem.getQuantity());
+            return new OrderItem(order.getId(), product, cartItem.getUnitPrice(), cartItem.getQuantity());
         }).toList();
     }   
 

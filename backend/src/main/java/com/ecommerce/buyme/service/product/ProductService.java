@@ -25,6 +25,7 @@ import com.ecommerce.buyme.repository.OrderItemRepository;
 import com.ecommerce.buyme.repository.ProductRepository;
 import com.ecommerce.buyme.request.AddProductRequest;
 import com.ecommerce.buyme.request.ProductUpdateRequest;
+import com.ecommerce.buyme.service.cart.CartService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +39,7 @@ public class ProductService implements IProductService {
     private final OrderItemRepository orderItemRepository;
     private final ImageRepository imageRepository;
     private final ModelMapper modelMapper;
+    private final CartService cartService;
 
     @Override
     public Product add(AddProductRequest request) {
@@ -91,9 +93,6 @@ public class ProductService implements IProductService {
                     "Image with id: " + imageId + " does not belong to product with id: " + productId);
         }
 
-        if (product.getImages() != null) {
-            product.getImages().removeIf(existing -> imageId.equals(existing.getId()));
-        }
         imageRepository.delete(image);
         return convertToDto(product);
     }
@@ -116,9 +115,10 @@ public class ProductService implements IProductService {
         // Only touch images when client explicitly sends images.
         // null = keep current images unchanged.
         if (request.getImages() != null) {
-            List<Image> resolvedImages = resolveImagesForProductUpdate(product, request.getImages());
-            product.getImages().clear();
-            product.getImages().addAll(resolvedImages);
+            //List<Image> resolvedImages = 
+            resolveImagesForProductUpdate(product, request.getImages());
+            // product.getImages().clear();
+            // product.getImages().addAll(resolvedImages);
         }
 
         Category cat = request.getCategory();
@@ -131,9 +131,10 @@ public class ProductService implements IProductService {
     @Override
     public void delete(String productId) {
         productRepository.findById(productId).ifPresentOrElse(pro -> {
-            List<CartItem> cartItems = cartItemRepository.findByProductId(productId);
+            List<CartItem> cartItems = cartItemRepository.findByProduct_Id(productId);
             cartItems.forEach(item -> {
-                Cart cart = item.getCart();
+                String cartId = item.getCartId();
+                Cart cart = cartService.getById(cartId);
                 cart.removeItem(item);
                 cartItemRepository.delete(item);
             });

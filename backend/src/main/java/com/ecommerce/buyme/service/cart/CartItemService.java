@@ -41,7 +41,7 @@ public class CartItemService implements ICartItemService {
                 })
                 .orElseGet(() -> {
                     CartItem newItem = new CartItem();
-                    newItem.setCart(cart);
+                    newItem.setCartId(cart.getId());
                     newItem.setProduct(product);
                     newItem.setQuantity(quantity);
                     newItem.setUnitPrice(product.getPrice());
@@ -82,7 +82,7 @@ public class CartItemService implements ICartItemService {
 
     @Override
     public CartItem getCartItemById(String cartId, String productId) {
-        return cartItemRepository.findByCartIdAndProductId(cartId, productId)
+        return cartItemRepository.findByCartIdAndProduct_Id(cartId, productId)
                 .orElseThrow(() -> new RuntimeException(
                         "Cart item not found for cart id: " + cartId + " and product id: " + productId));
     }

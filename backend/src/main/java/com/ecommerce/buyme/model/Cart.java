@@ -27,8 +27,7 @@ public class Cart {
 
     public void removeItem(CartItem cartItem) {
         this.items.remove(cartItem);
-        cartItem.setCart(null); // updates cartitem with current cart (since cartitem has a reference to cart) -
-                                // so it breaks the association between cart and cartitem
+        cartItem.setCartId(null);
         recalculateTotalAmount();
     }
 
@@ -39,7 +38,7 @@ public class Cart {
     }
 
     public void add(CartItem cartItem) {
-        cartItem.setCart(this); // updates cartitem with current cart (since cartitem has a reference to cart)
+        cartItem.setCartId(this.id); // updates cartitem with current cart id
         this.items.add(cartItem);
         recalculateTotalAmount();
     }
