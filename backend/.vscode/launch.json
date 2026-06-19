@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Spring Boot-BuymeApplication<buyme>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.ecommerce.buyme.BuymeApplication",
+            "projectName": "buyme",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}
