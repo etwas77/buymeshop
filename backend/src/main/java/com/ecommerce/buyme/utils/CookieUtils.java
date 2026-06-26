@@ -57,6 +57,19 @@ public class CookieUtils {
         return this.useSecureCookie ? "None" : "Lax";
     }
 
+    public String getTokenFromCookies(CookieType tokenType, HttpServletRequest request) {
+        String cookieName = tokenType == CookieType.REFRESH ? REFRESH_TOKEN_COOKIE : ACCESS_TOKEN_COOKIE;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookieName.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
+    }
+
     private void setResponseHeader(HttpServletResponse response, Cookie cookie, String sameSite) {
         StringBuffer header = new StringBuffer();
         header.append(cookie.getName()).append("=").append(cookie.getValue())

@@ -9,10 +9,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ecommerce.buyme.response.ErrorResponse;
 import com.ecommerce.buyme.security.ShopUserDetailService;
+import com.ecommerce.buyme.utils.CookieUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -25,10 +27,12 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     private final JwtUtils jwtUtils;
 
     private final ShopUserDetailService userDetailsService;
+    private final CookieUtils cookieUtils;
 
-    public AuthTokenFilter(JwtUtils jwtUtils, ShopUserDetailService userDetailsService) {
+    public AuthTokenFilter(JwtUtils jwtUtils, ShopUserDetailService userDetailsService, CookieUtils cookieUtils) {
         this.jwtUtils = jwtUtils;
         this.userDetailsService = userDetailsService;
+        this.cookieUtils = cookieUtils;
     }
 
     @Override
@@ -53,6 +57,11 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 
     private String parseJwt(HttpServletRequest request) {
+        String tokenString = cookieUtils.getTokenFromCookies(CookieUtils.CookieType.ACCESS, request);
+        if(tokenString != null && StringUtils.hasText(tokenString)) {
+            return tokenString;
+        }
+
         String headerAuth = request.getHeader("Authorization");
 
         if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
