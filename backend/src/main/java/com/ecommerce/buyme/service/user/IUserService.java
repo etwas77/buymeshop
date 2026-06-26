@@ -10,13 +10,13 @@ import com.ecommerce.buyme.request.UpdateUserRequest;
 public interface IUserService {
     User create(CreateUserRequest request);
 
-    User update(UpdateUserRequest request, Long userId);
+    User update(UpdateUserRequest request, String userId);
 
-    User getUserById(Long userId);
+    User getUserById(String userId);
 
     List<User> getAll();
 
-    void delete(Long userId);
+    void delete(String userId);
 
     UserDto convertToDto(User user);
 

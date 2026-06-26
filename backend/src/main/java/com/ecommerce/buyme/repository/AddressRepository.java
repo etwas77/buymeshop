@@ -2,14 +2,12 @@ package com.ecommerce.buyme.repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.ecommerce.buyme.model.Address;
 
-@Repository
-public interface AddressRepository extends JpaRepository<Address, Long> {
+public interface AddressRepository extends MongoRepository<Address, String> {
 
-    List<Address> findByUserId(Long userId);
+    List<Address> findByUserId(String userId);
 
 }

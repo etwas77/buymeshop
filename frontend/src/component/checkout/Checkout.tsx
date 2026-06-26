@@ -2,6 +2,8 @@ import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { StripeCardElementChangeEvent } from "@stripe/stripe-js";
 import { PaymentMethodCreateParams } from "@stripe/stripe-js/dist/api/payment-methods";
 import { PaymentIntentResult } from "@stripe/stripe-js/dist/stripe-js/stripe";
+import countries from "i18n-iso-countries";
+import enCountryLocale from "i18n-iso-countries/langs/en.json";
 import _ from "lodash";
 import React, { ChangeEvent } from "react";
 import { Card, Col, Container, Form, FormGroup, Row } from "react-bootstrap";
@@ -14,6 +16,8 @@ import { createPaymentIntent, placeOrder } from "../../store/features/orderSlice
 import { getUserById, UserState } from "../../store/features/userSlice";
 import { AppDispatch } from "../../store/store";
 import { cardElementOptions } from "./CardElementOptions";
+
+countries.registerLocale(enCountryLocale);
 
 interface UserInfo {
     firstName?: string;
@@ -41,8 +45,8 @@ const Checkout = () => {
 
     React.useEffect(() => {
         if (user === undefined) {
-            if (userId && !isNaN(Number(userId))) {
-                dispatch(getUserById(Number(userId)));
+            if (userId) {
+                dispatch(getUserById(userId));
             }
         }
         if (user) {
@@ -77,6 +81,11 @@ const Checkout = () => {
             toast.error("Cart is empty. Please add items to your cart before checkout.");
             return;
         }
+        if(userId === undefined) {
+            setIsProcessing(false);
+            toast.error("User ID is missing. Please log in again.");
+            return;
+        }
 
         // create payment intent with card details by backend
         const cardElement: any = elements.getElement(CardElement);
@@ -89,11 +98,12 @@ const Checkout = () => {
                 toast.error("Please select a billing address.");
                 return;
             }
+            const country = normalizeCountryToAlpha2(selectedAddress.country);
             const address: PaymentMethodCreateParams.BillingDetails.Address = {
                 line1: selectedAddress.optionalName,
                 line2: selectedAddress.street,
                 city: selectedAddress.city,
-                country: selectedAddress.country,
+                country,
             }
 
             // confirm payment intent with card details
@@ -111,7 +121,7 @@ const Checkout = () => {
 
             // place order if payment successful, else show error message
             if (paymentResult.paymentIntent?.status === "succeeded") {
-                dispatch(placeOrder(Number(userId))).unwrap().then(() => {
+                dispatch(placeOrder(userId)).unwrap().then(() => {
                     dispatch(resetCart());
                 }).catch((error) => {
                     toast.error("Failed to place order: " + error.message);
@@ -143,6 +153,20 @@ const Checkout = () => {
 
     const normalizeString = (str: string | undefined): string => {
         return str ? str.trim().toLowerCase() : "";
+    };
+
+    const normalizeCountryToAlpha2 = (countryInput: string | undefined): string | undefined => {
+        if (!countryInput) {
+            return undefined;
+        }
+
+        const trimmed = countryInput.trim();
+        if (trimmed.length === 2) {
+            const upperCode = trimmed.toUpperCase();
+            return countries.isValid(upperCode) ? upperCode : undefined;
+        }
+
+        return countries.getAlpha2Code(trimmed, "en") || undefined;
     };
 
     const handleAddressChange = (event: ChangeEvent<HTMLSelectElement>): void => {
@@ -222,8 +246,10 @@ const Checkout = () => {
                                     )}
 
                                     {_.map(user?.addresses, address => {
+                                        const countryCode = normalizeCountryToAlpha2(address.country);
+                                        const countryName = countryCode ? countries.getName(countryCode, "en") : address.country;
                                         const label = `${address.addressType} - ${address?.optionalName ? address.optionalName + "," : userInfo.firstName + " " + userInfo.lastName} 
-                                                        ${address.street}, ${address.city}, ${address.country}`.trim();
+                                                        ${address.street}, ${address.city}, ${countryName}`.trim();
                                         return (
                                             <option key={address.id} value={address.id}>
                                                 {label}

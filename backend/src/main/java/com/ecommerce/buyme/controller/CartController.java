@@ -25,20 +25,20 @@ public class CartController {
     private final ICartService cartService;
 
     @GetMapping("/cart/{cartId}")
-    public ResponseEntity<ApiResponse> getById(@PathVariable Long cartId) {
+    public ResponseEntity<ApiResponse> getById(@PathVariable String cartId) {
         Cart cart = cartService.getById(cartId);
         CartDto cartDto = cartService.mapToCartDto(cart);
         return ResponseEntity.ok(new ApiResponse("Cart retrieved successfully", cartDto));
     }
 
     @GetMapping("/clear/{cartId}")
-    public ResponseEntity<ApiResponse> clear(@PathVariable Long cartId) {
+    public ResponseEntity<ApiResponse> clear(@PathVariable String cartId) {
         cartService.clear(cartId);
         return ResponseEntity.ok(new ApiResponse("Cart cleared successfully", null));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse> getByUserId(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse> getByUserId(@PathVariable String userId) {
         Cart cart = cartService.getByUserId(userId);
         CartDto cartDto = cartService.mapToCartDto(cart);
         return ResponseEntity.ok(new ApiResponse("Cart retrieved successfully", cartDto));

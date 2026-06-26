@@ -1,6 +1,5 @@
 package com.ecommerce.buyme.controller;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import org.springframework.core.io.ByteArrayResource;
@@ -40,17 +39,9 @@ public class ImageController {
     }
 
     @GetMapping("/image/download/{imageId}")
-    public ResponseEntity<Resource> getById(@PathVariable Long imageId) {
-
+    public ResponseEntity<Resource> getById(@PathVariable String imageId) {
         Image image = imageService.getbyId(imageId);
-        ByteArrayResource resource;
-        try {
-            resource = new ByteArrayResource(
-                    image.getImage().getBytes(1, (int) image.getImage().length()));
-        } catch (SQLException e) {
-            throw new RuntimeException("Failed to read image data for image id: " + imageId, e);
-        }
-
+        ByteArrayResource resource = new ByteArrayResource(image.getImage());
         return ResponseEntity.ok()
                 .contentType(MediaType.parseMediaType(image.getFileType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + image.getFileName() + "\"")
@@ -58,14 +49,14 @@ public class ImageController {
     }
 
     @DeleteMapping("/delete/{imageId}/delete")
-    public ResponseEntity<ApiResponse> delete(@PathVariable Long imageId) {
+    public ResponseEntity<ApiResponse> delete(@PathVariable String imageId) {
         imageService.delete(imageId);
         ApiResponse response = new ApiResponse("Image deleted successfully", null);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping("/update/{imageId}/update")
-    public ResponseEntity<ApiResponse> update(@RequestParam MultipartFile file, @PathVariable("imageId") Long imageId) {
+    public ResponseEntity<ApiResponse> update(@RequestParam MultipartFile file, @PathVariable("imageId") String imageId) {
         imageService.update(file, imageId);
         ApiResponse response = new ApiResponse("Image updated successfully", null);
         return ResponseEntity.ok(response);
@@ -73,7 +64,7 @@ public class ImageController {
 
     @PostMapping("/upload")
     public ResponseEntity<ApiResponse> uploadImages(@RequestParam("files") List<MultipartFile> files,
-            @RequestParam("productId") Long productId) {
+            @RequestParam("productId") String productId) {
 
         List<ImageDto> savedImages = imageService.saveImages(files, productId);
         ApiResponse response = new ApiResponse("Images uploaded successfully", savedImages);

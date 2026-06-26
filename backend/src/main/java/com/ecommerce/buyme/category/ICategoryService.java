@@ -7,13 +7,13 @@ import com.ecommerce.buyme.model.Category;
 public interface ICategoryService {
     Category add(Category category);
 
-    Category update(Category category, Long id);
+    Category update(Category category, String id);
 
-    void delete(Long id);
+    void delete(String id);
 
     Category getByName(String name);
 
-    Category getById(Long id);
+    Category getById(String id);
 
     List<Category> getAll();
 

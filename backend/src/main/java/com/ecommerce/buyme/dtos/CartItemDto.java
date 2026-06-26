@@ -11,12 +11,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CartItemDto {
-    private Long id;
+    private String id;
     private int quantity;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
     
-    private Long productId;
+    private String productId;
     private String productName;
     private String productBrand;
 

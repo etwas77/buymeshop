@@ -11,13 +11,13 @@ import com.ecommerce.buyme.request.ProductUpdateRequest;
 public interface IProductService {
     Product add(AddProductRequest product);
 
-    Product update(ProductUpdateRequest request, Long productId);
+    Product update(ProductUpdateRequest request, String productId);
 
-    Product getById(Long productId);
+    Product getById(String productId);
 
-    ProductDto removeImage(Long productId, Long imageId);
+    ProductDto removeImage(String productId, String imageId);
 
-    void delete(Long productId);
+    void delete(String productId);
 
     List<Product> getAll();
 

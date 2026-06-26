@@ -11,11 +11,11 @@ public interface IImageService {
 
     List<Image> getAll();
 
-    Image getbyId(Long imageId);
+    Image getbyId(String imageId);
 
-    void delete(Long imageId);
+    void delete(String imageId);
 
-    void update(MultipartFile file, Long imageId);
+    void update(MultipartFile file, String imageId);
 
-    List<ImageDto> saveImages(List<MultipartFile> files, Long productId);
+    List<ImageDto> saveImages(List<MultipartFile> files, String productId);
 }

@@ -35,14 +35,14 @@ public class UserController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse> getUserById(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse> getUserById(@PathVariable String userId) {
         User user = userService.getUserById(userId);
         UserDto userDto = userService.convertToDto(user);
         return ResponseEntity.ok(new ApiResponse("User retrieved successfully", userDto));
     }
 
     @DeleteMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse> delete(@PathVariable Long userId) {
+    public ResponseEntity<ApiResponse> delete(@PathVariable String userId) {
         userService.delete(userId);
         return ResponseEntity.ok(new ApiResponse("User deleted successfully", null));
     }
@@ -55,7 +55,7 @@ public class UserController {
     }
 
     @PutMapping("/update/{userId}")
-    public ResponseEntity<ApiResponse> update(@RequestBody UpdateUserRequest request, @PathVariable Long userId) {
+    public ResponseEntity<ApiResponse> update(@RequestBody UpdateUserRequest request, @PathVariable String userId) {
         User user = userService.update(request, userId);
         UserDto userDto = userService.convertToDto(user);
         return ResponseEntity.ok(new ApiResponse("User updated successfully", userDto));

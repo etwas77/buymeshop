@@ -15,7 +15,6 @@ import com.ecommerce.buyme.repository.CartItemRepository;
 import com.ecommerce.buyme.repository.CartRepository;
 import com.ecommerce.buyme.service.product.IProductService;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -28,7 +27,7 @@ public class CartItemService implements ICartItemService {
     private final IProductService productService;
 
     @Override
-    public Cart addItemToCart(Long cartId, Long productId, int quantity) {
+    public Cart addItemToCart(String cartId, String productId, int quantity) {
         Cart cart = cartService.getById(cartId);
         Product product = productService.getById(productId);
         Set<CartItem> items = Optional.ofNullable(cart.getItems()).orElse(Collections.emptySet());
@@ -42,7 +41,7 @@ public class CartItemService implements ICartItemService {
                 })
                 .orElseGet(() -> {
                     CartItem newItem = new CartItem();
-                    newItem.setCart(cart);
+                    newItem.setCartId(cart.getId());
                     newItem.setProduct(product);
                     newItem.setQuantity(quantity);
                     newItem.setUnitPrice(product.getPrice());
@@ -55,7 +54,7 @@ public class CartItemService implements ICartItemService {
     }
 
     @Override
-    public void remove(Long cartId, Long productId) {
+    public void remove(String cartId, String productId) {
         Cart cart = cartService.getById(cartId);
         CartItem cartItem = getCartItemById(cartId, productId);
         cart.removeItem(cartItem);
@@ -63,7 +62,7 @@ public class CartItemService implements ICartItemService {
     }
 
     @Override
-    public void updateQuantity(Long cartId, Long productId, int quantity) {
+    public void updateQuantity(String cartId, String productId, int quantity) {
         Cart cart = cartService.getById(cartId);
         cart.getItems().stream()
                 .filter(item -> item.getProduct().getId().equals(productId))
@@ -82,9 +81,9 @@ public class CartItemService implements ICartItemService {
     }
 
     @Override
-    public CartItem getCartItemById(Long cartId, Long productId) {
-        return cartItemRepository.findByCartIdAndProductId(cartId, productId)
-                .orElseThrow(() -> new EntityNotFoundException(
+    public CartItem getCartItemById(String cartId, String productId) {
+        return cartItemRepository.findByCartIdAndProduct_Id(cartId, productId)
+                .orElseThrow(() -> new RuntimeException(
                         "Cart item not found for cart id: " + cartId + " and product id: " + productId));
     }
 

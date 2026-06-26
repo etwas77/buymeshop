@@ -25,9 +25,8 @@ import com.ecommerce.buyme.repository.OrderItemRepository;
 import com.ecommerce.buyme.repository.ProductRepository;
 import com.ecommerce.buyme.request.AddProductRequest;
 import com.ecommerce.buyme.request.ProductUpdateRequest;
+import com.ecommerce.buyme.service.cart.CartService;
 
-import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -40,11 +39,12 @@ public class ProductService implements IProductService {
     private final OrderItemRepository orderItemRepository;
     private final ImageRepository imageRepository;
     private final ModelMapper modelMapper;
+    private final CartService cartService;
 
     @Override
     public Product add(AddProductRequest request) {
         if (isProductExists(request.getName(), request.getBrand())) {
-            throw new EntityExistsException(request.getName() + " already exists.");
+            throw new RuntimeException(request.getName() + " already exists.");
         }
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName()))
                 .orElseGet(() -> {
@@ -69,33 +69,30 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public Product update(ProductUpdateRequest request, Long productId) {
+    public Product update(ProductUpdateRequest request, String productId) {
         return productRepository.findById(productId).map(pro -> {
             return productRepository.save(updateExistingProduct(pro, request));
-        }).orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
+        }).orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
     }
 
     @Override
-    public Product getById(Long productId) {
+    public Product getById(String productId) {
         return productRepository.findById(productId)
-                .orElseThrow(() -> new EntityNotFoundException("Product not found with id: " + productId));
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + productId));
     }
 
     @Override
     @Transactional
-    public ProductDto removeImage(Long productId, Long imageId) {
+    public ProductDto removeImage(String productId, String imageId) {
         Product product = getById(productId);
         Image image = imageRepository.findById(imageId)
-                .orElseThrow(() -> new EntityNotFoundException("Image not found with id: " + imageId));
+                .orElseThrow(() -> new RuntimeException("Image not found with id: " + imageId));
 
         if (image.getProduct() == null || !productId.equals(image.getProduct().getId())) {
-            throw new EntityNotFoundException(
+            throw new RuntimeException(
                     "Image with id: " + imageId + " does not belong to product with id: " + productId);
         }
 
-        if (product.getImages() != null) {
-            product.getImages().removeIf(existing -> imageId.equals(existing.getId()));
-        }
         imageRepository.delete(image);
         return convertToDto(product);
     }
@@ -118,9 +115,10 @@ public class ProductService implements IProductService {
         // Only touch images when client explicitly sends images.
         // null = keep current images unchanged.
         if (request.getImages() != null) {
-            List<Image> resolvedImages = resolveImagesForProductUpdate(product, request.getImages());
-            product.getImages().clear();
-            product.getImages().addAll(resolvedImages);
+            //List<Image> resolvedImages = 
+            resolveImagesForProductUpdate(product, request.getImages());
+            // product.getImages().clear();
+            // product.getImages().addAll(resolvedImages);
         }
 
         Category cat = request.getCategory();
@@ -131,11 +129,12 @@ public class ProductService implements IProductService {
     }
 
     @Override
-    public void delete(Long productId) {
+    public void delete(String productId) {
         productRepository.findById(productId).ifPresentOrElse(pro -> {
-            List<CartItem> cartItems = cartItemRepository.findByProductId(productId);
+            List<CartItem> cartItems = cartItemRepository.findByProduct_Id(productId);
             cartItems.forEach(item -> {
-                Cart cart = item.getCart();
+                String cartId = item.getCartId();
+                Cart cart = cartService.getById(cartId);
                 cart.removeItem(item);
                 cartItemRepository.delete(item);
             });
@@ -152,7 +151,7 @@ public class ProductService implements IProductService {
             productRepository.deleteById(pro.getId());
 
         }, () -> {
-            throw new EntityNotFoundException("Product not found with id: " + productId);
+            throw new RuntimeException("Product not found with id: " + productId);
         });
     }
 
@@ -178,7 +177,7 @@ public class ProductService implements IProductService {
 
     @Override
     public List<Product> getByName(String name) {
-        return productRepository.findByName(name);
+        return productRepository.findByNameContainingIgnoreCase(name);
     }
 
     @Override
@@ -227,15 +226,15 @@ public class ProductService implements IProductService {
 
         for (ImageDto dto : imageDtos) {
             if (dto.getId() == null) {
-                throw new EntityNotFoundException("Image id is required in product update payload");
+                throw new RuntimeException("Image id is required in product update payload");
             }
 
             Image image = imageRepository.findById(dto.getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Image not found with id: " + dto.getId()));
+                    .orElseThrow(() -> new RuntimeException("Image not found with id: " + dto.getId()));
 
             // Prevent attaching an image belonging to another product
             if (image.getProduct() != null && !product.getId().equals(image.getProduct().getId())) {
-                throw new EntityNotFoundException(
+                throw new RuntimeException(
                         "Image with id: " + dto.getId() + " does not belong to product with id: " + product.getId());
             }
 

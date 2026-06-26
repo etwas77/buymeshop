@@ -39,7 +39,7 @@ public class ProductController {
     }
 
     @GetMapping("/product/{productId}")
-    public ResponseEntity<ApiResponse> getById(@PathVariable("productId") Long productId) {
+    public ResponseEntity<ApiResponse> getById(@PathVariable("productId") String productId) {
         Product product = productService.getById(productId);
         ProductDto productDto = productService.convertToDto(product);
         ApiResponse response = new ApiResponse("Product retrieved successfully", productDto);
@@ -58,7 +58,7 @@ public class ProductController {
     @PreAuthorize("hasAuthority('ADMIN')")
     @PutMapping("/update/{productId}")
     public ResponseEntity<ApiResponse> update(@RequestBody ProductUpdateRequest request,
-            @PathVariable("productId") Long productId) {
+            @PathVariable("productId") String productId) {
 
         Product product = productService.update(request, productId);
         ProductDto productDto = productService.convertToDto(product);
@@ -68,15 +68,15 @@ public class ProductController {
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @DeleteMapping("/delete/{productId}")
-    public ResponseEntity<ApiResponse> delete(@PathVariable("productId") Long productId) {
+    public ResponseEntity<ApiResponse> delete(@PathVariable("productId") String productId) {
         productService.delete(productId);
         ApiResponse response = new ApiResponse("Product deleted successfully", null);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{productId}/images/{imageId}")
-    public ResponseEntity<ApiResponse> removeImage(@PathVariable("productId") Long productId,
-            @PathVariable("imageId") Long imageId) {
+    public ResponseEntity<ApiResponse> removeImage(@PathVariable("productId") String productId,
+            @PathVariable("imageId") String imageId) {
         ProductDto productDto = productService.removeImage(productId, imageId);
         ApiResponse response = new ApiResponse("Image removed successfully", productDto);
         return ResponseEntity.ok(response);

@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 import com.ecommerce.buyme.model.Category;
 import com.ecommerce.buyme.repository.CategoryRepository;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -21,34 +20,34 @@ public class CategoryService implements ICategoryService {
     public Category add(Category category) {
         Category existingCategory = categoryRepository.findByName(category.getName());
         if (existingCategory != null) {
-            throw new EntityNotFoundException("Category with name already exists: " + category.getName());
+            throw new IllegalArgumentException("Category with name already exists: " + category.getName());
         }
         return categoryRepository.save(category);
     }
 
     @Override
-    public Category update(Category category, Long id) {
+    public Category update(Category category, String id) {
         return categoryRepository.findById(id).map(cat -> {
             cat.setName(category.getName());
             return categoryRepository.save(cat);
-        }).orElseThrow(() -> new EntityNotFoundException("No such category with id exists: " + id));    
+        }).orElseThrow(() -> new IllegalArgumentException("No such category with id exists: " + id));    
     }
 
     @Override
-    public void delete(Long id) {
+    public void delete(String id) {
         categoryRepository.findById(id).ifPresentOrElse(cat -> categoryRepository.delete(cat)
-        , () -> { throw new EntityNotFoundException("No such category with id exists: " + id); });
+        , () -> { throw new IllegalArgumentException("No such category with id exists: " + id); });
     }
 
     @Override
     public Category getByName(String name) {
         return Optional.ofNullable(categoryRepository.findByName(name))
-                .orElseThrow(() -> new EntityNotFoundException("No such category exists: " + name));
+                .orElseThrow(() -> new IllegalArgumentException("No such category exists: " + name));
     }
 
     @Override
-    public Category getById(Long id) {
-        return categoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("No such category with id exists: " + id));
+    public Category getById(String id) {
+        return categoryRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("No such category with id exists: " + id));
     }
 
     @Override

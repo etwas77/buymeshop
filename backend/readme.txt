@@ -32,7 +32,7 @@ user_roles solves this correctly by storing one relation per row:
 expected upload way: 
 @PostMapping("/api/v1/images/upload")
 public ResponseEntity<List<ImageDto>> uploadImages(
-        @RequestParam Long productId,
+        @RequestParam String productId,
         @RequestParam List<MultipartFile> files) {
     List<ImageDto> dtos = imageService.saveImages(files, productId);
     return ResponseEntity.ok(dtos);

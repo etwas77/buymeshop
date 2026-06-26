@@ -16,14 +16,14 @@ const Account = () => {
     const navigate = useNavigate();
 
     React.useEffect(() => {
-        const userId = localStorage.getItem("userId");
-        if (userId === null || isNaN(Number(userId))) {
+        const userId = localStorage.getItem("userId");        
+        if (userId === null) {
             navigate("/login");
             return;
         }
 
         if (!user || String(user.id) !== userId) {
-            dispatch(getUserById(Number(userId)));
+            dispatch(getUserById(userId));
         }
     }, [dispatch, navigate, user]);
 

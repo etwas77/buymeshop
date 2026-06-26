@@ -2,12 +2,11 @@ package com.ecommerce.buyme.repository;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.mongodb.repository.MongoRepository;
 
 import com.ecommerce.buyme.model.Product;
 
-public interface ProductRepository extends JpaRepository<Product, Long> {
+public interface ProductRepository extends MongoRepository<Product, String> {
 
     List<Product> findByCategoryNameAndBrand(String categoryName, String brand);
 
@@ -28,8 +27,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
         So it behaves like:
         WHERE lower(product.name) LIKE '%lower(input)%'.
     */
-    @Query("SELECT p FROM Product p WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))")
-    List<Product> findByName(String name);
+    List<Product> findByNameContainingIgnoreCase(String name);
 
     boolean existsByNameAndBrand(String name, String brand);
 

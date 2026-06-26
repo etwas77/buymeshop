@@ -5,9 +5,9 @@ import { OrderDto } from "../../dtos/OrderDto";
 
 export const placeOrder = createAsyncThunk(
     "order/placeOrder",
-    async (userId: number) => {
+    async (userId: string) => {
         try {
-            const response = await authApi.post("/orders/order?userId=" + userId, {});
+            const response = await authApi.post("/orders/order?userId=" + userId);
             return response.data.data as OrderDto;
         }
         catch (error: any) {
@@ -19,7 +19,7 @@ export const placeOrder = createAsyncThunk(
 
 export const getOrdersByUserId = createAsyncThunk(
     "order/getOrdersByUserId",
-    async (userId: number) => {
+    async (userId: string) => {
         try {
             const response = await authApi.get("/orders/user/" + userId);
             return response.data.data as OrderDto[];

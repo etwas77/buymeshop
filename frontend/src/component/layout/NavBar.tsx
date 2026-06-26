@@ -24,7 +24,7 @@ const NavBar = () => {
         if (userId && isValidToken(token)) {
             //console.log('first time after login, getting cart and orders for userId in navbar:', userId);
             dispatch(getUserCarts({ userId }));
-            dispatch(getOrdersByUserId(Number(userId)));
+            dispatch(getOrdersByUserId(userId));
         }
     }, [userId, dispatch, token]);
 
