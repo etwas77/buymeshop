@@ -2,7 +2,6 @@ package com.ecommerce.buyme.security.jwt;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -23,11 +22,14 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
-    @Autowired
-    private ShopUserDetailService userDetailsService;
+    private final ShopUserDetailService userDetailsService;
+
+    public AuthTokenFilter(JwtUtils jwtUtils, ShopUserDetailService userDetailsService) {
+        this.jwtUtils = jwtUtils;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,

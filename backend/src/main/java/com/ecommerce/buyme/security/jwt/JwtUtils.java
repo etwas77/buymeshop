@@ -3,10 +3,10 @@ package com.ecommerce.buyme.security.jwt;
 import java.security.Key;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import com.ecommerce.buyme.security.ShopUserDetails;
@@ -33,7 +33,8 @@ public class JwtUtils {
         ShopUserDetails userPrincipal = (ShopUserDetails) authentication.getPrincipal();
 
         List<String> roles = userPrincipal.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
+            .filter(Objects::nonNull)
+            .map(authority -> authority.getAuthority())
                 .toList();
 
         return Jwts.builder()

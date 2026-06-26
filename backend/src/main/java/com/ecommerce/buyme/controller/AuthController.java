@@ -24,6 +24,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("${api.prefix}/auth")
@@ -36,6 +37,9 @@ public class AuthController {
     @Value("${auth.token.refresh-expiration-in-mils}")
     private Long refreshTokenExpirationTime;
 
+    @Value("${auth.token.access-expiration-in-mils}")
+    private Long accessTokenExpirationTime;
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUserEntity(@RequestBody LoginRequest request, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
@@ -43,14 +47,16 @@ public class AuthController {
 
         String accessToken = jwtUtils.generateAccessTokenForUser(authentication);
         String refreshToken = jwtUtils.generateRefreshTokenForUser(request.getEmail());
-        cookieUtils.addRefreshTokenToCookie(refreshToken, response, refreshTokenExpirationTime);
+        //cookieUtils.addRefreshTokenToCookie(refreshToken, response, refreshTokenExpirationTime);
+        cookieUtils.addTokenToCookie(CookieUtils.CookieType.ACCESS, accessToken, response, accessTokenExpirationTime);
+        cookieUtils.addTokenToCookie(CookieUtils.CookieType.REFRESH, refreshToken, response, refreshTokenExpirationTime);
         Map<String, String> tokens = new HashMap<>();
         tokens.put("accessToken", accessToken);
         return ResponseEntity.ok(tokens);
     }
 
     @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request) {
+    public ResponseEntity<?> refreshAccessToken(HttpServletRequest request, HttpServletResponse response) {
         cookieUtils.logCookies(request);
         String refreshToken = cookieUtils.getRefreshTokenFromCookies(request);
         if (refreshToken != null) {
@@ -63,6 +69,7 @@ public class AuthController {
                 if (newAccessToken != null) {
                     Map<String, String> tokens = new HashMap<>();
                     tokens.put("accessToken", newAccessToken);
+                    cookieUtils.addTokenToCookie(CookieUtils.CookieType.ACCESS, newAccessToken, response, accessTokenExpirationTime);
                     return ResponseEntity.ok(tokens);
                 } else {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to generate new access token");
@@ -71,5 +78,13 @@ public class AuthController {
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Missing, invalid, or expired refresh token");
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(HttpServletResponse response) {
+        cookieUtils.ClearCookie(CookieUtils.CookieType.ACCESS, response);
+        cookieUtils.ClearCookie(CookieUtils.CookieType.REFRESH, response);
+        return ResponseEntity.ok("logged out successfully");
+    }
+    
 
 }

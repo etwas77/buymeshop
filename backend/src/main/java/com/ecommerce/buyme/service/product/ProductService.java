@@ -3,6 +3,7 @@ package com.ecommerce.buyme.service.product;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -115,7 +116,7 @@ public class ProductService implements IProductService {
         // Only touch images when client explicitly sends images.
         // null = keep current images unchanged.
         if (request.getImages() != null) {
-            //List<Image> resolvedImages = 
+            // List<Image> resolvedImages =
             resolveImagesForProductUpdate(product, request.getImages());
             // product.getImages().clear();
             // product.getImages().addAll(resolvedImages);
@@ -207,8 +208,9 @@ public class ProductService implements IProductService {
     public List<Product> findDistinctProductsByNameList() {
         List<Product> products = getAll();
         Map<String, Product> distinctProductsMap = products.stream()
+                .filter(Objects::nonNull)
                 .collect(Collectors.toMap(
-                        Product::getName,
+                        product -> product.getName(),
                         product -> product,
                         (existing, replacement) -> existing));
         // duplicate names will be resolved by keeping the existing product and ignoring
@@ -218,7 +220,12 @@ public class ProductService implements IProductService {
 
     @Override
     public List<String> getAllDistinctBrands() {
-        return productRepository.findAll().stream().map(Product::getBrand).distinct().toList();
+        return productRepository.findAll().stream()
+                .filter(Objects::nonNull)
+                .map(product -> product.getBrand())
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
     }
 
     private List<Image> resolveImagesForProductUpdate(Product product, List<ImageDto> imageDtos) {
