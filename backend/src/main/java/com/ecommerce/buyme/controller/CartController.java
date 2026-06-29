@@ -11,8 +11,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.buyme.dtos.CartDto;
 import com.ecommerce.buyme.model.Cart;
+import com.ecommerce.buyme.model.User;
 import com.ecommerce.buyme.response.ApiResponse;
 import com.ecommerce.buyme.service.cart.ICartService;
+import com.ecommerce.buyme.service.user.IUserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("${api.prefix}/carts")
 public class CartController {
     private final ICartService cartService;
+    private final IUserService userService;
 
     @GetMapping("/cart/{cartId}")
     public ResponseEntity<ApiResponse> getById(@PathVariable String cartId) {
@@ -37,9 +40,10 @@ public class CartController {
         return ResponseEntity.ok(new ApiResponse("Cart cleared successfully", null));
     }
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse> getByUserId(@PathVariable String userId) {
-        Cart cart = cartService.getByUserId(userId);
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse> getByAuthenticatedUser() {
+        User user = userService.getAuthenticatedUser();
+        Cart cart = cartService.getByUserId(user.getId());
         CartDto cartDto = cartService.mapToCartDto(cart);
         return ResponseEntity.ok(new ApiResponse("Cart retrieved successfully", cartDto));
     }
