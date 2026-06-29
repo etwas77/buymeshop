@@ -19,6 +19,7 @@ import com.ecommerce.buyme.security.ShopUserDetailService;
 import com.ecommerce.buyme.security.jwt.AuthTokenFilter;
 import com.ecommerce.buyme.security.jwt.JwtEntryPoint;
 import com.ecommerce.buyme.security.jwt.JwtUtils;
+import com.ecommerce.buyme.utils.CookieUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +33,7 @@ public class ShopConfig {
     private final ShopUserDetailService userDetailsService;
     private final JwtEntryPoint authEntryPoint;
     private final JwtUtils jwtUtils;
+    private final CookieUtils cookieUtils;
 
     @Value("${api.prefix}")
     private String API_PREFIX;
@@ -40,7 +42,8 @@ public class ShopConfig {
         return new String[] {
                 API_PREFIX + "/orders/**",
                 API_PREFIX + "/carts/**",
-                API_PREFIX + "/cartItems/**"
+                API_PREFIX + "/cartItems/**",
+                API_PREFIX + "/auth/me",
         };
     }
 
@@ -56,7 +59,7 @@ public class ShopConfig {
 
     @Bean
     public AuthTokenFilter authTokenFilter() {
-        return new AuthTokenFilter(jwtUtils, userDetailsService);
+        return new AuthTokenFilter(jwtUtils, userDetailsService, cookieUtils);
     }
 
     @Bean

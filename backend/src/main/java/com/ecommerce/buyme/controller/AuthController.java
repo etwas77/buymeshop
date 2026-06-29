@@ -1,7 +1,9 @@
 package com.ecommerce.buyme.controller;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -15,14 +17,23 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.ecommerce.buyme.dtos.AuthDto;
+import com.ecommerce.buyme.dtos.RoleDto;
+import com.ecommerce.buyme.dtos.UserDto;
+import com.ecommerce.buyme.model.User;
 import com.ecommerce.buyme.request.LoginRequest;
+import com.ecommerce.buyme.response.ApiResponse;
 import com.ecommerce.buyme.security.ShopUserDetailService;
 import com.ecommerce.buyme.security.jwt.JwtUtils;
+import com.ecommerce.buyme.service.user.IUserService;
+import com.ecommerce.buyme.service.user.UserService;
 import com.ecommerce.buyme.utils.CookieUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
+
 
 
 @RestController
@@ -33,6 +44,7 @@ public class AuthController {
     private final CookieUtils cookieUtils;
     private final ShopUserDetailService userDetailsService;
     private final AuthenticationManager authenticationManager;
+    private final IUserService userService;
 
     @Value("${auth.token.refresh-expiration-in-mils}")
     private Long refreshTokenExpirationTime;
@@ -85,6 +97,15 @@ public class AuthController {
         cookieUtils.ClearCookie(CookieUtils.CookieType.REFRESH, response);
         return ResponseEntity.ok("logged out successfully");
     }
+
+    @GetMapping("/me")
+    public  ResponseEntity<ApiResponse> getMe() {
+        User user = userService.getAuthenticatedUser();
+        UserDto userDto = userService.convertToDto(user);
+        AuthDto authDto = new AuthDto(userDto.getId(), userDto.getRoles());
+        return ResponseEntity.ok(new ApiResponse( "Authenticated user", authDto));  
+    }
+    
     
 
 }

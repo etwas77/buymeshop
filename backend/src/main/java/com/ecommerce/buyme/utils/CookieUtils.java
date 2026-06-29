@@ -78,7 +78,7 @@ public class CookieUtils {
                 .append(this.useSecureCookie ? "; Secure" : "")
                 .append("; SameSite=").append(sameSite);
 
-        response.setHeader("Set-Cookie", header.toString());
+        response.addHeader("Set-Cookie", header.toString());
     }
 
     public String getRefreshTokenFromCookies(HttpServletRequest request) {

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { AddressDto, AddressType, CountryEnum } from "../../dtos/AddressDto";
 import { createAddresses, deleteAddress, getUserById, updateAddress, UserState } from "../../store/features/userSlice";
 import { AppDispatch } from "../../store/store";
+import { authMe } from "../../store/features/authSlice";
 
 const Account = () => {
     const dispatch = useDispatch<AppDispatch>();
@@ -94,7 +95,9 @@ const Account = () => {
             <h1>Account Page</h1>
             <section>
                 <h2>Login</h2>
-
+                <button className="btn btn-dark mb-3" onClick={() => { dispatch(authMe()) }}>
+                    auth me
+                </button>
                 <table className="table table-borderless mb-0" >
                     <tbody>
                         <tr>

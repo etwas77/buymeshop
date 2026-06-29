@@ -4,11 +4,14 @@ import java.security.Key;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.ecommerce.buyme.dtos.RoleDto;
 import com.ecommerce.buyme.security.ShopUserDetails;
 
 import io.jsonwebtoken.Jwts;
@@ -33,8 +36,8 @@ public class JwtUtils {
         ShopUserDetails userPrincipal = (ShopUserDetails) authentication.getPrincipal();
 
         List<String> roles = userPrincipal.getAuthorities().stream()
-            .filter(Objects::nonNull)
-            .map(authority -> authority.getAuthority())
+                .filter(Objects::nonNull)
+                .map(authority -> authority.getAuthority())
                 .toList();
 
         return Jwts.builder()

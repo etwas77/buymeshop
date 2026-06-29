@@ -3,6 +3,7 @@ import { jwtDecode } from "jwt-decode";
 import { LoginCredentials } from "../../component/auth/Login";
 import { authApi } from "../../component/services/api";
 import { clearAuthAndRedirect } from "../../component/common/utils/Functions";
+import { AuthDto } from "../../dtos/AuthDto";
 
 export const login = createAsyncThunk(
     "auth/login",
@@ -12,12 +13,21 @@ export const login = createAsyncThunk(
     }
 );
 
+export const authMe = createAsyncThunk(
+    "auth/authMe",
+    async () => {
+        const response = await authApi.get("/auth/me");
+        return response.data as AuthDto;
+    }
+);
+
 
 export interface AuthState {
     isAuthenticated?: boolean;
     token?: string;
     roles: string[];
     error?: string;
+    authMe?: AuthDto;
 }
 
 const authSlice = createSlice({
@@ -27,6 +37,7 @@ const authSlice = createSlice({
         token: localStorage.getItem("authToken") || undefined,
         roles: JSON.parse(localStorage.getItem("userRoles") || "[]"),
         error: undefined,
+        authMe: undefined,
     } as AuthState,
     reducers: {
         logout(state) {
@@ -49,6 +60,9 @@ const authSlice = createSlice({
         });
         builder.addCase(login.rejected, (state, action) => {
             state.error = action.error.message;
+        });
+        builder.addCase(authMe.fulfilled, (state, action) => {
+            state.authMe = action.payload;
         });
     }
 });
