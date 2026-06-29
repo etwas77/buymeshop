@@ -12,30 +12,9 @@ export const api = axios.create({
     baseURL,
 });
 
-authApi.interceptors.request.use(
-    (config) => {
-        if (config.url?.includes("/auth/refresh-token")) {
-            return config;
-        }
-
-        const token = localStorage.getItem("authToken");
-        if (token) {
-            config.headers["Authorization"] = `Bearer ${token}`;
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
-
-const refreshToken = async (): Promise<string> => {
-    try {        
-        const response = await authApi.post("/auth/refresh-token");        
-        return response.data.accessToken;
-    } catch (error) {
-        return Promise.reject(error);
-    }
+const refreshToken = async (): Promise<boolean> => {
+    const response = await authApi.post("/auth/refresh-token");
+    return response.status >= 200 && response.status < 300;
 };
 
 authApi.interceptors.response.use(
@@ -52,15 +31,11 @@ authApi.interceptors.response.use(
             originalRequest._retry = true;
 
             try {
-                const newToken = await refreshToken();
-                if (!newToken) {
+                const res = await refreshToken();
+                if (!res) {
                     clearAuthAndRedirect();
                     return Promise.reject(error);
                 }
-
-                localStorage.setItem("authToken", newToken);
-                authApi.defaults.headers.common["Authorization"] = `Bearer ${newToken}`;
-                originalRequest.headers["Authorization"] = `Bearer ${newToken}`;
 
                 return authApi(originalRequest);
             } catch (refreshError) {

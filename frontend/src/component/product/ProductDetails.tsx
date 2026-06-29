@@ -10,18 +10,19 @@ import { AppDispatch } from "../../store/store";
 import ImageZoomify from "../common/ImageZoomify";
 import LoadSpinner from "../common/LoadSpinner";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
-import { isAdmin } from "../common/utils/Functions";
+import { AuthState } from "../../store/features/authSlice";
 
 const ProductDetails = () => {
     const { id } = useParams();
 
     const { product, quantity } = useSelector((state: { products: ProductState }) => state.products);
     const { successMessage, errorMessage } = useSelector((state: { cart: cartState }) => state.cart);
+    const { authMe} = useSelector((state: { auth: AuthState }) => state.auth);
 
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
 
-    const visibleAdmin = isAdmin();
+    const visibleAdmin = authMe?.roles?.some(role => role.name === "ADMIN");
 
     React.useEffect(() => {
         if (id) {

@@ -5,26 +5,31 @@ import { BsPencilSquare, BsPlus, BsSave, BsTrash, BsXCircle } from "react-icons/
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { AddressDto, AddressType, CountryEnum } from "../../dtos/AddressDto";
-import { createAddresses, deleteAddress, getUserById, updateAddress, UserState } from "../../store/features/userSlice";
+import { createAddresses, deleteAddress, updateAddress, UserState, getUserById } from "../../store/features/userSlice";
 import { AppDispatch } from "../../store/store";
-import { authMe } from "../../store/features/authSlice";
+import { AuthState, callAuthMe } from "../../store/features/authSlice";
 
-const Account = () => {
+const   Account = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { user } = useSelector((state: { user: UserState }) => state.user);
+    const { authMe } = useSelector((state: { auth: AuthState }) => state.auth);
     const [addresses, setAddresses] = React.useState<AddressDto[]>([]);
     const [address, setAddress] = React.useState<AddressDto>();
     const navigate = useNavigate();
+console.log('user', user);
+console.log('authMe', authMe);
 
-    React.useEffect(() => {
-        const userId = localStorage.getItem("userId");        
-        if (userId === null) {
+
+    React.useEffect(() => {     
+        if (authMe === null) {
             navigate("/login");
             return;
         }
 
-        if (!user || String(user.id) !== userId) {
-            dispatch(getUserById(userId));
+        if (!user || String(user.id) !== authMe?.id) {
+            console.log("111", authMe?.id);
+            
+            dispatch(getUserById(authMe?.id ?? '' ));
         }
     }, [dispatch, navigate, user]);
 
@@ -95,7 +100,7 @@ const Account = () => {
             <h1>Account Page</h1>
             <section>
                 <h2>Login</h2>
-                <button className="btn btn-dark mb-3" onClick={() => { dispatch(authMe()) }}>
+                <button className="btn btn-dark mb-3" onClick={() => { dispatch(callAuthMe()) }}>
                     auth me
                 </button>
                 <table className="table table-borderless mb-0" >

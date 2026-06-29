@@ -1,31 +1,38 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { jwtDecode } from "jwt-decode";
 import { LoginCredentials } from "../../component/auth/Login";
-import { authApi } from "../../component/services/api";
 import { clearAuthAndRedirect } from "../../component/common/utils/Functions";
+import { authApi } from "../../component/services/api";
 import { AuthDto } from "../../dtos/AuthDto";
 
 export const login = createAsyncThunk(
     "auth/login",
     async (credentials: LoginCredentials) => {
         const response = await authApi.post("/auth/login", credentials);
-        return response.data as { accessToken: string };
+        console.log('login response', response.data.data);
+        
+        return response.data.data as AuthDto;
     }
 );
 
-export const authMe = createAsyncThunk(
-    "auth/authMe",
+export const callAuthMe = createAsyncThunk(
+    "auth/callAuthMe",
     async () => {
         const response = await authApi.get("/auth/me");
-        return response.data as AuthDto;
+        console.log('callAuthMe response', response.data.data);
+        return response.data.data as AuthDto;
+    }
+);
+
+export const logout = createAsyncThunk(
+    "auth/logout",
+    async () => {
+        const res = await authApi.post("/auth/logout");
+        return res.data;
     }
 );
 
 
 export interface AuthState {
-    isAuthenticated?: boolean;
-    token?: string;
-    roles: string[];
     error?: string;
     authMe?: AuthDto;
 }
@@ -33,40 +40,35 @@ export interface AuthState {
 const authSlice = createSlice({
     name: "auth",
     initialState: {
-        isAuthenticated: !!localStorage.getItem("authToken"),
-        token: localStorage.getItem("authToken") || undefined,
-        roles: JSON.parse(localStorage.getItem("userRoles") || "[]"),
+        isAuthenticated: false,
         error: undefined,
         authMe: undefined,
     } as AuthState,
     reducers: {
-        logout(state) {
-            state.isAuthenticated = false;
-            state.token = undefined;
-            state.roles = [];
-            state.error = undefined;
-            clearAuthAndRedirect();
-        },
     },
     extraReducers: (builder) => {
         builder.addCase(login.fulfilled, (state, action) => {
-            state.token = action.payload.accessToken;
-            state.isAuthenticated = true;
-            const decodedToken: any = jwtDecode(state.token);
-            state.roles = decodedToken.roles || [];
-            localStorage.setItem("authToken", state.token);
-            localStorage.setItem("userRoles", JSON.stringify(state.roles));
-            localStorage.setItem("userId", decodedToken.id);
+            state.authMe = action.payload;
         });
         builder.addCase(login.rejected, (state, action) => {
             state.error = action.error.message;
+             state.authMe = undefined;
         });
-        builder.addCase(authMe.fulfilled, (state, action) => {
+        builder.addCase(callAuthMe.fulfilled, (state, action) => {
             state.authMe = action.payload;
+        });
+        builder.addCase(callAuthMe.rejected, (state, action) => {
+            state.error = action.error.message;
+            state.authMe = undefined;
+        });
+        builder.addCase(logout.fulfilled, (state, _action) => {
+            state.error = undefined;
+            state.authMe = undefined;
+            clearAuthAndRedirect();
         });
     }
 });
 
-export const { logout } = authSlice.actions;
+export const { } = authSlice.actions;
 export default authSlice.reducer;
 

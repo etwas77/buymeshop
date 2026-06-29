@@ -4,7 +4,6 @@ import { api } from "../../component/services/api";
 import { toast } from "react-toastify";
 import { CreateUserRequestDto } from "../../dtos/CreateUserRequestDto";
 import { AddressDto } from "../../dtos/AddressDto";
-import { logout } from "./authSlice";
 
 export const getUserById = createAsyncThunk(
     "user/getUserById",
@@ -196,12 +195,6 @@ const userSlice = createSlice({
                 state.user = action.payload;
                 state.users = state.users?.map(u => u.id === action.payload?.id ? action.payload : u);
             }
-        });
-        builder.addCase(logout, (state) => {
-            state.loading = false;
-            state.error = undefined;
-            state.user = undefined;
-            state.users = undefined;
         });
         builder.addMatcher(
             (action) => action.type.startsWith("user/") && action.type.endsWith("/pending"),

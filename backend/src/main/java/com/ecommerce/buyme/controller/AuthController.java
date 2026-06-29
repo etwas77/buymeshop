@@ -1,9 +1,7 @@
 package com.ecommerce.buyme.controller;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -12,13 +10,13 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.buyme.dtos.AuthDto;
-import com.ecommerce.buyme.dtos.RoleDto;
 import com.ecommerce.buyme.dtos.UserDto;
 import com.ecommerce.buyme.model.User;
 import com.ecommerce.buyme.request.LoginRequest;
@@ -26,13 +24,11 @@ import com.ecommerce.buyme.response.ApiResponse;
 import com.ecommerce.buyme.security.ShopUserDetailService;
 import com.ecommerce.buyme.security.jwt.JwtUtils;
 import com.ecommerce.buyme.service.user.IUserService;
-import com.ecommerce.buyme.service.user.UserService;
 import com.ecommerce.buyme.utils.CookieUtils;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
 
 
 
@@ -53,18 +49,20 @@ public class AuthController {
     private Long accessTokenExpirationTime;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUserEntity(@RequestBody LoginRequest request, HttpServletResponse response) {
+    public ResponseEntity<ApiResponse> authenticateUserEntity(@RequestBody LoginRequest request, HttpServletResponse response) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
 
-        String accessToken = jwtUtils.generateAccessTokenForUser(authentication);
+        HashMap<String, Object> accessMap = jwtUtils.generateAccessTokenForUser(authentication);
+        String accessToken = (String) accessMap.get("token");
         String refreshToken = jwtUtils.generateRefreshTokenForUser(request.getEmail());
         //cookieUtils.addRefreshTokenToCookie(refreshToken, response, refreshTokenExpirationTime);
         cookieUtils.addTokenToCookie(CookieUtils.CookieType.ACCESS, accessToken, response, accessTokenExpirationTime);
         cookieUtils.addTokenToCookie(CookieUtils.CookieType.REFRESH, refreshToken, response, refreshTokenExpirationTime);
-        Map<String, String> tokens = new HashMap<>();
-        tokens.put("accessToken", accessToken);
-        return ResponseEntity.ok(tokens);
+        // Map<String, String> tokens = new HashMap<>();
+        // tokens.put("accessToken", accessToken);
+        String result = "login succeded: " + (accessToken != null);
+        return ResponseEntity.ok(new ApiResponse(result, accessMap.get("authDto")));
     }
 
     @PostMapping("/refresh-token")
@@ -76,13 +74,14 @@ public class AuthController {
             if (isValid) {
                 String userName = jwtUtils.getEmailFromToken(refreshToken);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userName);
-                String newAccessToken = jwtUtils.generateAccessTokenForUser(
+                HashMap<String, Object> accessMap = jwtUtils.generateAccessTokenForUser(
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
+                String newAccessToken = (String) accessMap.get("token");
                 if (newAccessToken != null) {
-                    Map<String, String> tokens = new HashMap<>();
-                    tokens.put("accessToken", newAccessToken);
+                    // Map<String, String> tokens = new HashMap<>();
+                    // tokens.put("accessToken", newAccessToken);
                     cookieUtils.addTokenToCookie(CookieUtils.CookieType.ACCESS, newAccessToken, response, accessTokenExpirationTime);
-                    return ResponseEntity.ok(tokens);
+                    return ResponseEntity.ok(new ApiResponse("Access token refreshed successfully", null));
                 } else {
                     return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to generate new access token");
                 }

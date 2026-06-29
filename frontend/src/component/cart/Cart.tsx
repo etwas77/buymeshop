@@ -3,30 +3,32 @@ import React from "react";
 import { Card } from "react-bootstrap";
 import { BsTrash } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { CartItemDto } from "../../dtos/CartItemDto";
-import { cartState, getUserCarts, removeCartItem, setLoading, updateCartItemQuantity } from "../../store/features/cartSlice";
+import { AuthState, callAuthMe } from "../../store/features/authSlice";
+import { cartState, getCartsMe, removeCartItem, setLoading, updateCartItemQuantity } from "../../store/features/cartSlice";
 import { AppDispatch } from "../../store/store";
 import LoadSpinner from "../common/LoadSpinner";
-import { isValidToken } from "../common/utils/Functions";
 import ProductImage from "../common/utils/ProductImage";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
 
 const Cart = () => {
-    const { userId } = useParams();
     const dispatch = useDispatch<AppDispatch>();
     const { items, cartId, isLoading } = useSelector((state: { cart: cartState }) => state.cart);
+    const { authMe, isAuthenticated } = useSelector((state: { auth: AuthState }) => state.auth);
     const navigate = useNavigate();
-    const token = localStorage.getItem("authToken") ?? "";
 
     React.useEffect(() => {
-        if (userId !== undefined && userId !== "null" && isValidToken(token)) {
-            dispatch(getUserCarts({ userId }));
+        if (isAuthenticated && authMe) {
+            dispatch(getCartsMe());
+        }
+        else if(isAuthenticated && !authMe) {
+            dispatch(callAuthMe()); 
         }
         else {
             dispatch(setLoading(false)); // No user ID, so we can stop loading immediately
         }
-    }, [userId, dispatch, token]);
+    }, [isAuthenticated, dispatch, authMe]);
 
 
 
@@ -37,7 +39,7 @@ const Cart = () => {
     }, [dispatch, cartId]);
 
     const handlePlaceOrder = () => {
-        navigate("/checkout/" + userId);
+        navigate("/checkout/" + authMe?.id);
         // if(items.length > 0) {
         //     dispatch(placeOrder(Number(userId))).unwrap().then(() => {
         //         dispatch(resetCart());

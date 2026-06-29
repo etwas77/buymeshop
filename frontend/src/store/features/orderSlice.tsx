@@ -5,9 +5,9 @@ import { OrderDto } from "../../dtos/OrderDto";
 
 export const placeOrder = createAsyncThunk(
     "order/placeOrder",
-    async (userId: string) => {
+    async () => {
         try {
-            const response = await authApi.post("/orders/order?userId=" + userId);
+            const response = await authApi.post("/orders/order");
             return response.data.data as OrderDto;
         }
         catch (error: any) {
@@ -17,11 +17,11 @@ export const placeOrder = createAsyncThunk(
     }
 );
 
-export const getOrdersByUserId = createAsyncThunk(
-    "order/getOrdersByUserId",
-    async (userId: string) => {
+export const getOrdersByMe = createAsyncThunk(
+    "order/getOrdersByMe",
+    async () => {
         try {
-            const response = await authApi.get("/orders/user/" + userId);
+            const response = await authApi.get("/orders/me");
             return response.data.data as OrderDto[];
         }
         catch (error: any) {
@@ -64,13 +64,13 @@ const orderSlice = createSlice({
             .addCase(placeOrder.rejected, (state) => {
                 state.isLoading = false;
             })
-            .addCase(getOrdersByUserId.fulfilled, (state, action) => {
+            .addCase(getOrdersByMe.fulfilled, (state, action) => {
                 state.isLoading = false;
                 if (action.payload) {
                     state.orders = action.payload;
                 }
             })
-            .addCase(getOrdersByUserId.rejected, (state) => {
+            .addCase(getOrdersByMe.rejected, (state) => {
                 state.isLoading = false;
             })
             .addCase(createPaymentIntent.fulfilled, (state, action) => {

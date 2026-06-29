@@ -1,25 +1,26 @@
 import _ from "lodash";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { OrderDto } from "../../dtos/OrderDto";
 import { OrderItemDto } from "../../dtos/OrderItemDto";
-import { getOrdersByUserId, OrderState } from "../../store/features/orderSlice";
+import { AuthState } from "../../store/features/authSlice";
+import { getOrdersByMe, OrderState } from "../../store/features/orderSlice";
 import { AppDispatch } from "../../store/store";
 import LoadSpinner from "../common/LoadSpinner";
 
 
 const Order = () => {
     const { orders, isLoading } = useSelector((state: { order: OrderState }) => state.order);
+    const { authMe, isAuthenticated } = useSelector((state: { auth: AuthState }) => state.auth);
     const dispatch = useDispatch<AppDispatch>();
-    const { userId } = useParams();
     const navigate = useNavigate();
 
     React.useEffect(() => {
-        if (userId) {            
-            dispatch(getOrdersByUserId(Number(userId)));
+        if (isAuthenticated && authMe) {            
+            dispatch(getOrdersByMe());
         }
-    }, [dispatch, userId]);
+    }, [dispatch, isAuthenticated, authMe]);
 
     if (isLoading)
         return <LoadSpinner variant="primary" />;
