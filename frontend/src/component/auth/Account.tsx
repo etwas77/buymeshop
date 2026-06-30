@@ -16,9 +16,6 @@ const   Account = () => {
     const [addresses, setAddresses] = React.useState<AddressDto[]>([]);
     const [address, setAddress] = React.useState<AddressDto>();
     const navigate = useNavigate();
-console.log('user', user);
-console.log('authMe', authMe);
-
 
     React.useEffect(() => {     
         if (authMe === null) {
@@ -26,9 +23,7 @@ console.log('authMe', authMe);
             return;
         }
 
-        if (!user || String(user.id) !== authMe?.id) {
-            console.log("111", authMe?.id);
-            
+        if (!user || String(user.id) !== authMe?.id) {           
             dispatch(getUserById(authMe?.id ?? '' ));
         }
     }, [dispatch, navigate, user]);

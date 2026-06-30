@@ -68,7 +68,7 @@ const NavBar = () => {
                                 </NavDropdown.Item>
 
                                 <NavDropdown.Divider />
-                                <NavDropdown.Item to={`/cart}`} as={Link}>
+                                <NavDropdown.Item to={"/cart"} as={Link}>
                                     <FaShoppingCart />
                                     My Cart({items.length})
                                 </NavDropdown.Item>

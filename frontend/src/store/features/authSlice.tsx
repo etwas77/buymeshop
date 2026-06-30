@@ -7,9 +7,7 @@ import { AuthDto } from "../../dtos/AuthDto";
 export const login = createAsyncThunk(
     "auth/login",
     async (credentials: LoginCredentials) => {
-        const response = await authApi.post("/auth/login", credentials);
-        console.log('login response', response.data.data);
-        
+        const response = await authApi.post("/auth/login", credentials);        
         return response.data.data as AuthDto;
     }
 );
@@ -18,7 +16,6 @@ export const callAuthMe = createAsyncThunk(
     "auth/callAuthMe",
     async () => {
         const response = await authApi.get("/auth/me");
-        console.log('callAuthMe response', response.data.data);
         return response.data.data as AuthDto;
     }
 );

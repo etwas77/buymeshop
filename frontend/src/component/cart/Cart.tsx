@@ -15,22 +15,20 @@ import QuantityUpdater from "../common/utils/QuantityUpdater";
 const Cart = () => {
     const dispatch = useDispatch<AppDispatch>();
     const { items, cartId, isLoading } = useSelector((state: { cart: cartState }) => state.cart);
-    const { authMe, isAuthenticated } = useSelector((state: { auth: AuthState }) => state.auth);
+    const { authMe } = useSelector((state: { auth: AuthState }) => state.auth);
     const navigate = useNavigate();
 
     React.useEffect(() => {
-        if (isAuthenticated && authMe) {
+        if (authMe) {            
             dispatch(getCartsMe());
         }
-        else if(isAuthenticated && !authMe) {
+        else if(!authMe) {
             dispatch(callAuthMe()); 
         }
         else {
             dispatch(setLoading(false)); // No user ID, so we can stop loading immediately
         }
-    }, [isAuthenticated, dispatch, authMe]);
-
-
+    }, [dispatch, authMe]);
 
     const handleQuantityChange = React.useCallback((productId: number, quantity: number) => () => {
         if (quantity >= 1) {
@@ -39,16 +37,7 @@ const Cart = () => {
     }, [dispatch, cartId]);
 
     const handlePlaceOrder = () => {
-        navigate("/checkout/" + authMe?.id);
-        // if(items.length > 0) {
-        //     dispatch(placeOrder(Number(userId))).unwrap().then(() => {
-        //         dispatch(resetCart());
-        //         dispatch(getUserById(Number(userId)));
-        //         navigate("/orders/" + userId);
-        //     }).catch((error) => {
-        //         console.error("Failed to place order:", error);
-        //     });
-        // }
+        navigate("/checkout");
     };
 
     if (isLoading) {
