@@ -12,21 +12,62 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class CookieUtils {
 
+    private static final String REFRESH_TOKEN_COOKIE = "refreshToken";
+    private static final String ACCESS_TOKEN_COOKIE = "accessToken";
+
+    public static enum CookieType {
+        REFRESH,
+        ACCESS
+    }
+    
     @Value("${app.use-secure-cookie}")
     private boolean useSecureCookie;
 
-    public void addRefreshTokenToCookie(String refreshToken, HttpServletResponse response, long maxAge) {
+    // public void addRefreshTokenToCookie(String refreshToken, HttpServletResponse response, long maxAge) {
+    //     if (response == null) {
+    //         throw new IllegalArgumentException("HttpServletResponse cannot be null");
+    //     }
+
+    //     addCookie(REFRESH_TOKEN_COOKIE, refreshToken, response, maxAge, getSameSiteAttribute());
+    // }
+
+    public void addTokenToCookie(CookieType tokenType, String accessToken, HttpServletResponse response, long maxAge) {
         if (response == null) {
             throw new IllegalArgumentException("HttpServletResponse cannot be null");
         }
+        String cookienName = tokenType == CookieType.REFRESH ? REFRESH_TOKEN_COOKIE : ACCESS_TOKEN_COOKIE;
+        addCookie(cookienName, accessToken, response, maxAge, getSameSiteAttribute());
+    }
 
-        Cookie cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setHttpOnly(true);               // client-side scripts cannot access the cookie
-        cookie.setSecure(this.useSecureCookie); // if true, cookie will only be sent over HTTPS
+    private void addCookie(String name, String value, HttpServletResponse response, long maxAge, String sameSite) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(this.useSecureCookie);
         cookie.setPath("/");
         cookie.setMaxAge((int) (maxAge / 1000));
-        setResponseHeader(response, cookie, this.useSecureCookie ? "None" : "Lax"); // "Lax" prevents the cookie from being sent in cross-site requests, 
-        // but allows it in top-level navigation. "None" allows the cookie to be sent in all contexts, but requires Secure to be true.
+        setResponseHeader(response, cookie, sameSite);
+    }
+
+    public void ClearCookie(CookieType tokenType, HttpServletResponse response) {
+        String cookienName = tokenType == CookieType.REFRESH ? REFRESH_TOKEN_COOKIE : ACCESS_TOKEN_COOKIE;
+        addCookie(cookienName, "", response, 0, getSameSiteAttribute());
+    }
+
+    private String getSameSiteAttribute() {
+        return this.useSecureCookie ? "None" : "Lax";
+    }
+
+    public String getTokenFromCookies(CookieType tokenType, HttpServletRequest request) {
+        String cookieName = tokenType == CookieType.REFRESH ? REFRESH_TOKEN_COOKIE : ACCESS_TOKEN_COOKIE;
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookieName.equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 
     private void setResponseHeader(HttpServletResponse response, Cookie cookie, String sameSite) {
@@ -37,7 +78,7 @@ public class CookieUtils {
                 .append(this.useSecureCookie ? "; Secure" : "")
                 .append("; SameSite=").append(sameSite);
 
-        response.setHeader("Set-Cookie", header.toString());
+        response.addHeader("Set-Cookie", header.toString());
     }
 
     public String getRefreshTokenFromCookies(HttpServletRequest request) {

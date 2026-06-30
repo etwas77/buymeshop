@@ -5,28 +5,24 @@ import { FaCheck, FaReceipt, FaShoppingCart, FaUser } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { AuthState, logout } from "../../store/features/authSlice";
-import { cartState, getUserCarts } from "../../store/features/cartSlice";
-import { getOrdersByUserId, OrderState } from "../../store/features/orderSlice";
+import { cartState, getCartsMe } from "../../store/features/cartSlice";
+import { getOrdersByMe, OrderState } from "../../store/features/orderSlice";
 import { AppDispatch } from "../../store/store";
-import { isAdmin, isValidToken } from "../common/utils/Functions";
 
 const NavBar = () => {
     const { items } = useSelector((state: { cart: cartState }) => state.cart);
     const { orders } = useSelector((state: { order: OrderState }) => state.order);
-    const { isAuthenticated } = useSelector((state: { auth: AuthState }) => state.auth);
-
+    const { authMe } = useSelector((state: { auth: AuthState }) => state.auth);
+    const isAdminUser = true; //authMe?.roles?.some(role => role.toLowerCase() === "admin") ?? false;
+    
     const dispatch = useDispatch<AppDispatch>();
 
-    const userId = localStorage.getItem("userId");
-    const token = localStorage.getItem("authToken") ?? "";
-
     React.useEffect(() => {
-        if (userId && isValidToken(token)) {
-            //console.log('first time after login, getting cart and orders for userId in navbar:', userId);
-            dispatch(getUserCarts({ userId }));
-            dispatch(getOrdersByUserId(userId));
+        if (authMe) {
+            dispatch(getCartsMe());
+            dispatch(getOrdersByMe());
         }
-    }, [userId, dispatch, token]);
+    }, [authMe, dispatch]);
 
 
     return (
@@ -48,7 +44,7 @@ const NavBar = () => {
                         </Nav.Link>
                     </Nav>
 
-                    {isAdmin() &&
+                    {isAdminUser &&
                         <Nav className='me-auto'>
                             <Nav.Link to={"/admin"} as={Link}>
                                 Admin Panel
@@ -56,7 +52,7 @@ const NavBar = () => {
                         </Nav>
                     }
 
-                    {!isAuthenticated &&
+                    {!authMe &&
                         <Nav className='me-auto'>
                             <Nav.Link to={"/login"} as={Link}>
                                 Log-in
@@ -72,24 +68,24 @@ const NavBar = () => {
                                 </NavDropdown.Item>
 
                                 <NavDropdown.Divider />
-                                <NavDropdown.Item to={`/cart/${userId}`} as={Link}>
+                                <NavDropdown.Item to={"/cart"} as={Link}>
                                     <FaShoppingCart />
                                     My Cart({items.length})
                                 </NavDropdown.Item>
 
-                                <NavDropdown.Item to={`/orders/${userId}`} as={Link}>
+                                <NavDropdown.Item to={`/orders`} as={Link}>
                                     <FaReceipt />
                                     My Orders({orders.length})
                                 </NavDropdown.Item>
 
-                                <NavDropdown.Item to={`/checkout/${userId}`} as={Link}>
+                                <NavDropdown.Item to={`/checkout`} as={Link}>
                                     <FaCheck />
                                     Checkout
                                 </NavDropdown.Item>
 
                                 <NavDropdown.Divider />
 
-                                {isAuthenticated &&
+                                {authMe &&
                                     <NavDropdown.Item onClick={() => {
                                         dispatch(logout());
                                     }}>
@@ -104,7 +100,7 @@ const NavBar = () => {
                         placement="bottom"
                         overlay={<Tooltip id="cart-tooltip">View Cart</Tooltip>}
                     >
-                        <Nav.Link to={`/cart/${userId}`} as={Link}>
+                        <Nav.Link to={`/cart`} as={Link}>
 
                             <FaShoppingCart />
 

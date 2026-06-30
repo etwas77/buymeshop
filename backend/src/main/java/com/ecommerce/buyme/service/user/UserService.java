@@ -1,6 +1,7 @@
 package com.ecommerce.buyme.service.user;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -11,7 +12,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.buyme.dtos.AddressDto;
-import com.ecommerce.buyme.dtos.RoleDto;
 import com.ecommerce.buyme.dtos.UserDto;
 import com.ecommerce.buyme.model.Address;
 import com.ecommerce.buyme.model.Role;
@@ -71,7 +71,8 @@ public class UserService implements IUserService {
 
                     if (request.getRoles() != null) {
                         Set<Role> incomingRoles = request.getRoles().stream()
-                            .map(RoleDto::getName)
+                            .filter(Objects::nonNull)
+                            .map(roleDto -> roleDto.getName())
                             .map(roleName -> Optional.ofNullable(roleRepository.findByName(roleName))
                                 .orElseThrow(() -> new RuntimeException("Role not found: " + roleName)))
                                 .collect(Collectors.toSet());

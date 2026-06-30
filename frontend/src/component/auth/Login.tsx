@@ -10,7 +10,7 @@ export interface LoginCredentials {
 }
 
 const Login = () => {
-    const { isAuthenticated } = useSelector((state: { auth: AuthState }) => state.auth);
+    const { authMe } = useSelector((state: { auth: AuthState }) => state.auth);
  
     const [credentials, setCredentials] = React.useState<LoginCredentials>({ email: "", password: "" });
     const dispatch = useDispatch<AppDispatch>();
@@ -18,11 +18,11 @@ const Login = () => {
     const location = useLocation();
 
     React.useEffect(() => {
-        if (isAuthenticated) {
+        if (authMe) {
             const from = (location.state as any)?.from?.pathname || "/";
             navigate(from, { replace: true });
         }
-    }, [isAuthenticated, navigate, location.state]);
+    }, [authMe, navigate, location.state]);
 
     return (
         <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "50vh" }}>

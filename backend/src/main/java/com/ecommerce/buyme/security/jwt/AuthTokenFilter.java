@@ -2,7 +2,6 @@ package com.ecommerce.buyme.security.jwt;
 
 import java.io.IOException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
@@ -10,6 +9,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.ecommerce.buyme.response.ErrorResponse;
 import com.ecommerce.buyme.security.ShopUserDetailService;
+import com.ecommerce.buyme.utils.CookieUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.FilterChain;
@@ -23,11 +23,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class AuthTokenFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtUtils jwtUtils;
+    private final JwtUtils jwtUtils;
 
-    @Autowired
-    private ShopUserDetailService userDetailsService;
+    private final ShopUserDetailService userDetailsService;
+    private final CookieUtils cookieUtils;
+
+    public AuthTokenFilter(JwtUtils jwtUtils, ShopUserDetailService userDetailsService, CookieUtils cookieUtils) {
+        this.jwtUtils = jwtUtils;
+        this.userDetailsService = userDetailsService;
+        this.cookieUtils = cookieUtils;
+    }
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response,
@@ -51,10 +56,9 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     }
 
     private String parseJwt(HttpServletRequest request) {
-        String headerAuth = request.getHeader("Authorization");
-
-        if (StringUtils.hasText(headerAuth) && headerAuth.startsWith("Bearer ")) {
-            return headerAuth.substring(7);
+        String tokenString = cookieUtils.getTokenFromCookies(CookieUtils.CookieType.ACCESS, request);
+        if(tokenString != null && StringUtils.hasText(tokenString)) {
+            return tokenString;
         }
 
         return null;

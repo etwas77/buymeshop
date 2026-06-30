@@ -2,6 +2,7 @@ package com.ecommerce.buyme.data;
 
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.Objects;
 
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationListener;
@@ -25,8 +26,9 @@ public class DataInitializer implements ApplicationListener<ApplicationReadyEven
 
     private void initializeRoles(Set<String> roles) {
         Set<String> existingRoleNames = roleRepository.findAll().stream()
-                .map(Role::getName)
-                .collect(Collectors.toSet());
+            .filter(Objects::nonNull)
+            .map(roleDto -> roleDto.getName())
+            .collect(Collectors.toSet());
 
         roles.stream()
                 .filter(roleName -> !existingRoleNames.contains(roleName))

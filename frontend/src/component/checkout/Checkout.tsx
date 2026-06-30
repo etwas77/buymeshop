@@ -8,10 +8,10 @@ import _ from "lodash";
 import React, { ChangeEvent } from "react";
 import { Card, Col, Container, Form, FormGroup, Row } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { AddressDto } from "../../dtos/AddressDto";
-import { cartState, getUserCarts, resetCart } from "../../store/features/cartSlice";
+import { AuthState } from "../../store/features/authSlice";
+import { cartState, getCartsMe, resetCart } from "../../store/features/cartSlice";
 import { createPaymentIntent, placeOrder } from "../../store/features/orderSlice";
 import { getUserById, UserState } from "../../store/features/userSlice";
 import { AppDispatch } from "../../store/store";
@@ -26,9 +26,9 @@ interface UserInfo {
 }
 
 const Checkout = () => {
-    const { userId } = useParams();
     const { user } = useSelector((state: { user: UserState }) => state.user);
     const { cart } = useSelector((state: { cart: cartState }) => state.cart);
+    const { authMe } = useSelector((state: { auth: AuthState }) => state.auth);
     const dispatch = useDispatch<AppDispatch>();
 
     const [userInfo, setUserInfo] = React.useState<UserInfo>({
@@ -44,10 +44,8 @@ const Checkout = () => {
     const [cardError, setCardError] = React.useState<string>();
 
     React.useEffect(() => {
-        if (user === undefined) {
-            if (userId) {
-                dispatch(getUserById(userId));
-            }
+        if (user === undefined && authMe?.id) {
+            dispatch(getUserById(authMe.id));
         }
         if (user) {
             setUserInfo({
@@ -59,13 +57,13 @@ const Checkout = () => {
                 setSelectedAddress(user.addresses[0]);
             }
         }
-    }, [user, dispatch, userId]);
+    }, [user, dispatch, authMe?.id]);
 
     React.useEffect(() => {
-        if (cart === undefined && userId) {
-            dispatch(getUserCarts({ userId }));
+        if (cart === undefined && authMe) {
+            dispatch(getCartsMe());
         }
-    }, [userId, cart]);
+    }, [cart, authMe, dispatch]);
 
     const handlePaymentAndOrder = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -81,7 +79,7 @@ const Checkout = () => {
             toast.error("Cart is empty. Please add items to your cart before checkout.");
             return;
         }
-        if(userId === undefined) {
+        if(authMe === undefined) {
             setIsProcessing(false);
             toast.error("User ID is missing. Please log in again.");
             return;
@@ -121,7 +119,7 @@ const Checkout = () => {
 
             // place order if payment successful, else show error message
             if (paymentResult.paymentIntent?.status === "succeeded") {
-                dispatch(placeOrder(userId)).unwrap().then(() => {
+                dispatch(placeOrder()).unwrap().then(() => {
                     dispatch(resetCart());
                 }).catch((error) => {
                     toast.error("Failed to place order: " + error.message);

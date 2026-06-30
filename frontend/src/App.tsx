@@ -26,10 +26,10 @@ function App() {
                 <Route path="/unauthorized" element={<div className="text-center mt-5"><h1>Unauthorized Access</h1><p>You do not have permission to view this page.</p></div>} />
 
                 <Route element={<ProtectedRoute useOutlet />}>          
-                    <Route path="/cart/:userId" element={<Cart />} />       {/* needs authentication */}
-                    <Route path="/orders/:userId" element={<Order />} />    {/* needs authentication */}
+                    <Route path="/cart" element={<Cart />} />       {/* needs authentication */}
+                    <Route path="/orders" element={<Order />} />    {/* needs authentication */}
                     <Route path="/profile" element={<Account />} />         {/* needs authentication */}
-                    <Route path="/checkout/:userId" element={<Checkout />} />       
+                    <Route path="/checkout" element={<Checkout />} />       
                 </Route>
 
                 <Route element={<ProtectedRoute useOutlet allowRoles={["ADMIN"]} />}>

@@ -2,13 +2,17 @@ package com.ecommerce.buyme.security.jwt;
 
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
 
+import com.ecommerce.buyme.dtos.AuthDto;
+import com.ecommerce.buyme.dtos.RoleDto;
 import com.ecommerce.buyme.security.ShopUserDetails;
 
 import io.jsonwebtoken.Jwts;
@@ -29,14 +33,17 @@ public class JwtUtils {
     @Value("${auth.token.refresh-expiration-in-mils}")
     private String refreshExpirationTime;
 
-    public String generateAccessTokenForUser(Authentication authentication) {
+    public HashMap<String, Object> generateAccessTokenForUser(Authentication authentication) {
         ShopUserDetails userPrincipal = (ShopUserDetails) authentication.getPrincipal();
 
         List<String> roles = userPrincipal.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
+                .filter(Objects::nonNull)
+                .map(authority -> authority.getAuthority())
                 .toList();
 
-        return Jwts.builder()
+        AuthDto authDto = new AuthDto(userPrincipal.getId(), roles.stream().map(RoleDto::new).collect(Collectors.toSet()));
+
+        String token =  Jwts.builder()
                 .setSubject(userPrincipal.getEmail())
                 .claim("id", userPrincipal.getId())
                 .claim("roles", roles)
@@ -44,6 +51,11 @@ public class JwtUtils {
                 .setExpiration(calculateFromMillis(expirationTime))
                 .signWith(key(), SignatureAlgorithm.HS256)
                 .compact();
+
+        HashMap<String, Object> retObject = new HashMap<>();
+        retObject.put("token", token);
+        retObject.put("authDto", authDto);
+        return retObject;
     }
 
     public String generateRefreshTokenForUser(String email) {

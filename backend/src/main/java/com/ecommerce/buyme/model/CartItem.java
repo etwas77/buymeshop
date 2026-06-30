@@ -30,4 +30,19 @@ public class CartItem {
     public void calculateTotalPrice() {
         this.totalPrice = this.unitPrice.multiply(BigDecimal.valueOf(this.quantity));
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        CartItem cartItem = (CartItem) o;
+
+        return id != null ? id.equals(cartItem.id) : cartItem.id == null;
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }   
 }
