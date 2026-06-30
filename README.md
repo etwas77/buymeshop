@@ -1,7 +1,7 @@
 example implementation of ecommerce web application. 
 - backend using java spring;
 - frontend using reactjs;
-- JWT authentication:
+- JWT authentication, using Http-Only cookie set:
     - some backend endpoints are secured with token;
     - some frontend routes are secured;
     - some endpoint within controller are secured using Role;
