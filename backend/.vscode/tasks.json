@@ -1,0 +1,32 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "compose: up chroma",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "compose",
+        "-f",
+        "${workspaceFolder}/docker-compose.yaml",
+        "up",
+        "-d",
+        "chroma"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "compose: down chroma",
+      "type": "shell",
+      "command": "docker",
+      "args": [
+        "compose",
+        "-f",
+        "${workspaceFolder}/docker-compose.yaml",
+        "stop",
+        "chroma"
+      ],
+      "problemMatcher": []
+    }
+  ]
+}

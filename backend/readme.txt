@@ -52,3 +52,9 @@ At checkout, system creates Order + OrderItems from the cart snapshot
 Cart is cleared (or kept for future shopping)
 Order remains as the permanent transaction record
 
+
+### chroma vector db
+docker compose -f docker-compose.yaml up -d chroma
+docker compose -f docker-compose.yaml ps
+docker compose -f docker-compose.yaml logs -f chroma
+docker compose -f docker-compose.yaml stop chroma

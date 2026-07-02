@@ -8,6 +8,7 @@
             "mainClass": "com.ecommerce.buyme.BuymeApplication",
             "projectName": "buyme",
             "args": "",
+            "preLaunchTask": "compose: up chroma",
             "envFile": "${workspaceFolder}/.env"
         }
     ]
