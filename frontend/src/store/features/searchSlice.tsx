@@ -6,15 +6,20 @@ export const searchByImage = createAsyncThunk(
     async (imageFile: File) => {
         const formData = new FormData();
         formData.append("file", imageFile);
-        const response = await api.post("/products/search-by-image", formData);
-        return response.data;
+        const response = await api.post("/images/search-by-image", formData, {
+            headers: {
+                    "Content-Type": "multipart/form-data"
+                },
+                withCredentials: false
+        });
+        return response.data.data as string[];
     }
 );
 export interface SearchState {
     searchQuery: string;
     selectedCategory: string;
     imageSearch?: string;
-    imageSearchResults?: any[];
+    imageSearchResults?: string[];
 }
 
 const searchSlice = createSlice({

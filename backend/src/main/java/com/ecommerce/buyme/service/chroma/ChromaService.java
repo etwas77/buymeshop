@@ -25,9 +25,9 @@ public class ChromaService implements IChromaService {
     private final  ChromaApi chromaApi;
 
     @Value("${spring.ai.vectorstore.chroma.tenant-name}")
-    private final String tenantName;
+    private String tenantName;
     @Value("${spring.ai.vectorstore.chroma.database-name}")
-    private final String databaseName;
+    private String databaseName;
 
     @Override
     public void deleteCollection(String collectionName) {

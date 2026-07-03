@@ -22,6 +22,8 @@ const Home = () => {
     const { distinctProducts: products, isLoading } = useSelector((state: { products: ProductState }) => state.products);
     const dispatch = useDispatch<AppDispatch>();
 
+    console.log('imageSearchResults', imageSearchResults);
+    
     React.useEffect(() => {
         dispatch(getAllDistinctProducts());
     }, [dispatch]);
@@ -39,7 +41,7 @@ const Home = () => {
             const matchesCategory = selectedCategory === 'All Categories'
                 || product.category.name.toLowerCase().includes(selectedCategory.toLowerCase());
             const matchesSearchQuery = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchesImageSearch = !imageSearchResults || imageSearchResults.includes(product.id);
+            const matchesImageSearch = imageSearchResults !== undefined && imageSearchResults.length > 0 && imageSearchResults.includes(product.id);
             return matchesCategory && matchesSearchQuery && matchesImageSearch;
         });
         setFilteredProducts(filtered);

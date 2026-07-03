@@ -11,14 +11,10 @@ const ImageSearch = () => {
     const { imageSearch } = useSelector((state: { search: { imageSearch?: string } }) => state.search);
     console.log('imageSearch', imageSearch);
 
-    console.log('fileRef', fileRef);
-
     const dispatch = useDispatch<AppDispatch>();
 
     const hadleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        console.log('file', file);
-
         if (file) {
             setImageFile(file);
             setImagePreview(URL.createObjectURL(file));
@@ -33,7 +29,6 @@ const ImageSearch = () => {
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         const file = event.dataTransfer.files?.[0];
-        console.log('file', file);
 
         if (file && file.type.startsWith("image/")) {
             setImageFile(file);

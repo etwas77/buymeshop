@@ -1,5 +1,6 @@
 package com.ecommerce.buyme.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.core.io.ByteArrayResource;
@@ -56,7 +57,10 @@ public class ImageController {
     }
 
     @PutMapping("/update/{imageId}/update")
-    public ResponseEntity<ApiResponse> update(@RequestParam MultipartFile file, @PathVariable("imageId") String imageId) {
+    public ResponseEntity<ApiResponse> update(
+            @PathVariable("imageId") String imageId,
+            @RequestParam MultipartFile file) {
+
         imageService.update(file, imageId);
         ApiResponse response = new ApiResponse("Image updated successfully", null);
         return ResponseEntity.ok(response);
@@ -69,6 +73,14 @@ public class ImageController {
         List<ImageDto> savedImages = imageService.saveImages(files, productId);
         ApiResponse response = new ApiResponse("Images uploaded successfully", savedImages);
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/search-by-image")
+    public ResponseEntity<ApiResponse> searchByImage(@RequestParam("file") MultipartFile file) {
+
+        List<String> results = new ArrayList<>();
+        results.add("Search by image functionality is under development.");
+        return ResponseEntity.ok(new ApiResponse("Results", results));
     }
 
 }
