@@ -107,7 +107,7 @@ public class ImageService implements IImageService {
                 savedImages.add(dto);
 
                 String imageSummary = getImageSummary(productId, file, savedImage);
-                log.info("Stored image summary embedded ids: {}", imageSummary);
+                log.info("Stored image summary: {}", imageSummary);
             } catch (IOException e) {
                 throw new RuntimeException(
                         "Failed to save image for product with id: " + productId + ". Error: " + e.getMessage());

@@ -10,20 +10,20 @@ import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.ecommerce.buyme.service.chroma.LLMServiceUtil;
+import com.ecommerce.buyme.service.LLM.LLMService.LLMService;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class ImageSearchService implements IImageSearchService {
-    private final LLMServiceUtil llmServiceUtil;
+    private final LLMService llmService;
     private final ChromaVectorStore vectorStore;
 
     @Override
     public List<String> saveEmbeddings(MultipartFile image, String productId, String imageId) {
         try {
-            String imageDescription = llmServiceUtil.descriptionImage(image);
+            String imageDescription = llmService.describeImage(image);
             Map<String, Object> metadata = new HashMap<>();
             metadata.put("productId", productId);
             metadata.put("imageId", imageId);

@@ -1,4 +1,4 @@
-package com.ecommerce.buyme.service.chroma;
+package com.ecommerce.buyme.service.LLM.LLMService;
 
 import java.io.IOException;
 
@@ -15,10 +15,11 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class LLMServiceUtil {
+public class LLMService
+{
     private final ChatModel chatModel;
-
-    public String descriptionImage(MultipartFile image) throws IOException {
+    
+    public String describeImage(MultipartFile image) throws IOException {
         String mimeType = image.getContentType();
         if (mimeType == null || !mimeType.startsWith("image/")) {
             throw new IllegalArgumentException("Unsupported or missing image MIME type");
@@ -29,7 +30,7 @@ public class LLMServiceUtil {
         .prompt()
         .user(promptUserSpec -> promptUserSpec.text(
             """
-            Generate a concise, detailed textual description of the image strcitly for visual similarity search.
+            Generate a concise, detailed textual description of the image strictly for visual similarity search.
             Follow these rules:
             - Limit the description to 2-3 short sentences or a list of key attributes.
             - Focus ONLY on clearly visible, distinctive features such as:
