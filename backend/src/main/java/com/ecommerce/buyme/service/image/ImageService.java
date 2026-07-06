@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,7 +40,8 @@ public class ImageService implements IImageService {
 
     @Override
     public Image getbyId(String imageId) {
-        return imageRepository.findById(imageId).orElseThrow(() -> new RuntimeException("No such image with id exists: " + imageId));
+        return imageRepository.findById(imageId)
+                .orElseThrow(() -> new RuntimeException("No such image with id exists: " + imageId));
     }
 
     @Override
@@ -88,18 +90,18 @@ public class ImageService implements IImageService {
 
         for (MultipartFile file : files) {
             try {
+                String imageId = new ObjectId().toHexString();
+                String downloadUrl = "/api/v1/images/image/download/" + imageId;
+
                 Image image = new Image();
+                image.setId(imageId);
                 image.setImage(file.getBytes());
                 image.setFileName(file.getOriginalFilename());
                 image.setFileType(file.getContentType());
                 image.setProduct(product);
+                image.setDownloadUrl(downloadUrl);
 
                 Image savedImage = imageRepository.save(image);
-
-                String downloadUrl = "/api/v1/images/image/download/" + savedImage.getId();
-                savedImage.setDownloadUrl(downloadUrl);
-
-                savedImage = imageRepository.save(savedImage);
 
                 ImageDto dto = new ImageDto(savedImage.getId(), savedImage.getFileName(), savedImage.getDownloadUrl());
                 savedImages.add(dto);
@@ -117,8 +119,7 @@ public class ImageService implements IImageService {
 
     private String getImageSummary(String productId, MultipartFile file, Image savedImage) {
         return String.valueOf(
-            imageSearchService.saveEmbeddings(file, productId, savedImage.getId())   
-        );
+                imageSearchService.saveEmbeddings(file, productId, savedImage.getId()));
     }
 
 }
