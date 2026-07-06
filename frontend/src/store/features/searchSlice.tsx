@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { api } from "../../component/services/api";
+import { ProductDto } from "../../dtos/ProductDto";
 
 export const searchByImage = createAsyncThunk(
     "search/searchByImage",
@@ -12,14 +13,15 @@ export const searchByImage = createAsyncThunk(
                 },
                 withCredentials: false
         });
-        return response.data.data as string[];
+        return response.data.data as  ProductDto[];
     }
 );
 export interface SearchState {
     searchQuery: string;
     selectedCategory: string;
     imageSearch?: string;
-    imageSearchResults?: string[];
+    imageSearchResults?: ProductDto[];
+    searchInProgress: boolean;
 }
 
 const searchSlice = createSlice({
@@ -27,6 +29,7 @@ const searchSlice = createSlice({
     initialState: {
         searchQuery: "",
         selectedCategory: "All Categories",
+        searchInProgress: false,
     } as SearchState,
     reducers: {
         setSearchQuery: (state: SearchState, action: PayloadAction<string>) => {
@@ -46,8 +49,15 @@ const searchSlice = createSlice({
         },
     },
     extraReducers: (builder) => {
+        builder.addCase(searchByImage.pending, (state) => {
+            state.searchInProgress = true;
+        });
         builder.addCase(searchByImage.fulfilled, (state, action) => {
             state.imageSearchResults = action.payload;
+            state.searchInProgress = false;
+        });
+        builder.addCase(searchByImage.rejected, (state) => {
+            state.searchInProgress = false;
         });
     }
 });

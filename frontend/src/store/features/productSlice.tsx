@@ -51,7 +51,7 @@ export const getAllDistinctProducts = createAsyncThunk(
     "products/getAllDistinctProducts",
     async () => {
         try {
-            const response = await api.get("/products/distinct/products");
+            const response = await api.get("/products/distinct/products");            
             return response.data.data as ProductDto[];
         }
         catch (error: any) {

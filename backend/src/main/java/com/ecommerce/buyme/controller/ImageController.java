@@ -19,9 +19,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.buyme.dtos.ImageDto;
+import com.ecommerce.buyme.dtos.ProductDto;
 import com.ecommerce.buyme.model.Image;
+import com.ecommerce.buyme.model.Product;
 import com.ecommerce.buyme.response.ApiResponse;
+import com.ecommerce.buyme.service.LLM.LLMService.LLMService;
 import com.ecommerce.buyme.service.image.IImageService;
+import com.ecommerce.buyme.service.product.IProductService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +35,8 @@ import lombok.RequiredArgsConstructor;
 public class ImageController {
 
     private final IImageService imageService;
+    private final LLMService llmService;
+    private final IProductService productService;
 
     @GetMapping
     public ResponseEntity<ApiResponse> getAll() {
@@ -77,10 +83,18 @@ public class ImageController {
 
     @PostMapping("/search-by-image")
     public ResponseEntity<ApiResponse> searchByImage(@RequestParam("file") MultipartFile file) {
+        try {
+            String imageDescription = llmService.describeImage(file);
 
-        List<String> results = new ArrayList<>();
-        results.add("Search by image functionality is under development.");
-        return ResponseEntity.ok(new ApiResponse("Results", results));
+            List<Product> products = new ArrayList<Product>(); // Assuming you have a method to search products based on the image description
+            List<ProductDto> productDtos = productService.convertProductsToDto(products);
+
+            // results.add(imageDescription);
+            return ResponseEntity.ok(new ApiResponse("Results", productDtos));
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(new ApiResponse("Error processing the file: " + e.getMessage(), null));
+        }
     }
 
 }

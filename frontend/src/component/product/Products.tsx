@@ -43,7 +43,7 @@ const Products = () => {
                 || product.category.name.toLowerCase().includes(selectedCategory.toLowerCase());
             const matchesSearchQuery = product.name.toLowerCase().includes(searchQuery.toLowerCase());
             const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
-            const matchesImageSearch = !imageSearchResults || imageSearchResults.includes(product.id);
+            const matchesImageSearch = imageSearchResults === undefined ? true : (imageSearchResults.length > 0 && imageSearchResults.some(p => p.id === product.id));
             return matchesCategory && matchesSearchQuery && matchesBrand && matchesImageSearch;
         });
         setFilteredProducts(filtered);
@@ -52,7 +52,7 @@ const Products = () => {
     const first = currentPage * itemsPerPage;
     const last = first + itemsPerPage;
 
-    const currentProducts = filteredProducts.slice(first, last);
+    const currentProducts = filteredProducts.slice(first, last);  
 
     if (isLoading) {
         return <div>
