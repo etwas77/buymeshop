@@ -21,6 +21,7 @@ const Home = () => {
     const { itemsPerPage, currentPage } = useSelector((state: { pagination: PaginationState }) => state.pagination);
     const { distinctProducts: products, isLoading } = useSelector((state: { products: ProductState }) => state.products);
     const dispatch = useDispatch<AppDispatch>();
+    console.log('imageSearchResults', imageSearchResults);
     
     React.useEffect(() => {
         dispatch(getAllDistinctProducts());

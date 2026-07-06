@@ -7,6 +7,8 @@ export const searchByImage = createAsyncThunk(
     async (imageFile: File) => {
         const formData = new FormData();
         formData.append("file", imageFile);
+        console.log(2);
+        
         const response = await api.post("/images/search-by-image", formData, {
             headers: {
                     "Content-Type": "multipart/form-data"

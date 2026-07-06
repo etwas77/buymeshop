@@ -41,16 +41,26 @@ export const deleteImage = createAsyncThunk(
 
 export interface ImageState {
     images?: ImageDto[];
+    isUploading: boolean;
 }
 
 const imageSlice = createSlice({
     name: "image",
-    initialState: {} as ImageState,
+    initialState: {
+        isUploading: false,
+    } as ImageState,
     reducers: {
     },
-    extraReducers: (builder) => {
-        builder.addCase(uploadImages.fulfilled, (state, action) => {
+    extraReducers: (builder) => {builder
+        .addCase(uploadImages.fulfilled, (state, action) => {
             state.images = action.payload;
+            state.isUploading = false;
+        })
+        .addCase(uploadImages.pending, (state) => {
+            state.isUploading = true;
+        })
+        .addCase(uploadImages.rejected, (state) => {
+            state.isUploading = false;
         })
         .addCase(deleteImage.fulfilled, (state, action) => {
             if (state.images) {

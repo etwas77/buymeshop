@@ -14,7 +14,7 @@ import com.ecommerce.buyme.model.Image;
 import com.ecommerce.buyme.model.Product;
 import com.ecommerce.buyme.repository.ImageRepository;
 import com.ecommerce.buyme.request.EmbeddingsDeleteRequest;
-import com.ecommerce.buyme.service.chroma.ChromaService;
+import com.ecommerce.buyme.service.chroma.IChromaService;
 import com.ecommerce.buyme.service.product.IProductService;
 
 import lombok.RequiredArgsConstructor;
@@ -27,8 +27,8 @@ public class ImageService implements IImageService {
 
     private final ImageRepository imageRepository;
     private final IProductService productService;
-    private final ChromaService chromaService;
-    private final ImageSearchService imageSearchService;
+    private final IChromaService chromaService;
+    private final IImageSearchService imageSearchService;
 
     @Value("${spring.ai.vectorstore.chroma.collection-name}")
     private String collectionName;
@@ -74,7 +74,8 @@ public class ImageService implements IImageService {
                     .imageId(imageId)
                     .build();
             chromaService.deleteEmbeddingByCollectionId(deleteRequest);
-            String imageSummary = getImageSummary(image.getProduct().getId(), file, image);
+
+            String imageSummary = getImageSummary(file, image.getProduct().getId(), image);
             log.info("Image summary {}", imageSummary);
 
         } catch (IOException e) {
@@ -106,7 +107,7 @@ public class ImageService implements IImageService {
                 ImageDto dto = new ImageDto(savedImage.getId(), savedImage.getFileName(), savedImage.getDownloadUrl());
                 savedImages.add(dto);
 
-                String imageSummary = getImageSummary(productId, file, savedImage);
+                String imageSummary = getImageSummary(file, productId, savedImage);
                 log.info("Stored image summary: {}", imageSummary);
             } catch (IOException e) {
                 throw new RuntimeException(
@@ -117,9 +118,8 @@ public class ImageService implements IImageService {
         return savedImages;
     }
 
-    private String getImageSummary(String productId, MultipartFile file, Image savedImage) {
-        return String.valueOf(
-                imageSearchService.saveEmbeddings(file, productId, savedImage.getId()));
+    private String getImageSummary(MultipartFile file, String productId, Image savedImage) {
+        return imageSearchService.saveEmbeddings(file, productId, savedImage.getId());
     }
 
 }

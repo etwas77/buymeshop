@@ -1,8 +1,13 @@
 package com.ecommerce.buyme.controller;
 
+import com.ecommerce.buyme.repository.ImageRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import org.springframework.ai.chroma.vectorstore.ChromaVectorStore;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
@@ -28,15 +33,19 @@ import com.ecommerce.buyme.service.image.IImageService;
 import com.ecommerce.buyme.service.product.IProductService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("${api.prefix}/images")
 @RequiredArgsConstructor
+@Slf4j
 public class ImageController {
 
+    private final ImageRepository imageRepository;
     private final IImageService imageService;
     private final LLMService llmService;
     private final IProductService productService;
+    private final ChromaVectorStore chromaVectorStore;
 
     @GetMapping
     public ResponseEntity<ApiResponse> getAll() {
@@ -86,10 +95,26 @@ public class ImageController {
         try {
             String imageDescription = llmService.describeImage(file);
 
-            List<Product> products = new ArrayList<Product>(); // Assuming you have a method to search products based on the image description
-            List<ProductDto> productDtos = productService.convertProductsToDto(products);
+            SearchRequest searchRequest = SearchRequest.builder()
+                    .query(imageDescription)
+                    .topK(10)   // how many results you want to retrieve
+                    .similarityThreshold(0.85f) // adjust based on your needs
+                    .build();
+            List<Document> searchResults = chromaVectorStore.doSimilaritySearch(searchRequest);
+            searchResults.forEach(doc -> {
+                Double score = doc.getScore();
+                Object productId = doc.getMetadata().get("productId");
+                log.info("Found document with score: {}, productId: {}", score, productId);
+            });
+            List<Product> products = new ArrayList<Product>();
+            // for (Document doc : searchResults) {
+            //     Map<String, Object> map = doc.getMetadata();
+            //     String productId = (String) map.get("productId");
+            //     Product product = productService.getById(productId);
+            //     products.add(product);
+            // }
 
-            // results.add(imageDescription);
+            List<ProductDto> productDtos = productService.convertProductsToDto(products);
             return ResponseEntity.ok(new ApiResponse("Results", productDtos));
         } catch (Exception e) {
             return ResponseEntity.status(500)

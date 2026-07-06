@@ -21,7 +21,7 @@ public class ImageSearchService implements IImageSearchService {
     private final ChromaVectorStore vectorStore;
 
     @Override
-    public List<String> saveEmbeddings(MultipartFile image, String productId, String imageId) {
+    public String saveEmbeddings(MultipartFile image, String productId, String imageId) {
         try {
             String imageDescription = llmService.describeImage(image);
             Map<String, Object> metadata = new HashMap<>();
@@ -38,8 +38,7 @@ public class ImageSearchService implements IImageSearchService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to save embeddings for image with id: " + imageId, e);
         }
-
-        return List.of("successfully added to vector store");
+        return "Successfully added to vector store image" + image.getName();
     }
 
 }

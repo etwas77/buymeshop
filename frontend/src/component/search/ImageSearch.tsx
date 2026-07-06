@@ -47,6 +47,8 @@ const ImageSearch = () => {
         }
 
         if (imageFile) {
+            console.log(1);
+            
             await dispatch(searchByImage(imageFile));
         }
     };
