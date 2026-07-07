@@ -1,7 +1,7 @@
 package com.ecommerce.buyme.service.image;
 
-import org.springframework.web.multipart.MultipartFile;
+import com.ecommerce.buyme.dtos.ImageEmbeddingPayload;
 
 public interface IImageSearchService {
-    String saveEmbeddings(MultipartFile file, String productId, String imageId);
+    String saveEmbeddings(ImageEmbeddingPayload payload, String productId, String imageId);
 }

@@ -10,6 +10,7 @@ import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.ecommerce.buyme.dtos.ImageEmbeddingPayload;
 import com.ecommerce.buyme.service.LLM.LLMService.LLMService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,9 +22,9 @@ public class ImageSearchService implements IImageSearchService {
     private final ChromaVectorStore vectorStore;
 
     @Override
-    public String saveEmbeddings(MultipartFile image, String productId, String imageId) {
+    public String saveEmbeddings(ImageEmbeddingPayload payload, String productId, String imageId) {
         try {
-            String imageDescription = llmService.describeImage(image);
+            String imageDescription = llmService.describeImage(payload);
             Map<String, Object> metadata = new HashMap<>();
             metadata.put("productId", productId);
             metadata.put("imageId", imageId);
@@ -38,7 +39,7 @@ public class ImageSearchService implements IImageSearchService {
         } catch (Exception e) {
             throw new RuntimeException("Failed to save embeddings for image with id: " + imageId, e);
         }
-        return "Successfully added to vector store image" + image.getName();
+        return "Successfully added to vector store image " + imageId + " for product " + productId;
     }
 
 }

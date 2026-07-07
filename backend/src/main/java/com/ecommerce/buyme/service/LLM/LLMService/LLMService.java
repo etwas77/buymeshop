@@ -1,5 +1,6 @@
 package com.ecommerce.buyme.service.LLM.LLMService;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
 import org.springframework.ai.chat.client.ChatClient;
@@ -7,7 +8,8 @@ import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.stereotype.Service;
 import org.springframework.util.MimeType;
-import org.springframework.web.multipart.MultipartFile;
+
+import com.ecommerce.buyme.dtos.ImageEmbeddingPayload;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,12 +21,13 @@ public class LLMService
 {
     private final ChatModel chatModel;
     
-    public String describeImage(MultipartFile image) throws IOException {
-        String mimeType = image.getContentType();
+    public String describeImage(ImageEmbeddingPayload payload) throws IOException {
+        String mimeType = payload.contentType();
         if (mimeType == null || !mimeType.startsWith("image/")) {
             throw new IllegalArgumentException("Unsupported or missing image MIME type");
         }
-        InputStreamResource resource = new InputStreamResource(image.getInputStream());
+        InputStreamResource resource =
+            new InputStreamResource(new ByteArrayInputStream(payload.imageBytes()));
         
         return ChatClient.create(chatModel)
         .prompt()

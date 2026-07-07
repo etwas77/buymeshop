@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.buyme.dtos.ImageDto;
+import com.ecommerce.buyme.dtos.ImageEmbeddingPayload;
 import com.ecommerce.buyme.dtos.ProductDto;
 import com.ecommerce.buyme.model.Image;
 import com.ecommerce.buyme.model.Product;
@@ -94,7 +95,14 @@ public class ImageController {
     @PostMapping("/search-by-image")
     public ResponseEntity<ApiResponse> searchByImage(@RequestParam("file") MultipartFile file) {
         try {
-            String imageDescription = llmService.describeImage(file);
+            ImageEmbeddingPayload payload = new ImageEmbeddingPayload(
+                        file.getBytes(),
+                        file.getContentType(),
+                        file.getOriginalFilename(),
+                        "",
+                        "");
+
+            String imageDescription = llmService.describeImage(payload);
 
             SearchRequest searchRequest = SearchRequest.builder()
                     .query(imageDescription)

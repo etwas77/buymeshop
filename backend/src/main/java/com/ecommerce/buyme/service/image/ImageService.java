@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.buyme.dtos.ImageDto;
+import com.ecommerce.buyme.dtos.ImageEmbeddingPayload;
 import com.ecommerce.buyme.model.Image;
 import com.ecommerce.buyme.model.Product;
 import com.ecommerce.buyme.repository.ImageRepository;
@@ -75,7 +76,14 @@ public class ImageService implements IImageService {
                     .build();
             chromaService.deleteEmbeddingByCollectionId(deleteRequest);
 
-            imageAsyncService.saveEmbeddingsAsync(file, image.getProduct().getId(), imageId);
+            ImageEmbeddingPayload payload = new ImageEmbeddingPayload(
+                    file.getBytes(),
+                    file.getContentType(),
+                    file.getOriginalFilename(),
+                    image.getProduct().getId(),
+                    imageId
+            );
+            imageAsyncService.saveEmbeddingsAsync(payload);
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to update image with id: " + imageId + ". Error: " + e.getMessage());
@@ -106,7 +114,14 @@ public class ImageService implements IImageService {
                 ImageDto dto = new ImageDto(savedImage.getId(), savedImage.getFileName(), savedImage.getDownloadUrl());
                 savedImages.add(dto);
 
-                imageAsyncService.saveEmbeddingsAsync(file, productId, savedImage.getId());
+                ImageEmbeddingPayload payload = new ImageEmbeddingPayload(
+                        file.getBytes(),
+                        file.getContentType(),
+                        file.getOriginalFilename(),
+                        productId,
+                        savedImage.getId());
+
+                imageAsyncService.saveEmbeddingsAsync(payload);
             } catch (IOException e) {
                 throw new RuntimeException(
                         "Failed to save image for product with id: " + productId + ". Error: " + e.getMessage());
