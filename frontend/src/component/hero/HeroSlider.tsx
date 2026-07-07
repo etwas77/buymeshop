@@ -2,13 +2,11 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import _ from "lodash";
-import bg1 from "../../assets/images/hero-1.jpg";
-import bg2 from "../../assets/images/hero-2.jpg";
-import bg3 from "../../assets/images/hero-3.jpg";
-import bg6 from "../../assets/images/hero-6.jpg";
-import bg7 from "../../assets/images/hero-7.jpg";
+import bg1 from "../../assets/images/Audi_80_b4.jpg";
+import bg2 from "../../assets/images/aum.jpg";
+import bg3 from "../../assets/images/oum1.png";
 
-const images = [bg1, bg2, bg3, bg6, bg7];
+const images = [bg1, bg2, bg3];
 
 export interface HeroSliderProps {
     currentSlide?: number;

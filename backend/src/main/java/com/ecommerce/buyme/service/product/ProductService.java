@@ -26,7 +26,7 @@ import com.ecommerce.buyme.repository.OrderItemRepository;
 import com.ecommerce.buyme.repository.ProductRepository;
 import com.ecommerce.buyme.request.AddProductRequest;
 import com.ecommerce.buyme.request.ProductUpdateRequest;
-import com.ecommerce.buyme.service.cart.CartService;
+import com.ecommerce.buyme.service.cart.ICartService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,7 +40,7 @@ public class ProductService implements IProductService {
     private final OrderItemRepository orderItemRepository;
     private final ImageRepository imageRepository;
     private final ModelMapper modelMapper;
-    private final CartService cartService;
+    private final ICartService cartService;
 
     @Override
     public Product add(AddProductRequest request) {

@@ -17,11 +17,11 @@ import { SearchState } from "../../store/features/searchSlice";
 
 const Home = () => {
     const [filteredProducts, setFilteredProducts] = React.useState<ProductDto[]>([]);
-    const { searchQuery, selectedCategory, imageSearchResults } = useSelector((state: { search: SearchState }) => state.search);
+    const { searchQuery, selectedCategory, searchResults } = useSelector((state: { search: SearchState }) => state.search);
     const { itemsPerPage, currentPage } = useSelector((state: { pagination: PaginationState }) => state.pagination);
     const { distinctProducts: products, isLoading } = useSelector((state: { products: ProductState }) => state.products);
     const dispatch = useDispatch<AppDispatch>();
-
+    
     React.useEffect(() => {
         dispatch(getAllDistinctProducts());
     }, [dispatch]);
@@ -39,11 +39,11 @@ const Home = () => {
             const matchesCategory = selectedCategory === 'All Categories'
                 || product.category.name.toLowerCase().includes(selectedCategory.toLowerCase());
             const matchesSearchQuery = product.name.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchesImageSearch = !imageSearchResults || imageSearchResults.includes(product.id);
+            const matchesImageSearch = searchResults === undefined ? true : (searchResults.length > 0 && searchResults.includes(product.id));
             return matchesCategory && matchesSearchQuery && matchesImageSearch;
         });
         setFilteredProducts(filtered);
-    }, [products, searchQuery, selectedCategory, imageSearchResults]);
+    }, [products, searchQuery, selectedCategory, searchResults]);
 
     if (isLoading) {
         return <div>

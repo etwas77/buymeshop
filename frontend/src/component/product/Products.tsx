@@ -17,7 +17,7 @@ import LoadSpinner from "../common/LoadSpinner";
 const Products = () => {
     const [filteredProducts, setFilteredProducts] = React.useState<ProductDto[]>([]);
     const { products, selectedBrands, isLoading } = useSelector((state: { products: ProductState }) => state.products);
-    const { searchQuery, selectedCategory, imageSearchResults } = useSelector((state: { search: SearchState }) => state.search);
+    const { searchQuery, selectedCategory, searchResults } = useSelector((state: { search: SearchState }) => state.search);
     const { itemsPerPage, currentPage } = useSelector((state: { pagination: PaginationState }) => state.pagination);
     const dispatch = useDispatch<AppDispatch>();
     const { name } = useParams();
@@ -43,16 +43,16 @@ const Products = () => {
                 || product.category.name.toLowerCase().includes(selectedCategory.toLowerCase());
             const matchesSearchQuery = product.name.toLowerCase().includes(searchQuery.toLowerCase());
             const matchesBrand = selectedBrands.length === 0 || selectedBrands.includes(product.brand);
-            const matchesImageSearch = !imageSearchResults || imageSearchResults.includes(product.id);
+            const matchesImageSearch = searchResults === undefined ? true : (searchResults.length > 0 && searchResults.includes(product.id));
             return matchesCategory && matchesSearchQuery && matchesBrand && matchesImageSearch;
         });
         setFilteredProducts(filtered);
-    }, [products, searchQuery, selectedCategory, selectedBrands, imageSearchResults]);
+    }, [products, searchQuery, selectedCategory, selectedBrands, searchResults]);
 
     const first = currentPage * itemsPerPage;
     const last = first + itemsPerPage;
 
-    const currentProducts = filteredProducts.slice(first, last);
+    const currentProducts = filteredProducts.slice(first, last);  
 
     if (isLoading) {
         return <div>

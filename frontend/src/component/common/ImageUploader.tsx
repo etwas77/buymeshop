@@ -1,11 +1,12 @@
 import _ from "lodash";
 import { nanoid } from "nanoid";
 import React from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { uploadImages } from "../../store/features/imageSlice";
 import { getProductById } from "../../store/features/productSlice";
 import { AppDispatch } from "../../store/store";
+import LoadSpinner from "./LoadSpinner";
 
 const useAppDispatch = useDispatch.withTypes<AppDispatch>();
 
@@ -21,6 +22,7 @@ interface ImageUploaderProps {
 const ImageUploader = (p: ImageUploaderProps) => {
     const { productId } = p;
     const [images, setImages] = React.useState<ImagePreview[]>([]);
+    const { isUploading } = useSelector((state: { image: { isUploading: boolean } }) => state.image);
     const dispatch = useAppDispatch();
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -40,7 +42,7 @@ const ImageUploader = (p: ImageUploaderProps) => {
             return;
         }
         if (images.length > 0) {
-            await dispatch(uploadImages({ files: images.map(img => img.file), productId }));            
+            await dispatch(uploadImages({ files: images.map(img => img.file), productId }));
             setImages([]);
             dispatch(getProductById(productId));
             toast.success("Images uploaded successfully");
@@ -59,6 +61,7 @@ const ImageUploader = (p: ImageUploaderProps) => {
                     className="form-control me-2"
 
                 />
+                {isUploading && <LoadSpinner variant="secondary" />}
                 <button
                     type="button"
                     onClick={handleUpload}
@@ -66,6 +69,8 @@ const ImageUploader = (p: ImageUploaderProps) => {
                     disabled={images.length === 0}>
                     {images.length === 0 ? "Select Images" : "Upload Images"}
                 </button>
+            </div>
+            <div className="d-flex flex-wrap gap-2">
             </div>
         </div>
     );

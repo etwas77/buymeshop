@@ -1,24 +1,18 @@
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { searchByImage, setImageSearch } from "../../store/features/searchSlice";
+import { searchByImage, SearchState, setImageSearch } from "../../store/features/searchSlice";
 import { AppDispatch } from "../../store/store";
 
 const ImageSearch = () => {
     const [imageFile, setImageFile] = React.useState<File>();
     const [imagePreview, setImagePreview] = React.useState<string>();
-    const [isLoading, setIsLoading] = React.useState<boolean>(false);
     const fileRef = React.useRef<HTMLInputElement>(null);
-    const { imageSearch } = useSelector((state: { search: { imageSearch?: string } }) => state.search);
-    console.log('imageSearch', imageSearch);
-
-    console.log('fileRef', fileRef);
+    const { imageSearch, searchInProgress } = useSelector((state: { search: SearchState }) => state.search);
 
     const dispatch = useDispatch<AppDispatch>();
 
     const hadleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        console.log('file', file);
-
         if (file) {
             setImageFile(file);
             setImagePreview(URL.createObjectURL(file));
@@ -33,7 +27,6 @@ const ImageSearch = () => {
     const handleDrop = (event: React.DragEvent<HTMLDivElement>) => {
         event.preventDefault();
         const file = event.dataTransfer.files?.[0];
-        console.log('file', file);
 
         if (file && file.type.startsWith("image/")) {
             setImageFile(file);
@@ -52,16 +45,8 @@ const ImageSearch = () => {
             return;
         }
 
-        if (imageFile) {
-            setIsLoading(true);
-            try {
-                await dispatch(searchByImage(imageFile));
-
-            } catch (error) {
-                console.error("Error searching with image:", error);
-            } finally {
-                setIsLoading(false);
-            }
+        if (imageFile) {            
+            await dispatch(searchByImage(imageFile));
         }
     };
 
@@ -89,8 +74,8 @@ const ImageSearch = () => {
                     onChange={hadleImageUpload}
                 />
                 <div className="mt-2 mb-3">
-                    <button type="submit" className="image-search-button" disabled={!imageFile || isLoading}>
-                        {isLoading ? "Searching..." : "Search"}
+                    <button type="submit" className="image-search-button" disabled={!imageFile || searchInProgress}>
+                        {searchInProgress ? "Searching..." : "Search"}
                     </button>
                 </div>
             </form>

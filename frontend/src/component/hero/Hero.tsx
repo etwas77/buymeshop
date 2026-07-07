@@ -12,10 +12,10 @@ const Hero = () => {
             <div className="hero-content">
                 <h1>Welcome to <span className="text-primary">BuyMeShop-le</span></h1>
                 <SearchBar />
-                <div className="home-button-container">
+                {/* <div className="home-button-container">
                     <a href="#shop" className="home-shop-button link">Shop Now</a>
                     <button className="deals-button">today's deal</button>
-                </div>
+                </div> */}
             </div>
         </div>
 
