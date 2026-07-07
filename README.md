@@ -7,5 +7,4 @@ example implementation of ecommerce web application.
     - some endpoint within controller are secured using Role;
 - mysql as db (branch "mysql");
 - mongodb as db (branch "mongo");
-
-currently adding openAI "search by image", under develop branch
+- using openAI, chrome vector db for search-by-image. image embeddings stored into chroma async during upload/update.
