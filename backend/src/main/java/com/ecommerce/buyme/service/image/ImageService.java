@@ -28,7 +28,7 @@ public class ImageService implements IImageService {
     private final ImageRepository imageRepository;
     private final IProductService productService;
     private final IChromaService chromaService;
-    private final IImageSearchService imageSearchService;
+    private final ImageAsyncService imageAsyncService;
 
     @Value("${spring.ai.vectorstore.chroma.collection-name}")
     private String collectionName;
@@ -75,8 +75,7 @@ public class ImageService implements IImageService {
                     .build();
             chromaService.deleteEmbeddingByCollectionId(deleteRequest);
 
-            String imageSummary = getImageSummary(file, image.getProduct().getId(), image);
-            log.info("Image summary {}", imageSummary);
+            imageAsyncService.saveEmbeddingsAsync(file, image.getProduct().getId(), imageId);
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to update image with id: " + imageId + ". Error: " + e.getMessage());
@@ -107,8 +106,7 @@ public class ImageService implements IImageService {
                 ImageDto dto = new ImageDto(savedImage.getId(), savedImage.getFileName(), savedImage.getDownloadUrl());
                 savedImages.add(dto);
 
-                String imageSummary = getImageSummary(file, productId, savedImage);
-                log.info("Stored image summary: {}", imageSummary);
+                imageAsyncService.saveEmbeddingsAsync(file, productId, savedImage.getId());
             } catch (IOException e) {
                 throw new RuntimeException(
                         "Failed to save image for product with id: " + productId + ". Error: " + e.getMessage());
@@ -116,10 +114,6 @@ public class ImageService implements IImageService {
         }
 
         return savedImages;
-    }
-
-    private String getImageSummary(MultipartFile file, String productId, Image savedImage) {
-        return imageSearchService.saveEmbeddings(file, productId, savedImage.getId());
     }
 
 }
