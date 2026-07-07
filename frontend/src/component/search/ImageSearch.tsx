@@ -8,7 +8,6 @@ const ImageSearch = () => {
     const [imagePreview, setImagePreview] = React.useState<string>();
     const fileRef = React.useRef<HTMLInputElement>(null);
     const { imageSearch, searchInProgress } = useSelector((state: { search: SearchState }) => state.search);
-    console.log('imageSearch', imageSearch);
 
     const dispatch = useDispatch<AppDispatch>();
 
@@ -46,9 +45,7 @@ const ImageSearch = () => {
             return;
         }
 
-        if (imageFile) {
-            console.log(1);
-            
+        if (imageFile) {            
             await dispatch(searchByImage(imageFile));
         }
     };

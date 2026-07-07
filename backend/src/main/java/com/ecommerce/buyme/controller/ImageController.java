@@ -4,6 +4,7 @@ import com.ecommerce.buyme.repository.ImageRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import org.springframework.ai.chroma.vectorstore.ChromaVectorStore;
 import org.springframework.ai.document.Document;
@@ -97,25 +98,17 @@ public class ImageController {
 
             SearchRequest searchRequest = SearchRequest.builder()
                     .query(imageDescription)
-                    .topK(10)   // how many results you want to retrieve
+                    .topK(10) // how many results you want to retrieve
                     .similarityThreshold(0.85f) // adjust based on your needs
                     .build();
             List<Document> searchResults = chromaVectorStore.doSimilaritySearch(searchRequest);
-            searchResults.forEach(doc -> {
-                Double score = doc.getScore();
-                Object productId = doc.getMetadata().get("productId");
-                log.info("Found document with score: {}, productId: {}", score, productId);
-            });
-            List<Product> products = new ArrayList<Product>();
-            // for (Document doc : searchResults) {
-            //     Map<String, Object> map = doc.getMetadata();
-            //     String productId = (String) map.get("productId");
-            //     Product product = productService.getById(productId);
-            //     products.add(product);
-            // }
+            List<String> productIds = searchResults.stream()
+                    .map(doc -> doc.getMetadata().get("productId"))
+                    .filter(Objects::nonNull)
+                    .map(obj -> obj.toString())
+                    .toList();
 
-            List<ProductDto> productDtos = productService.convertProductsToDto(products);
-            return ResponseEntity.ok(new ApiResponse("Results", productDtos));
+            return ResponseEntity.ok(new ApiResponse("Search results as list of product IDs", productIds));
         } catch (Exception e) {
             return ResponseEntity.status(500)
                     .body(new ApiResponse("Error processing the file: " + e.getMessage(), null));
