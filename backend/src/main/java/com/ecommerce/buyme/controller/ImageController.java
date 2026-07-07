@@ -1,9 +1,6 @@
 package com.ecommerce.buyme.controller;
 
-import com.ecommerce.buyme.repository.ImageRepository;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 import org.springframework.ai.chroma.vectorstore.ChromaVectorStore;
@@ -26,13 +23,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.buyme.dtos.ImageDto;
 import com.ecommerce.buyme.dtos.ImageEmbeddingPayload;
-import com.ecommerce.buyme.dtos.ProductDto;
 import com.ecommerce.buyme.model.Image;
-import com.ecommerce.buyme.model.Product;
 import com.ecommerce.buyme.response.ApiResponse;
 import com.ecommerce.buyme.service.LLM.LLMService.LLMService;
 import com.ecommerce.buyme.service.image.IImageService;
-import com.ecommerce.buyme.service.product.IProductService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,11 +36,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Slf4j
 public class ImageController {
-
-    private final ImageRepository imageRepository;
     private final IImageService imageService;
     private final LLMService llmService;
-    private final IProductService productService;
     private final ChromaVectorStore chromaVectorStore;
 
     @GetMapping

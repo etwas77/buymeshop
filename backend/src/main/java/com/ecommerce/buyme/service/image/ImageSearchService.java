@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.springframework.ai.chroma.vectorstore.ChromaVectorStore;
 import org.springframework.ai.document.Document;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import com.ecommerce.buyme.dtos.ImageEmbeddingPayload;
 import com.ecommerce.buyme.service.LLM.LLMService.LLMService;
