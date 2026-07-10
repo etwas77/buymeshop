@@ -31,7 +31,6 @@ The current state also includes a few important implementation notes:
 
 - Authentication is now centered on HTTP-only access/refresh-token cookies plus `/auth/me`; the old `loginSlice` still exists in Redux but is no longer part of the active auth flow.
 - Image uploads trigger asynchronous embedding generation in the backend, so image search depends on OpenAI and Chroma being available in development.
-- Frontend route guards protect admin screens, but the navbar currently always shows the admin link because `isAdminUser` is hardcoded to `true`.
 - Backend authorization is only partially enforced server-side: cart/order/auth-me routes are secured globally and product create/update/delete uses `@PreAuthorize("hasAuthority('ADMIN')")`, but user, address, image, category, and Chroma endpoints are currently still permitted by the backend filter chain unless protected elsewhere.
 
 ## Repository layout
