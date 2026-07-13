@@ -280,3 +280,13 @@ For a fully free setup, prefer **SonarQube Community Build self-hosted**. Do not
 ### Recommendation
 
 Start **without SonarQube**, get Maven-based checks stable first, then add SonarQube Community Build only if a centralized dashboard is useful.
+
+### Usage
+to read current target/spotbugsXml.xml as a table:
+[xml]$report = Get-Content .\target\spotbugsXml.xml; $report.BugCollection.BugInstance | Select-Object type, category, priority | Format-Table
+
+ spotbugs:check  runs analysis and refreshes  target\spotbugsXml.xml
+ .\mvnw.cmd spotbugs:check
+
+to check if "ICAST_INT_CAST_TO_FLOAT_PASSED_TO_ROUND" resolved :
+[xml]$report = Get-Content .\target\spotbugsXml.xml; $report.BugCollection.BugInstance | Where-Object { $_.type -eq 'ICAST_INT_CAST_TO_FLOAT_PASSED_TO_ROUND' } | Select-Object type, priority

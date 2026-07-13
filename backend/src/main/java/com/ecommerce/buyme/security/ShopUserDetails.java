@@ -11,21 +11,18 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.ecommerce.buyme.model.User;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+
 
 @Getter
-@Setter
-@AllArgsConstructor
 @NoArgsConstructor
 public class ShopUserDetails implements UserDetails {
 
     private String id;
     private String email;
     private String password;
-    private Collection<GrantedAuthority> authorities;
+    private Collection<GrantedAuthority> authorities = List.of();
 
     public static ShopUserDetails buildUserDetails(User user) {
         ShopUserDetails shopUserDetails = new ShopUserDetails();
@@ -41,7 +38,7 @@ public class ShopUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return List.copyOf(authorities);
     }
 
     @Override

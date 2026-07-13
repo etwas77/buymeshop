@@ -91,8 +91,8 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        cookieUtils.ClearCookie(CookieUtils.CookieType.ACCESS, response);
-        cookieUtils.ClearCookie(CookieUtils.CookieType.REFRESH, response);
+        cookieUtils.clearCookie(CookieUtils.CookieType.ACCESS, response);
+        cookieUtils.clearCookie(CookieUtils.CookieType.REFRESH, response);
         return ResponseEntity.ok("logged out successfully");
     }
 

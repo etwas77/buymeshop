@@ -146,7 +146,7 @@ public class ProductService implements IProductService {
                 orderItemRepository.save(item);
             });
 
-            Optional.ofNullable(pro.getCategory().getProducts().remove(pro));
+            pro.getCategory().getProducts().remove(pro);
             pro.setCategory(null);
 
             productRepository.deleteById(pro.getId());

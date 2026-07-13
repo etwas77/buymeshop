@@ -111,6 +111,9 @@ public class UserService implements IUserService {
     @Override
     public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("User is not authenticated");
+        }
 
         String email = authentication.getName();
         return Optional.ofNullable(userRepository.findByEmail(email))
