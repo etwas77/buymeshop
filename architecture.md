@@ -32,6 +32,7 @@ The current state also includes a few important implementation notes:
 - Authentication is now centered on HTTP-only access/refresh-token cookies plus `/auth/me`; the old `loginSlice` still exists in Redux but is no longer part of the active auth flow.
 - Image uploads trigger asynchronous embedding generation in the backend, so image search depends on OpenAI and Chroma being available in development.
 - Backend authorization is only partially enforced server-side: cart/order/auth-me routes are secured globally and product create/update/delete uses `@PreAuthorize("hasAuthority('ADMIN')")`, but user, address, image, category, and Chroma endpoints are currently still permitted by the backend filter chain unless protected elsewhere.
+- Backend design-health checks are implemented with PMD, SpotBugs, Checkstyle, and ArchUnit. `verify` runs the complete backend test and analysis pipeline; static-analysis findings are currently reported without failing the build, while ArchUnit rules run as normal tests.
 
 ## Repository layout
 
@@ -291,6 +292,34 @@ The frontend expects environment values such as:
 
 ## Quality and testing status
 
-- The backend currently has a single test class: `BuymeApplicationTests`.
-- The frontend has Testing Library dependencies installed, but no frontend test script is configured in `package.json`.
-- There are currently no dedicated lint scripts in either project.
+### Backend
+
+The backend SOLID-metrics rollout is implemented as a set of complementary design-health checks rather than a single SOLID score:
+
+| Tool | Current role | Configuration |
+| --- | --- | --- |
+| PMD 7.17 via Maven plugin 3.28.0 | Complexity, size, public surface, and coupling indicators | `backend\config\pmd\ruleset.xml` |
+| SpotBugs Maven plugin 4.10.3.0 | Bytecode-level correctness and implementation findings | `backend\config\spotbugs\exclude.xml` |
+| Checkstyle Maven plugin 3.6.0 | File length, method length, and parameter-count limits | `backend\config\checkstyle\checkstyle.xml` |
+| ArchUnit 1.4.2 | Layer boundaries, dependency direction, and package-cycle checks | `backend\src\test\java\com\ecommerce\buyme\architecture` |
+
+PMD currently checks cyclomatic and NPath complexity, NCSS count, method count, object coupling, god classes, and excessive public members. Checkstyle uses an 800-line file limit, 60-line method limit, and seven-parameter limit. SpotBugs runs with maximum analysis effort and low-priority findings enabled; its exclusion file contains narrow suppressions for intentional MongoDB entity references, injected security dependencies, and Spring Security configuration methods whose framework APIs declare broad exceptions.
+
+The backend now has three test classes:
+
+- `BuymeApplicationTests` verifies that the Spring application context loads.
+- `LayerArchitectureTest` prevents controllers from using repositories directly, services from depending on controllers, and repositories from depending on upper layers.
+- `DependencyRulesTest` rejects cycles between top-level application packages and prevents security/configuration code from depending on controllers.
+
+The standard backend quality command is:
+
+```powershell
+cd backend
+.\mvnw.cmd verify
+```
+
+The Maven `verify` lifecycle runs tests, including the blocking ArchUnit rules, followed by PMD, SpotBugs, and Checkstyle. The three static-analysis plugins are currently soft reporting gates: their findings do not fail the build. Reports can also be refreshed individually with `pmd:check`, `spotbugs:check`, and `checkstyle:check`.
+
+### Frontend
+
+The frontend has Testing Library dependencies installed, but no test or lint script is currently configured in `package.json`.
