@@ -6,8 +6,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.springframework.security.core.Authentication;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +26,6 @@ import com.ecommerce.buyme.request.CreateUserRequest;
 import com.ecommerce.buyme.request.UpdateUserRequest;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 
 @Service
 @RequiredArgsConstructor
@@ -111,13 +113,14 @@ public class UserService implements IUserService {
     @Override
     public User getAuthenticatedUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("User is not authenticated");
+        if(authentication == null || !authentication.isAuthenticated()
+         || authentication instanceof AnonymousAuthenticationToken) {
+            throw new AuthenticationCredentialsNotFoundException("User is not authenticated");
         }
 
         String email = authentication.getName();
         return Optional.ofNullable(userRepository.findByEmail(email))
-                .orElseThrow(() -> new RuntimeException("Login required to access this resource"));
+                .orElseThrow(() -> new AuthenticationCredentialsNotFoundException("Login required to access this resource"));
     }
 
 }

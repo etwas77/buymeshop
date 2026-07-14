@@ -288,5 +288,15 @@ to read current target/spotbugsXml.xml as a table:
  spotbugs:check  runs analysis and refreshes  target\spotbugsXml.xml
  .\mvnw.cmd spotbugs:check
 
+use gui to analize:
+ .\mvnw.cmd spotbugs:gui
+
+
 to check if "ICAST_INT_CAST_TO_FLOAT_PASSED_TO_ROUND" resolved :
 [xml]$report = Get-Content .\target\spotbugsXml.xml; $report.BugCollection.BugInstance | Where-Object { $_.type -eq 'ICAST_INT_CAST_TO_FLOAT_PASSED_TO_ROUND' } | Select-Object type, priority
+
+to use pmd to generate ./target/pmd.xml results
+.\mvnw.cmd pmd:check 
+
+to generate html report in ./target/reports/pmd.html:
+.\mvnw.cmd pmd:pmd

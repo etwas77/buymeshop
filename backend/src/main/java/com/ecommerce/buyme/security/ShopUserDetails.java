@@ -1,5 +1,6 @@
 package com.ecommerce.buyme.security;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +19,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 public class ShopUserDetails implements UserDetails {
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     private String id;
     private String email;

@@ -22,22 +22,19 @@ public class ImageSearchService implements IImageSearchService {
 
     @Override
     public String saveEmbeddings(ImageEmbeddingPayload payload, String productId, String imageId) {
-        try {
-            String imageDescription = llmService.describeImage(payload);
-            Map<String, Object> metadata = new HashMap<>();
-            metadata.put("productId", productId);
-            metadata.put("imageId", imageId);
-            metadata.put("documentId", UUID.randomUUID().toString());
-            var doc = Document.builder()
-                    .id(imageId)
-                    .text(imageDescription)
-                    .metadata(metadata)
-                    .build();
 
-            vectorStore.doAdd(List.of(doc));
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to save embeddings for image with id: " + imageId, e);
-        }
+        String imageDescription = llmService.describeImage(payload);
+        Map<String, Object> metadata = new HashMap<>();
+        metadata.put("productId", productId);
+        metadata.put("imageId", imageId);
+        metadata.put("documentId", UUID.randomUUID().toString());
+        var doc = Document.builder()
+                .id(imageId)
+                .text(imageDescription)
+                .metadata(metadata)
+                .build();
+
+        vectorStore.doAdd(List.of(doc));
         return "Successfully added to vector store image " + imageId + " for product " + productId;
     }
 
