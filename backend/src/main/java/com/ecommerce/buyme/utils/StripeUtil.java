@@ -1,23 +1,16 @@
 package com.ecommerce.buyme.utils;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import com.stripe.Stripe;
+import com.stripe.StripeClient;
 
-import jakarta.annotation.PostConstruct;
-import lombok.Getter;
-import lombok.Setter;
-
-@Component
-@Getter
-@Setter
+@Configuration
 public class StripeUtil {
-    @Value("${stripe.secret.key}")
-    private String  stripeSecretKey;
 
-    @PostConstruct
-    public void init() {
-        Stripe.apiKey = stripeSecretKey;
+    @Bean
+    StripeClient stripeClient(@Value("${stripe.secret.key}") String apiKey) {
+        return new StripeClient(apiKey);
     }
 }

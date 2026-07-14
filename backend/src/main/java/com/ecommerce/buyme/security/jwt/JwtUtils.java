@@ -35,8 +35,14 @@ public class JwtUtils {
 
     public HashMap<String, Object> generateAccessTokenForUser(Authentication authentication) {
         ShopUserDetails userPrincipal = (ShopUserDetails) authentication.getPrincipal();
-
-        List<String> roles = userPrincipal.getAuthorities().stream()
+        if(userPrincipal == null) {
+            throw new IllegalStateException("User principal must not be null");
+        }
+        var authorities = userPrincipal.getAuthorities();
+        if(authorities == null || authorities.isEmpty()) {
+            throw new IllegalStateException("User authorities must not be null or empty");
+        }
+        List<String> roles = authorities.stream()
                 .filter(Objects::nonNull)
                 .map(authority -> authority.getAuthority())
                 .toList();

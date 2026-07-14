@@ -13,6 +13,7 @@ import org.springframework.ai.chroma.vectorstore.ChromaApi.QueryRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.buyme.exceptions.ChromaOperationException;
 import com.ecommerce.buyme.request.EmbeddingsDeleteRequest;
 
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class ChromaService implements IChromaService {
         try {
             chromaApi.deleteCollection(tenantName, databaseName, collectionName);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to delete collection: " + collectionName, e);
+            throw new ChromaOperationException("Failed to delete collection: " + collectionName, e);
         }
     }
 
@@ -43,7 +44,7 @@ public class ChromaService implements IChromaService {
         try {
             return chromaApi.listCollections(tenantName, databaseName);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve collections", e);
+            throw new ChromaOperationException("Failed to retrieve collections", e);
         }
     }
 
@@ -60,7 +61,7 @@ public class ChromaService implements IChromaService {
             
             return chromaApi.getEmbeddings(tenantName, databaseName, collectionId, request);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to get embedding for collection: " + collectionId, e);
+            throw new ChromaOperationException("Failed to get embedding for collection: " + collectionId, e);
         }
     }
 
@@ -70,7 +71,7 @@ public class ChromaService implements IChromaService {
             CreateCollectionRequest request = new CreateCollectionRequest(collectionName);
             return  chromaApi.createCollection(tenantName, databaseName, request);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to create collection: " + collectionName, e);
+            throw new ChromaOperationException("Failed to create collection: " + collectionName, e);
         }
     }   
 
@@ -79,7 +80,7 @@ public class ChromaService implements IChromaService {
         try {
             return chromaApi.getCollection(tenantName, databaseName, collectionName);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to retrieve collection by name: " + collectionName, e);
+            throw new ChromaOperationException("Failed to retrieve collection by name: " + collectionName, e);
         }
     }
 
@@ -96,7 +97,7 @@ public class ChromaService implements IChromaService {
             performDelete(collectionId, idsToDelete, Long.valueOf(request.getImageId()));
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to delete embeddings for collection", e);
+            throw new ChromaOperationException("Failed to delete embeddings for collection", e);
         }
     }
 
@@ -109,7 +110,7 @@ public class ChromaService implements IChromaService {
             log.info("delete response={}", deleteResponse);
         } catch (Exception e) {
             log.error("Failed to delete embeddings for imageId={} in idsToDelete={}", imageId, idsToDelete, e);
-            throw new RuntimeException(e);
+            throw new ChromaOperationException("Failed to delete embeddings for imageId=" + imageId, e);
         }
     }
 

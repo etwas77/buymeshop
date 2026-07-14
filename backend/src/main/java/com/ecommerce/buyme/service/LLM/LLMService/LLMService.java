@@ -1,7 +1,6 @@
 package com.ecommerce.buyme.service.LLM.LLMService;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
@@ -21,7 +20,7 @@ public class LLMService
 {
     private final ChatModel chatModel;
     
-    public String describeImage(ImageEmbeddingPayload payload) throws IOException {
+    public String describeImage(ImageEmbeddingPayload payload) {
         String mimeType = payload.contentType();
         if (mimeType == null || !mimeType.startsWith("image/")) {
             throw new IllegalArgumentException("Unsupported or missing image MIME type");

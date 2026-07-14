@@ -1,6 +1,7 @@
 package com.ecommerce.buyme.service.image;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,30 +65,32 @@ public class ImageService implements IImageService {
     @Override
     public void update(MultipartFile file, String imageId) {
         Image image = getbyId(imageId);
+        byte[] imageBytes;
         try {
-            image.setImage(file.getBytes());
-            image.setFileName(file.getOriginalFilename());
-            image.setFileType(file.getContentType());
-            imageRepository.save(image);
-
-            EmbeddingsDeleteRequest deleteRequest = EmbeddingsDeleteRequest.builder()
-                    .collectionId(collectionName)
-                    .imageId(imageId)
-                    .build();
-            chromaService.deleteEmbeddingByCollectionId(deleteRequest);
-
-            ImageEmbeddingPayload payload = new ImageEmbeddingPayload(
-                    file.getBytes(),
-                    file.getContentType(),
-                    file.getOriginalFilename(),
-                    image.getProduct().getId(),
-                    imageId
-            );
-            imageAsyncService.saveEmbeddingsAsync(payload);
-
+            imageBytes = file.getBytes();
         } catch (IOException e) {
-            throw new RuntimeException("Failed to update image with id: " + imageId + ". Error: " + e.getMessage());
+            throw new UncheckedIOException("Failed to read image file for update with id: " + imageId, e);
         }
+
+        image.setImage(imageBytes);
+        image.setFileName(file.getOriginalFilename());
+        image.setFileType(file.getContentType());
+        imageRepository.save(image);
+
+        EmbeddingsDeleteRequest deleteRequest = EmbeddingsDeleteRequest.builder()
+                .collectionId(collectionName)
+                .imageId(imageId)
+                .build();
+        chromaService.deleteEmbeddingByCollectionId(deleteRequest);
+
+        ImageEmbeddingPayload payload = new ImageEmbeddingPayload(
+                imageBytes,
+                file.getContentType(),
+                file.getOriginalFilename(),
+                image.getProduct().getId(),
+                imageId);
+        imageAsyncService.saveEmbeddingsAsync(payload);
+
     }
 
     @Override
@@ -97,35 +100,37 @@ public class ImageService implements IImageService {
         List<ImageDto> savedImages = new ArrayList<>();
 
         for (MultipartFile file : files) {
+            byte[] imageBytes;
             try {
-                String imageId = new ObjectId().toHexString();
-                String downloadUrl = "/api/v1/images/image/download/" + imageId;
-
-                Image image = new Image();
-                image.setId(imageId);
-                image.setImage(file.getBytes());
-                image.setFileName(file.getOriginalFilename());
-                image.setFileType(file.getContentType());
-                image.setProduct(product);
-                image.setDownloadUrl(downloadUrl);
-
-                Image savedImage = imageRepository.save(image);
-
-                ImageDto dto = new ImageDto(savedImage.getId(), savedImage.getFileName(), savedImage.getDownloadUrl());
-                savedImages.add(dto);
-
-                ImageEmbeddingPayload payload = new ImageEmbeddingPayload(
-                        file.getBytes(),
-                        file.getContentType(),
-                        file.getOriginalFilename(),
-                        productId,
-                        savedImage.getId());
-
-                imageAsyncService.saveEmbeddingsAsync(payload);
+                imageBytes = file.getBytes();
             } catch (IOException e) {
-                throw new RuntimeException(
-                        "Failed to save image for product with id: " + productId + ". Error: " + e.getMessage());
+                throw new UncheckedIOException("Failed to read image file for product with id: " + productId, e);
             }
+
+            String imageId = new ObjectId().toHexString();
+            String downloadUrl = "/api/v1/images/image/download/" + imageId;
+
+            Image image = new Image();
+            image.setId(imageId);
+            image.setImage(imageBytes);
+            image.setFileName(file.getOriginalFilename());
+            image.setFileType(file.getContentType());
+            image.setProduct(product);
+            image.setDownloadUrl(downloadUrl);
+
+            Image savedImage = imageRepository.save(image);
+
+            ImageDto dto = new ImageDto(savedImage.getId(), savedImage.getFileName(), savedImage.getDownloadUrl());
+            savedImages.add(dto);
+
+            ImageEmbeddingPayload payload = new ImageEmbeddingPayload(
+                    imageBytes,
+                    file.getContentType(),
+                    file.getOriginalFilename(),
+                    productId,
+                    savedImage.getId());
+
+            imageAsyncService.saveEmbeddingsAsync(payload);
         }
 
         return savedImages;

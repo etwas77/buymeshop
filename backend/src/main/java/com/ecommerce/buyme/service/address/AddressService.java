@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.ecommerce.buyme.exceptions.EntityNotFoundException;
 import com.ecommerce.buyme.model.Address;
 import com.ecommerce.buyme.repository.AddressRepository;
 
@@ -26,20 +27,20 @@ public class AddressService implements IAddressService {
 
     @Override
     public Address getAddressById(String addressId) {
-        return addressRepository.findById(addressId).orElseThrow(() -> new RuntimeException("Address not found with id: " + addressId));
+        return addressRepository.findById(addressId).orElseThrow(() -> new EntityNotFoundException("Address not found with id: " + addressId));
     }
 
     @Override
     public void deleteAddress(String addressId) {
         if (!addressRepository.existsById(addressId)) {
-            throw new RuntimeException("Address not found with id: " + addressId);
+            throw new EntityNotFoundException("Address not found with id: " + addressId);
         }
         addressRepository.deleteById(addressId);
     }
 
     @Override
     public Address updateAddress(String addressId, Address updatedAddress) {
-        Address existingAddress = addressRepository.findById(addressId).orElseThrow(() -> new RuntimeException("Address not found with id: " + addressId));
+        Address existingAddress = addressRepository.findById(addressId).orElseThrow(() -> new EntityNotFoundException("Address not found with id: " + addressId));
 
         existingAddress.setStreet(updatedAddress.getStreet());
         existingAddress.setCity(updatedAddress.getCity());

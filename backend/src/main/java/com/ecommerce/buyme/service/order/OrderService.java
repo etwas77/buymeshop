@@ -24,6 +24,7 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
 
 import lombok.RequiredArgsConstructor;
+import com.stripe.StripeClient;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +34,7 @@ public class OrderService implements IOrderService {
     private final ProductRepository productRepository;
     private final ICartService cartService;
     private final ModelMapper modelMapper;
+    private final StripeClient stripeClient;
 
     @Transactional
     @Override
@@ -82,8 +84,8 @@ public class OrderService implements IOrderService {
 
     @Override
     public String createPaymentIntent(PaymentRequest paymentRequest) throws StripeException {
-        long amountInSmallestUnit = Math.round(paymentRequest.getAmount() * 100);
-        PaymentIntent paymentIntent = PaymentIntent.create(
+        long amountInSmallestUnit = paymentRequest.getAmount().movePointRight(2).longValueExact();
+        PaymentIntent paymentIntent = stripeClient.v1().paymentIntents().create(
             PaymentIntentCreateParams.builder()
                 .setAmount(amountInSmallestUnit)
                 .setCurrency(paymentRequest.getCurrency())

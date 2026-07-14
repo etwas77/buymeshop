@@ -48,7 +48,7 @@ public class CookieUtils {
         setResponseHeader(response, cookie, sameSite);
     }
 
-    public void ClearCookie(CookieType tokenType, HttpServletResponse response) {
+    public void clearCookie(CookieType tokenType, HttpServletResponse response) {
         String cookienName = tokenType == CookieType.REFRESH ? REFRESH_TOKEN_COOKIE : ACCESS_TOKEN_COOKIE;
         addCookie(cookienName, "", response, 0, getSameSiteAttribute());
     }
