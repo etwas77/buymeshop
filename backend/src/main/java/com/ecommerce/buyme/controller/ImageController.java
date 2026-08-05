@@ -84,34 +84,29 @@ public class ImageController {
     }
 
     @PostMapping("/search-by-image")
-    public ResponseEntity<ApiResponse> searchByImage(@RequestParam("file") MultipartFile file) {
-        try {
-            ImageEmbeddingPayload payload = new ImageEmbeddingPayload(
-                        file.getBytes(),
-                        file.getContentType(),
-                        file.getOriginalFilename(),
-                        "",
-                        "");
+    public ResponseEntity<ApiResponse> searchByImage(@RequestParam("file") MultipartFile file) throws Exception {
+        ImageEmbeddingPayload payload = new ImageEmbeddingPayload(
+                    file.getBytes(),
+                    file.getContentType(),
+                    file.getOriginalFilename(),
+                    "",
+                    "");
 
-            String imageDescription = llmService.describeImage(payload);
+        String imageDescription = llmService.describeImage(payload);
 
-            SearchRequest searchRequest = SearchRequest.builder()
-                    .query(imageDescription)
-                    .topK(10) // how many results you want to retrieve
-                    .similarityThreshold(0.85f) // adjust based on your needs
-                    .build();
-            List<Document> searchResults = chromaVectorStore.doSimilaritySearch(searchRequest);
-            List<String> productIds = searchResults.stream()
-                    .map(doc -> doc.getMetadata().get("productId"))
-                    .filter(Objects::nonNull)
-                    .map(obj -> obj.toString())
-                    .toList();
+        SearchRequest searchRequest = SearchRequest.builder()
+                .query(imageDescription)
+                .topK(10)
+                .similarityThreshold(0.85f)
+                .build();
+        List<Document> searchResults = chromaVectorStore.doSimilaritySearch(searchRequest);
+        List<String> productIds = searchResults.stream()
+                .map(doc -> doc.getMetadata().get("productId"))
+                .filter(Objects::nonNull)
+                .map(obj -> obj.toString())
+                .toList();
 
-            return ResponseEntity.ok(new ApiResponse("Search results as list of product IDs", productIds));
-        } catch (Exception e) {
-            return ResponseEntity.status(500)
-                    .body(new ApiResponse("Error processing the file: " + e.getMessage(), null));
-        }
+        return ResponseEntity.ok(new ApiResponse("Search results as list of product IDs", productIds));
     }
 
 }

@@ -33,6 +33,7 @@ The current state also includes a few important implementation notes:
 - Image uploads trigger asynchronous embedding generation in the backend, so image search depends on OpenAI and Chroma being available in development.
 - Backend authorization is only partially enforced server-side: cart/order/auth-me routes are secured globally and product create/update/delete uses `@PreAuthorize("hasAuthority('ADMIN')")`, but user, address, image, category, and Chroma endpoints are currently still permitted by the backend filter chain unless protected elsewhere.
 - Backend design-health checks are implemented with PMD, SpotBugs, Checkstyle, and ArchUnit. `verify` runs the complete backend test and analysis pipeline; static-analysis findings are currently reported without failing the build, while ArchUnit rules run as normal tests.
+- **Resilience improvements** (recent): External service failures (OpenAI, Chroma) now return HTTP 503 instead of HTTP 500. Client timeouts are configured to prevent indefinite hangs. Specific `ExternalServiceUnavailableException` distinguishes temporary service unavailability from application errors.
 
 ## Repository layout
 
@@ -141,7 +142,7 @@ The backend follows a conventional controller/service/repository split:
 | `model` | MongoDB documents and embedded object graphs |
 | `dtos`, `request`, `response` | API payloads |
 | `security` | JWT auth, user details service, security config, and CORS |
-| `exceptions` | Central exception mapping |
+| `exceptions` | Central exception mapping and external service failure handling |
 | `data` | Startup initialization |
 | `config` | Async executor wiring |
 
@@ -203,6 +204,27 @@ This design mixes separate Mongo collections with nested object snapshots, which
 | Cart | `/carts/me`, `/carts/cart/{cartId}`, `/cartItems/add`, `/cartItems/update/{cartId}/{productId}` |
 | Orders | `/orders/order`, `/orders/me`, `/orders/create-payment-intent` |
 | Chroma | `/chroma/collections`, `/chroma/embeddings/{collectionId}`, `/chroma/embeddings/delete` |
+
+### Error handling and external service resilience
+
+External service calls (OpenAI for image descriptions, Chroma for vector search) are now handled with explicit failure modes:
+
+- **`ExternalServiceUnavailableException`** is thrown when OpenAI or Chroma fails and caught by `GlobalExceptionHandler`, which returns HTTP 503 (Service Unavailable) with an `ApiResponse` body indicating the nature of the failure.
+- **Client timeouts** are configured in `application.properties`:
+  - OpenAI: 2s connection, 15s read timeout
+  - Chroma: 1s connection, 5s read timeout
+- **Narrow exception handling** in service layers (e.g., `ChromaService`, `LLMService`) preserves the original exception cause in the chain, aiding debugging.
+- **Controllers no longer catch broad `Exception` blocks** that mask specific failure modes; validation errors, business errors, and service unavailability are handled separately.
+
+Expected outcomes:
+
+| Scenario | Status Code | Message Example |
+| --- | --- | --- |
+| Valid search, OpenAI unavailable | 503 | "Image search is temporarily unavailable" |
+| Valid search, Chroma unavailable | 503 | "Vector search is temporarily unavailable" |
+| Invalid MIME type | 400 | "Unsupported or missing image MIME type" |
+| Valid search, no matches | 200 | Empty product ID list |
+| Timeout on external call | 503 | "Image search is temporarily unavailable" |
 
 ## Key business flows
 
