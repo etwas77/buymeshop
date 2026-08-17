@@ -14,7 +14,7 @@ const NavBar = () => {
     const { orders } = useSelector((state: { order: OrderState }) => state.order);
     const { authMe } = useSelector((state: { auth: AuthState }) => state.auth);
     const isAdminUser = authMe?.roles?.some(role => role.name === "admin") ?? false;
-    
+
     const dispatch = useDispatch<AppDispatch>();
 
     React.useEffect(() => {
@@ -38,12 +38,13 @@ const NavBar = () => {
                             All Products
                         </Nav.Link>
                     </Nav>
-                    <Nav className='me-auto'>
-                        <Nav.Link to={"/manage"} as={Link}>
-                            Manage Products
-                        </Nav.Link>
-                    </Nav>
-
+                    {isAdminUser &&
+                        <Nav className='me-auto'>
+                            <Nav.Link to={"/manage"} as={Link}>
+                                Manage Products
+                            </Nav.Link>
+                        </Nav>
+                    }
                     {isAdminUser &&
                         <Nav className='me-auto'>
                             <Nav.Link to={"/admin"} as={Link}>

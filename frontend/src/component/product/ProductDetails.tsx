@@ -11,6 +11,7 @@ import ImageZoomify from "../common/ImageZoomify";
 import LoadSpinner from "../common/LoadSpinner";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
 import { AuthState } from "../../store/features/authSlice";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const ProductDetails = () => {
     const { id } = useParams();
@@ -21,6 +22,7 @@ const ProductDetails = () => {
 
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
+console.log('authMe', authMe);
 
     const visibleAdmin = authMe?.roles?.some(role => role.name === "ADMIN");
 
@@ -85,15 +87,17 @@ const ProductDetails = () => {
                     </div>
                 </div>
                 <div className="d-flex gap-2 mt-3" >
-                    <button className="add-to-cart-button" onClick={handleAddTocart}>
+                    <OverlayTrigger overlay={<Tooltip>{authMe ? " add to cart" : "login to add to cart"}</Tooltip>}>
+                    <button className="add-to-cart-button" onClick={handleAddTocart} disabled={product.inventory === 0 || !authMe}>
                         <FaShoppingCart />
-                        {" add to cart"}
+                        {"add to cart"}
                     </button>
-                    <button className="buy-now-button">
+                    </OverlayTrigger>
+                    {/* <button className="buy-now-button">
                         <FaShoppingBasket />
                         {" buy now"}
 
-                    </button>
+                    </button> */}
 
                     {visibleAdmin &&
                         <button className="buy-now-button" onClick={() => navigate("/manage/" + product.id)}>
