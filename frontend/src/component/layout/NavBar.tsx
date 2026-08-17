@@ -8,11 +8,13 @@ import { AuthState, logout } from "../../store/features/authSlice";
 import { cartState, getCartsMe } from "../../store/features/cartSlice";
 import { getOrdersByMe, OrderState } from "../../store/features/orderSlice";
 import { AppDispatch } from "../../store/store";
+import { getUserById, UserState } from "../../store/features/userSlice";
 
 const NavBar = () => {
     const { items } = useSelector((state: { cart: cartState }) => state.cart);
     const { orders } = useSelector((state: { order: OrderState }) => state.order);
     const { authMe } = useSelector((state: { auth: AuthState }) => state.auth);
+    const { user } = useSelector((state: { user: UserState }) => state.user);
     const isAdminUser = authMe?.roles?.some(role => role.name === "ADMIN") ?? false;
 
     const dispatch = useDispatch<AppDispatch>();
@@ -21,8 +23,11 @@ const NavBar = () => {
         if (authMe) {
             dispatch(getCartsMe());
             dispatch(getOrdersByMe());
+            dispatch(getUserById(authMe.id));
         }
     }, [authMe, dispatch]);
+
+    const fullname = user === undefined ? "" : ("/" + user.firstName + " " + user.lastName)
 
 
     return (
@@ -61,7 +66,7 @@ const NavBar = () => {
                         </Nav>
                     }
                     <Nav className='ms-auto'>
-                        <NavDropdown title='Account' id='profile-dropdown' align="end">
+                        <NavDropdown title={'Account' + fullname} id='profile-dropdown' align="end">
                             <>
                                 <NavDropdown.Item to={"/profile"} as={Link}>
                                     <FaUser />
