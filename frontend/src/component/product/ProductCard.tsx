@@ -1,11 +1,13 @@
 import _ from "lodash";
 import { Card } from "react-bootstrap";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import { ProductDto } from "../../dtos/ProductDto";
 import ProductImage from "../common/utils/ProductImage";
 import { addToCart } from "../../store/features/cartSlice";
 import { AppDispatch } from "../../store/store";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { AuthState } from "../../store/features/authSlice";
 
 export interface ProductCardProps {
     products: ProductDto[];
@@ -14,8 +16,9 @@ export interface ProductCardProps {
 const ProductCard = (p: ProductCardProps) => {
     const { products } = p;
     const dispatch = useDispatch<AppDispatch>();
+    const { authMe } = useSelector((state: { auth: AuthState }) => state.auth);
 
-    const handleAddTocart = (productId: string) => () => {
+    const handleAddTocart = (productId: string) => () => {        
         dispatch(addToCart({ productId, quantity: 1 }));
     }
 
@@ -37,9 +40,17 @@ const ProductCard = (p: ProductCardProps) => {
                                     {product.inventory > 0 ? "In stock " + product.inventory : "Out of stock"}
                                 </p>
                                 <div className="d-flex gap-2">
-                                    <button className="shop-now-button" onClick={handleAddTocart(product.id)}>
-                                        {" add to cart"}
-                                    </button>
+                                    <OverlayTrigger overlay={<Tooltip>
+                                        {authMe === undefined ? "login to add to cart" : " add to cart"}
+                                    </Tooltip>}>
+                                        <button
+                                            className="shop-now-button"
+                                            onClick={handleAddTocart(product.id)}
+                                            disabled={authMe === undefined}
+                                        >
+                                            {" add to cart"}
+                                        </button>
+                                    </OverlayTrigger>
                                 </div>
                                 <p className="product-name">{product.name}</p>
                                 <p className="product-description">{product.description}</p>
