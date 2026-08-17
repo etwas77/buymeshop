@@ -15,10 +15,10 @@ const RootLayot = () => {
     }, [dispatch]);
 
     return (
-        <main>
+        <main className="root-layout">
             <NavBar />
             <ToastContainer position="top-right" autoClose={3000} />
-            <div>
+            <div style={{ flex: 1 }}>
                 <Outlet />
             </div>
             <Footer />
