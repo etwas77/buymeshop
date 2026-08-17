@@ -44,7 +44,6 @@ buymeshop/
 ```
 
 ## High-level runtime architecture
-
 ```text
 Browser
   -> React SPA (frontend)
@@ -61,6 +60,137 @@ Image upload/update
       -> async executor (`imageSummaryExecutor`)
           -> `LLMService` image description
           -> Chroma embedding/document storage
+```
+## Architecture diagram
+
+```mermaid
+graph TB
+    Actor["Shopper / Administrator"] --> Browser["Web browser"]
+
+    subgraph Frontend["Frontend - React 19, TypeScript, Vite"]
+        direction TB
+        Entry["index.tsx<br/>React root, Redux Provider, Stripe Elements"]
+        Router["App.tsx<br/>React Router route table"]
+        Shell["RootLayout<br/>NavBar, Outlet, Footer, session restore"]
+        PublicUI["Public storefront<br/>Home, products, details, search, login, register"]
+        ProtectedUI["Authenticated UI<br/>Cart, checkout, orders, account"]
+        AdminUI["ADMIN UI<br/>Product management, user administration"]
+        RouteGuard["ProtectedRoute<br/>Authentication and role guards"]
+        Store["Redux Toolkit store"]
+        Slices["Domain slices<br/>auth, users, products, categories, images,<br/>search, pagination, cart, orders"]
+        LegacySlice["Legacy login slice<br/>registered but not in active auth flow"]
+        PublicAPI["Axios api<br/>public and currently permitted requests"]
+        AuthAPI["Axios authApi<br/>cookies, 401/403 refresh, one retry"]
+
+        Entry --> Router
+        Entry --> Store
+        Router --> Shell
+        Shell --> PublicUI
+        Shell --> RouteGuard
+        RouteGuard --> ProtectedUI
+        RouteGuard --> AdminUI
+        PublicUI <--> Store
+        ProtectedUI <--> Store
+        AdminUI <--> Store
+        Store --> Slices
+        Store --> LegacySlice
+        Slices --> PublicAPI
+        Slices --> AuthAPI
+    end
+
+    Browser --> Entry
+    Browser <-->|"HTTP-only access and refresh cookies"| AuthAPI
+
+    subgraph Backend["Backend - Spring Boot 4.1 REST API"]
+        direction TB
+        CORS["WebConfig<br/>CORS from BASE_URL"]
+        Security["Spring Security filter chain<br/>stateless request authorization"]
+        TokenFilter["AuthTokenFilter<br/>access-cookie JWT validation"]
+        AuthSupport["JwtUtils, CookieUtils,<br/>AuthenticationManager, ShopUserDetailService"]
+        Controllers["REST controllers under configurable api.prefix<br/>auth, users, addresses, products, categories,<br/>images, carts, cart items, orders, Chroma"]
+        Payloads["Requests, DTOs and ApiResponse payloads"]
+        ErrorHandler["GlobalExceptionHandler<br/>central HTTP error mapping"]
+
+        subgraph Services["Application services"]
+            direction LR
+            UserServices["User and address services"]
+            CatalogServices["Product and category services"]
+            CartServices["Cart and cart-item services"]
+            OrderServices["Order service"]
+            ImageServices["Image service"]
+            ChromaServices["Chroma administration service"]
+        end
+
+        subgraph ImagePipeline["AI image pipeline"]
+            direction TB
+            ImageControllerSearch["ImageController search-by-image<br/>describe upload and query top matches"]
+            Executor["imageSummaryExecutor<br/>4-8 worker threads, queue 200"]
+            AsyncImage["ImageAsyncService<br/>background upload/update processing"]
+            ImageSearch["ImageSearchService<br/>description document plus metadata"]
+            LLM["LLMService<br/>Spring AI ChatModel"]
+            VectorStore["Spring AI ChromaVectorStore"]
+        end
+
+        subgraph Persistence["Persistence layer"]
+            direction TB
+            Repositories["MongoRepository interfaces<br/>users, roles, addresses, products, categories,<br/>images, carts, cart items, orders, order items"]
+            Models["MongoDB documents and embedded snapshots<br/>User, Role, Address, Product, Category, Image,<br/>Cart, CartItem, Order, OrderItem"]
+        end
+
+        Seeder["DataInitializer<br/>seed ROLE_USER and ADMIN"]
+
+        CORS --> Security
+        Security --> TokenFilter
+        TokenFilter --> AuthSupport
+        Security --> Controllers
+        Controllers --> AuthSupport
+        Controllers <--> Payloads
+        Controllers --> UserServices
+        Controllers --> CatalogServices
+        Controllers --> CartServices
+        Controllers --> OrderServices
+        Controllers --> ImageServices
+        Controllers --> ChromaServices
+        Controllers --> ImageControllerSearch
+        Controllers -. exceptions .-> ErrorHandler
+
+        AuthSupport --> Repositories
+        UserServices --> Repositories
+        CatalogServices --> Repositories
+        CartServices --> Repositories
+        OrderServices --> Repositories
+        ImageServices --> Repositories
+        Repositories --> Models
+        Seeder --> Repositories
+
+        ImageServices -->|"upload or update"| Executor
+        Executor --> AsyncImage
+        AsyncImage --> ImageSearch
+        ImageSearch --> LLM
+        ImageSearch --> VectorStore
+        ImageControllerSearch --> LLM
+        ImageControllerSearch --> VectorStore
+        ImageServices -->|"delete stale embedding"| ChromaServices
+    end
+
+    PublicAPI -->|"HTTP /api/v1"| CORS
+    AuthAPI -->|"credentialed HTTP /api/v1"| CORS
+
+    subgraph External["Data stores and external services"]
+        direction LR
+        MongoDB[("MongoDB<br/>buyme_db")]
+        Stripe["Stripe API<br/>Payment Intents"]
+        OpenAI["OpenAI API<br/>multimodal descriptions and embeddings"]
+        Chroma[("Chroma vector database<br/>image_collection")]
+    end
+
+    Models <--> MongoDB
+    ProtectedUI -->|"Stripe.js confirms card payment"| Stripe
+    OrderServices -->|"create payment intent"| Stripe
+    LLM --> OpenAI
+    VectorStore -->|"embedding model"| OpenAI
+    VectorStore <--> Chroma
+    ChromaServices <--> Chroma
 ```
 
 ## Frontend architecture
