@@ -25,9 +25,16 @@ export const addToCart = createAsyncThunk(
 
 export const getCartsMe = createAsyncThunk(
     "cart/getCartsMe",
-    async () => {
-        const response = await authApi.get("/carts/me");
-        return response.data;
+    async (_payload, { rejectWithValue }) => {
+        try {
+            const response = await authApi.get("/carts/me");
+            return response.data;
+        } catch (error: any) {
+            if (error.response && error.response.data && error.response.data) {
+                return rejectWithValue(error.response.data);
+            }
+            return rejectWithValue(error.message || 'Unknown error');
+        }
     },
     {
         condition: (_payload, { getState }) => {
@@ -147,7 +154,7 @@ const cartSlice = createSlice({
                 state.requestStatus = "succeeded";
             })
             .addCase(getCartsMe.rejected, (state, action) => {
-                state.errorMessage = "Failed to fetch user carts: " + (action.payload || action.error.message);
+                //state.errorMessage = "Failed to fetch user carts: " + (action.payload || action.error.message);
                 state.successMessage = undefined; // Clear any previous success message on error
                 state.isLoading = false;
                 state.requestStatus = "failed";

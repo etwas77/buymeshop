@@ -18,11 +18,10 @@ const ProductDetails = () => {
 
     const { product, quantity } = useSelector((state: { products: ProductState }) => state.products);
     const { successMessage, errorMessage } = useSelector((state: { cart: cartState }) => state.cart);
-    const { authMe} = useSelector((state: { auth: AuthState }) => state.auth);
+    const { authMe } = useSelector((state: { auth: AuthState }) => state.auth);
 
     const dispatch = useDispatch<AppDispatch>();
     const navigate = useNavigate();
-console.log('authMe', authMe);
 
     const visibleAdmin = authMe?.roles?.some(role => role.name === "ADMIN");
 
@@ -87,11 +86,13 @@ console.log('authMe', authMe);
                     </div>
                 </div>
                 <div className="d-flex gap-2 mt-3" >
-                    <OverlayTrigger overlay={<Tooltip>{authMe ? " add to cart" : "login to add to cart"}</Tooltip>}>
-                    <button className="add-to-cart-button" onClick={handleAddTocart} disabled={product.inventory === 0 || !authMe}>
-                        <FaShoppingCart />
-                        {"add to cart"}
-                    </button>
+                    <OverlayTrigger overlay={<Tooltip>
+                        {authMe === undefined ? "login to add to cart" : (quantity === 0 ? "add at least one item to cart" : " add to cart")}
+                    </Tooltip>}>
+                        <button className="add-to-cart-button" onClick={handleAddTocart} disabled={product.inventory === 0 || !authMe || quantity === 0}>
+                            <FaShoppingCart />
+                            {"add to cart"}
+                        </button>
                     </OverlayTrigger>
                     {/* <button className="buy-now-button">
                         <FaShoppingBasket />
@@ -101,9 +102,9 @@ console.log('authMe', authMe);
 
                     {visibleAdmin &&
                         <button className="buy-now-button" onClick={() => navigate("/manage/" + product.id)}>
-                        <FaItunes/>
-                        {"manage item"}
-                    </button>}
+                            <FaItunes />
+                            {"manage item"}
+                        </button>}
                 </div>
             </div>
 

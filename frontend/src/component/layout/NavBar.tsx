@@ -13,7 +13,7 @@ const NavBar = () => {
     const { items } = useSelector((state: { cart: cartState }) => state.cart);
     const { orders } = useSelector((state: { order: OrderState }) => state.order);
     const { authMe } = useSelector((state: { auth: AuthState }) => state.auth);
-    const isAdminUser = authMe?.roles?.some(role => role.name === "admin") ?? false;
+    const isAdminUser = authMe?.roles?.some(role => role.name === "ADMIN") ?? false;
 
     const dispatch = useDispatch<AppDispatch>();
 
