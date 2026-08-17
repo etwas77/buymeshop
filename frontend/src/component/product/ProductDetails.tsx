@@ -1,17 +1,17 @@
 import _ from "lodash";
 import React from "react";
-import { FaItunes, FaShoppingBasket, FaShoppingCart } from "react-icons/fa";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
+import { FaItunes, FaShoppingCart } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import { AuthState } from "../../store/features/authSlice";
 import { addToCart, cartState } from "../../store/features/cartSlice";
-import { decrementQuantity, getProductById, ProductState, incrementQuantity } from "../../store/features/productSlice";
+import { decrementQuantity, getProductById, incrementQuantity, ProductState } from "../../store/features/productSlice";
 import { AppDispatch } from "../../store/store";
 import ImageZoomify from "../common/ImageZoomify";
 import LoadSpinner from "../common/LoadSpinner";
 import QuantityUpdater from "../common/utils/QuantityUpdater";
-import { AuthState } from "../../store/features/authSlice";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
 
 const ProductDetails = () => {
     const { id } = useParams();

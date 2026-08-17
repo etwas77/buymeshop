@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { api } from "../../component/services/api";
-import { ProductDto } from "../../dtos/ProductDto";
 
 export const searchByImage = createAsyncThunk(
     "search/searchByImage",

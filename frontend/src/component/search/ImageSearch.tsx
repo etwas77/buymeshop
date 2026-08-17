@@ -7,7 +7,7 @@ const ImageSearch = () => {
     const [imageFile, setImageFile] = React.useState<File>();
     const [imagePreview, setImagePreview] = React.useState<string>();
     const fileRef = React.useRef<HTMLInputElement>(null);
-    const { imageSearch, searchInProgress } = useSelector((state: { search: SearchState }) => state.search);
+    const { searchInProgress } = useSelector((state: { search: SearchState }) => state.search);
 
     const dispatch = useDispatch<AppDispatch>();
 

@@ -148,6 +148,9 @@ const productSlice = createSlice({
             }
             state.selectedBrands = [...state.selectedBrands, action.payload];
         },
+        resetFilterByBrands: (state: ProductState) => {
+            state.selectedBrands = [];
+        },
         incrementQuantity: (state: ProductState) => {
             state.quantity++;
         },
@@ -229,5 +232,5 @@ const productSlice = createSlice({
     }
 });
 
-export const { filterByBrand, incrementQuantity, decrementQuantity, addBrand, unsetProduct } = productSlice.actions;
+export const { filterByBrand, incrementQuantity, decrementQuantity, addBrand, unsetProduct, resetFilterByBrands } = productSlice.actions;
 export default productSlice.reducer;
