@@ -14,3 +14,4 @@ example implementation of ecommerce web application.
   - TBD <a href="">architecture overview</a>
   - TBD <a href="">frontend overview</a>
   - TBD <a href="">backend overview</a>
+  - TBD <a href="">AI functionality</a>
