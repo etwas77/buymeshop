@@ -183,6 +183,7 @@ const cartSlice = createSlice({
             })
             .addCase(removeCartItem.fulfilled, (state, action) => {
                 const payload = action.payload.payload;
+                state.cart = undefined;
                 state.items = state.items.filter(item => item.productId !== payload.productId);
                 state.totalAmount = state.items.reduce((sum, item) => sum + item.totalPrice, 0);
                 state.successMessage = action.payload.message;
