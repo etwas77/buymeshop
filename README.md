@@ -11,7 +11,7 @@ example implementation of ecommerce web application.
 - Backend SOLID-metrics design-health checks are implemented with PMD, SpotBugs, Checkstyle, and ArchUnit.
 - demo on youtube:
   - <a href="https://www.youtube.com/watch?v=hps5di50p40">web site functionality</a>
-  - TBD <a href="">architecture overview</a>
+  - TBD <a href="https://www.youtube.com/watch?v=Ila_XfOCATs">architecture overview</a>
   - TBD <a href="">frontend overview</a>
   - TBD <a href="">backend overview</a>
   - TBD <a href="">AI functionality</a>
