@@ -11,7 +11,7 @@ const AdminPanel = () => {
     const dispatch = useDispatch<AppDispatch>();
     const [selectedUser, setSelectedUser] = React.useState<UserDto>();
     const [rolesInput, setRolesInput] = React.useState("");
-    const [emailFilter, setEmailFilter] = React.useState("");
+    const [filter, setFilter] = React.useState("");
 
     React.useEffect(() => {
         dispatch(getUsers());
@@ -61,9 +61,13 @@ const AdminPanel = () => {
         }
     }
 
-    const filteredUsers = users?.filter((user: UserDto) =>
-        user.email?.toLowerCase().includes(emailFilter.toLowerCase().trim())
-    );
+    const normalizedFilter = filter.toLowerCase().trim();
+    const filteredUsers = users?.filter((user: UserDto) => {
+        const fullName = `${user.firstName ?? ""} ${user.lastName ?? ""}`.toLowerCase();
+        const email = user.email?.toLowerCase() ?? "";
+
+        return email.includes(normalizedFilter) || fullName.includes(normalizedFilter);
+    });
 
     return (
         <div>
@@ -76,11 +80,11 @@ const AdminPanel = () => {
                         <input
                             type="text"
                             className="form-control mb-2"
-                            placeholder="Type email to filter users"
-                            value={emailFilter}
-                            onChange={(e) => setEmailFilter(e.target.value)}
+                            placeholder="Type email or name to filter users"
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
                         />
-                        <select className="form-select" defaultValue="" onChange={onSelect}>
+                        <select className="form-select" defaultValue="" onChange={onSelect} size={6}>
                             <option value="">Select user by email</option>
                             {filteredUsers?.map((user: UserDto) => (
                                 <option key={user.id} value={user.id}>
