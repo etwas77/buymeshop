@@ -148,7 +148,6 @@ public class ProductService implements IProductService {
                 orderItemRepository.save(item);
             });
 
-            pro.getCategory().getProducts().remove(pro);
             pro.setCategory(null);
 
             productRepository.deleteById(pro.getId());
