@@ -12,6 +12,6 @@ example implementation of ecommerce web application.
 - demo on youtube:
   - <a href="https://www.youtube.com/watch?v=hps5di50p40">web site functionality</a>
   - <a href="https://www.youtube.com/watch?v=Ila_XfOCATs">architecture overview</a>
-  - TBD <a href="https://www.youtube.com/watch?v=go0dGa3htu8">frontend overview</a>
+  - <a href="https://www.youtube.com/watch?v=go0dGa3htu8">frontend overview</a>
   - TBD <a href="">backend overview</a>
   - TBD <a href="">AI functionality</a>
