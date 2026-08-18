@@ -9,3 +9,8 @@ example implementation of ecommerce web application.
 - mongodb as db (branch "mongo");
 - using openAI, chrome vector db for search-by-image. image embeddings stored into chroma async during upload/update.
 - Backend SOLID-metrics design-health checks are implemented with PMD, SpotBugs, Checkstyle, and ArchUnit.
+- demo on youtube:
+  - <a href="https://www.youtube.com/watch?v=hps5di50p40">web site functionality</a>
+  - TBD <a href="">architecture overview</a>
+  - TBD <a href="">frontend overview</a>
+  - TBD <a href="">backend overview</a>
